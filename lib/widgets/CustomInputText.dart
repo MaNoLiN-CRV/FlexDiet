@@ -17,9 +17,6 @@ import 'package:flutter/material.dart';
 /// )
 /// ```
 class CustomInput extends StatefulWidget {
-  /// The text label displayed above the input field.
-  final String label;
-
   /// The initial value to be shown in the input field.
   /// If null, the field will be empty.
   final String? initialValue;
@@ -62,9 +59,14 @@ class CustomInput extends StatefulWidget {
   /// When true, this disables autocorrect functionality.
   final bool? isPassword;
 
+  ///Controller
+  final TextEditingController controller;
+
+  ///InputDecoration
+  final InputDecoration decoration;
+
   const CustomInput({
     super.key,
-    required this.label,
     this.initialValue,
     this.onChanged,
     this.validator,
@@ -74,26 +76,25 @@ class CustomInput extends StatefulWidget {
     this.maxLength,
     this.maxLines,
     this.isPassword = false,
-    required TextEditingController controller,
-    required IconData prefixIcon,
-    IconButton? suffixIcon,
+    required this.controller,
+    required this.decoration,
   });
 
   @override
-  CustomInputState createState() => CustomInputState();
+  _CustomInputState createState() => _CustomInputState();
 }
 
 /// The state for the CustomInput widget.
 ///
 /// Manages a [TextEditingController] for the input field and handles its lifecycle.
-class CustomInputState extends State<CustomInput> {
+class _CustomInputState extends State<CustomInput> {
   /// Controller for the text input field.
   late final TextEditingController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.initialValue);
+    _controller = widget.controller;
   }
 
   @override
@@ -114,10 +115,7 @@ class CustomInputState extends State<CustomInput> {
       maxLength: widget.maxLength,
       maxLines: widget.obscureText ? 1 : widget.maxLines,
       autocorrect: widget.isPassword ?? false,
-      decoration: InputDecoration(
-        labelText: widget.label,
-        border: const OutlineInputBorder(),
-      ),
+      decoration: widget.decoration,
     );
   }
 }

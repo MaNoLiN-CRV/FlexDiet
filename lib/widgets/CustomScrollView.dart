@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-
 /// CustomEnhancedScrollView Widget is a custom implementation of the [ScrollView] widget.
 /// It provides a way to add custom slivers to the scrollable area of the widget.
 /// Example usage:
@@ -48,7 +47,7 @@ import 'package:flutter/material.dart';
 ///   reverse: true,
 ///   controller: ScrollController(),
 ///   cachePixelsPercent: 0.3,
-///   
+///
 /// )
 /// ```
 /// Props:
@@ -61,7 +60,6 @@ import 'package:flutter/material.dart';
 /// - reverse: Whether to reverse the scrollable area of the widget.
 /// - controller: The scroll controller to use for the scrollable area of the widget.
 /// - cachePixelsPercent: The percentage of the scrollable area of the widget to cache. Example: 0.3 means 30% of the scrollable area will be cached.
-
 
 class CustomEnhancedScrollView extends StatelessWidget {
   final List<Widget> slivers;
@@ -90,7 +88,6 @@ class CustomEnhancedScrollView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MediaQueryData mediaQuery = MediaQuery.of(context);
-    
 
     return SafeArea(
       top: false,
@@ -124,14 +121,12 @@ class CustomEnhancedScrollView extends StatelessWidget {
     );
   }
 
-
   double _calculateCacheExtent(MediaQueryData mediaQuery) {
     return mediaQuery.orientation == Orientation.portrait
         ? mediaQuery.size.height * cachePixelsPercent!
         : mediaQuery.size.width * cachePixelsPercent!;
   }
 }
-
 
 class _SliverListWrapper extends StatelessWidget {
   final List<Widget> slivers;
@@ -149,7 +144,6 @@ class _SliverListWrapper extends StatelessWidget {
   }
 }
 
-
 class _CustomScrollBehavior extends ScrollBehavior {
   @override
   Widget buildOverscrollIndicator(
@@ -166,6 +160,4 @@ class _CustomScrollBehavior extends ScrollBehavior {
       child: child,
     );
   }
-
- 
 }
