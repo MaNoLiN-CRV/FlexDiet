@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 /// A custom form input widget that provides a standardized text input field with a label.
-/// 
+///
 /// This widget wraps [TextFormField] to create a reusable input component with
 /// consistent styling and built-in support for validation, initial values, and
 /// various input configurations.
-/// 
+///
 /// Example usage:
 /// ```dart
 /// CustomInput(
@@ -25,23 +25,23 @@ class CustomInput extends StatefulWidget {
   final String? initialValue;
 
   /// Callback function that is called when the text in the field changes.
-  /// 
+  ///
   /// The function receives the new value as a String parameter.
   final ValueChanged<String>? onChanged;
 
   /// Function to validate the input value.
-  /// 
+  ///
   /// Returns an error message string if validation fails, or null if valid.
   final FormFieldValidator<String>? validator;
 
   /// The type of keyboard to display for editing the text.
-  /// 
+  ///
   /// For example, [TextInputType.number] for numeric input,
   /// or [TextInputType.emailAddress] for email input.
   final TextInputType? keyboardType;
 
   /// The type of action button to show on the keyboard.
-  /// 
+  ///
   /// This determines the bottom-right button on the software keyboard.
   final TextInputAction? textInputAction;
 
@@ -52,18 +52,18 @@ class CustomInput extends StatefulWidget {
   final int? maxLength;
 
   /// The maximum number of lines for the input field.
-  /// 
+  ///
   /// If this is 1 (the default), the enter key on the keyboard will move focus
   /// to the next field. Otherwise, the enter key will insert a new line.
   final int? maxLines;
 
   /// Whether this input field is used for password entry.
-  /// 
+  ///
   /// When true, this disables autocorrect functionality.
   final bool? isPassword;
 
   const CustomInput({
-    Key? key,
+    super.key,
     required this.label,
     this.initialValue,
     this.onChanged,
@@ -74,14 +74,17 @@ class CustomInput extends StatefulWidget {
     this.maxLength,
     this.maxLines,
     this.isPassword = false,
-  }) : super(key: key);
+    required TextEditingController controller,
+    required IconData prefixIcon,
+    IconButton? suffixIcon,
+  });
 
   @override
   CustomInputState createState() => CustomInputState();
 }
 
 /// The state for the CustomInput widget.
-/// 
+///
 /// Manages a [TextEditingController] for the input field and handles its lifecycle.
 class CustomInputState extends State<CustomInput> {
   /// Controller for the text input field.
@@ -109,7 +112,7 @@ class CustomInputState extends State<CustomInput> {
       textInputAction: widget.textInputAction,
       obscureText: widget.obscureText,
       maxLength: widget.maxLength,
-      maxLines: widget.maxLines,
+      maxLines: widget.obscureText ? 1 : widget.maxLines,
       autocorrect: widget.isPassword ?? false,
       decoration: InputDecoration(
         labelText: widget.label,

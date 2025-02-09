@@ -70,6 +70,8 @@ class CustomButton extends StatelessWidget {
     this.icon,
     this.iconSize = 20.0,
     this.mainAxisAlignment = MainAxisAlignment.center,
+    required Color backgroundColor,
+    required Color textColor,
   });
 
   @override
@@ -94,9 +96,10 @@ class CustomButton extends StatelessWidget {
             const SizedBox(width: 8),
           ],
           Text(text,
-              style: textStyle ?? theme.textTheme.labelLarge?.copyWith(
-                color: theme.colorScheme.onPrimary,
-              )),
+              style: textStyle ??
+                  theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.onPrimary,
+                  )),
         ],
       ),
     );
