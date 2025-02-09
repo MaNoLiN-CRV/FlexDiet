@@ -93,5 +93,7 @@ void ShowToast(BuildContext context, String mensaje,
 
 extension CustomColorScheme on ColorScheme {
   Color get success => const Color(0xFF4CAF50);
-  Color get warning => const Color(0xFFFF9800);
+  Color get warning => const Color.fromARGB(255, 227, 168, 81);
+  Color get error => const Color.fromARGB(255, 165, 26, 16);
+  Color get info => const Color(0xFF2196F3);
 }
