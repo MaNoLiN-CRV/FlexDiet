@@ -7,6 +7,7 @@ enum ToastType {
   warning,
   info,
 }
+
 /// Displays a custom toast message.
 ///
 /// This function creates and displays a toast with a customizable appearance,
@@ -23,30 +24,30 @@ enum ToastType {
 /// ```dart
 /// ShowToast(context, "An error occurred.", toastType: ToastType.error);
 /// ```
-void ShowToast(BuildContext context, String mensaje, {ToastType toastType = ToastType.info}) {
+void ShowToast(BuildContext context, String mensaje,
+    {ToastType toastType = ToastType.info}) {
   FToast fToast = FToast();
   fToast.init(context);
 
   Color backgroundColor;
   IconData icon;
 
-  final theme = Theme.of(context); 
+  final theme = Theme.of(context);
 
   switch (toastType) {
     case ToastType.success:
-      backgroundColor = theme.colorScheme.success; 
+      backgroundColor = theme.colorScheme.success;
       icon = Icons.check;
       break;
     case ToastType.error:
-      backgroundColor = theme.colorScheme.error; 
+      backgroundColor = theme.colorScheme.error;
       icon = Icons.error;
       break;
     case ToastType.warning:
-      backgroundColor = theme.colorScheme.warning; 
+      backgroundColor = theme.colorScheme.warning;
       icon = Icons.warning;
       break;
     case ToastType.info:
-    default:
       backgroundColor = theme.colorScheme.primary;
       icon = Icons.info;
       break;
@@ -69,11 +70,12 @@ void ShowToast(BuildContext context, String mensaje, {ToastType toastType = Toas
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: theme.colorScheme.onPrimary, size: 20), 
+          Icon(icon, color: theme.colorScheme.onPrimary, size: 20),
           const SizedBox(width: 8),
           Text(
             mensaje,
-            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onPrimary),
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(color: theme.colorScheme.onPrimary),
           ),
         ],
       ),
@@ -89,8 +91,7 @@ void ShowToast(BuildContext context, String mensaje, {ToastType toastType = Toas
   );
 }
 
-
 extension CustomColorScheme on ColorScheme {
-  Color get success => const Color(0xFF4CAF50); 
-  Color get warning => const Color(0xFFFF9800); 
+  Color get success => const Color(0xFF4CAF50);
+  Color get warning => const Color(0xFFFF9800);
 }
