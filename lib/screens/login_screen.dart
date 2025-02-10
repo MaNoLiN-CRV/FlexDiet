@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/images/backgroundAuth.jpg'),
+            image: AssetImage('assets/images/background.jpg'),
             opacity: 0.8,
             fit: BoxFit.cover,
           ),
@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Handle login logic here
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5451D6),
+                    backgroundColor: const Color(0xFF30436E),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     textStyle: const TextStyle(fontSize: 18),
                     shape: RoundedRectangleBorder(
@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         '¿Olvidaste tu contraseña?',
                         style: TextStyle(
-                          color: Color(0xFF4530B3),
+                          color: Color(0xFF30436E),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         'Únete ahora',
                         style: TextStyle(
-                          color: Color(0xFF4530B3),
+                          color: Color(0xFF30436E),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -186,28 +186,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 Column(
                   children: [
                     SizedBox(
-                      width: double.infinity,
+                      width: 250,
                       child: GoogleAuthButton(
                         onPressed: () {},
                         style: const AuthButtonStyle(
-                          buttonColor: Color(0xFF5451D6),
-                          borderRadius: 12,
-                          textStyle:
-                              TextStyle(fontSize: 16, color: Colors.white),
-                        ),
+                            buttonColor: Color(0xFF30436E),
+                            borderRadius: 12,
+                            textStyle:
+                                TextStyle(fontSize: 16, color: Colors.white),
+                            iconSize: 20),
                       ),
                     ),
                     const SizedBox(height: 15),
                     SizedBox(
-                      width: double.infinity,
+                      width: 250,
                       child: AppleAuthButton(
                         onPressed: () {},
                         style: const AuthButtonStyle(
-                          buttonColor: Color(0xFF5451D6),
-                          borderRadius: 12,
-                          textStyle:
-                              TextStyle(fontSize: 16, color: Colors.white),
-                        ),
+                            buttonColor: Color(0xFF30436E),
+                            borderRadius: 12,
+                            textStyle:
+                                TextStyle(fontSize: 16, color: Colors.white),
+                            iconSize: 20),
                       ),
                     ),
                   ],
