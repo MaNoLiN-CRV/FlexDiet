@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:auth_buttons/auth_buttons.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/CustomInputText.dart';
-import 'package:local_auth/local_auth.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _isPasswordVisible = false;
-  final LocalAuthentication _localAuth = LocalAuthentication();
+  bool _isConfirmPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Tu camino hacia una vida saludable',
+                  'Regístrate para empezar tu viaje saludable',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
@@ -56,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 50),
+                // Username input
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -82,6 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
+                // Password input
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -121,10 +121,53 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
+                // Confirm Password input
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black,
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: CustomInput(
+                    controller: _confirmPasswordController,
+                    obscureText: !_isConfirmPasswordVisible,
+                    decoration: InputDecoration(
+                      labelText: 'Confirmar Contraseña',
+                      labelStyle: const TextStyle(color: Color(0xFF30436E)),
+                      border: InputBorder.none,
+                      prefixIcon: const Icon(Icons.lock_outline,
+                          color: Color(0xFF30436E)),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: const Color(0xFF5451D6),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordVisible =
+                                !_isConfirmPasswordVisible;
+                          });
+                        },
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 30),
+                // Sign Up button
                 ElevatedButton(
                   onPressed: () {
-                    // Handle login logic here
+                    // Handle registration logic here
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF30436E),
@@ -135,34 +178,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Comenzar mi viaje saludable',
+                    'Regístrate',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 10),
+                // Already have an account?
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        '¿Olvidaste tu contraseña?',
-                        style: TextStyle(
-                          color: Color(0xFF30436E),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const RegisterScreen()),
-                        );
+                        Navigator.pop(context);
                       },
                       child: const Text(
-                        'Únete ahora',
+                        '¿Ya tienes cuenta? Inicia sesión',
                         style: TextStyle(
                           color: Color(0xFF30436E),
                           fontWeight: FontWeight.w500,
@@ -170,80 +200,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: const [
-                    Expanded(
-                      child: Divider(color: Color(0xFF30436E), thickness: 0.5),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        'O continúa con',
-                        style: TextStyle(color: Color(0xFF30436E)),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(color: Color(0xFF30436E), thickness: 0.5),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Column(
-                  children: [
-                    SizedBox(
-                      width: 250,
-                      child: GoogleAuthButton(
-                        onPressed: () {},
-                        style: const AuthButtonStyle(
-                            buttonColor: Color(0xFF30436E),
-                            borderRadius: 12,
-                            textStyle:
-                                TextStyle(fontSize: 16, color: Colors.white),
-                            iconSize: 20),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    SizedBox(
-                      width: 250,
-                      child: AppleAuthButton(
-                        onPressed: () {},
-                        style: const AuthButtonStyle(
-                            buttonColor: Color(0xFF30436E),
-                            borderRadius: 12,
-                            textStyle:
-                                TextStyle(fontSize: 16, color: Colors.white),
-                            iconSize: 20),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.fingerprint,
-                      size: 40,
-                      color: Color(0xFF30436E),
-                    ),
-                    onPressed: () async {
-                      bool canAuthenticate =
-                          await _localAuth.canCheckBiometrics ||
-                              await _localAuth.isDeviceSupported();
-                      if (canAuthenticate) {
-                        try {
-                          await _localAuth.authenticate(
-                            localizedReason: 'Autentícate para iniciar sesión',
-                            options: const AuthenticationOptions(
-                                biometricOnly: true),
-                          );
-                        } on PlatformException catch (e) {
-                          print('Error en autenticación: $e');
-                        }
-                      }
-                    },
-                  ),
                 ),
               ],
             ),
