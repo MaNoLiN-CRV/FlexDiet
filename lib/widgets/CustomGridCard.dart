@@ -61,7 +61,7 @@ class GridCard extends StatelessWidget {
     Color? cardColor;
     ShapeBorder? cardShape;
     Clip? cardClipBehavior;
-    WidgetStateProperty<double>? cardElevation;
+    double? cardElevation;
     Color? cardShadowColor;
     Color? cardSurfaceTintColor;
 
@@ -70,7 +70,7 @@ class GridCard extends StatelessWidget {
       cardColor = themeData.color;
       cardShape = themeData.shape;
       cardClipBehavior = themeData.clipBehavior;
-      cardElevation = themeData.elevation as WidgetStateProperty<double>?;
+      cardElevation = themeData.elevation;
       cardShadowColor = themeData.shadowColor;
       cardSurfaceTintColor = themeData.surfaceTintColor;
     }
@@ -79,7 +79,7 @@ class GridCard extends StatelessWidget {
       color: cardColor,
       shape: cardShape,
       clipBehavior: cardClipBehavior,
-      elevation: cardElevation?.resolve(WidgetState.values.toSet()),
+      elevation: cardElevation,
       shadowColor: cardShadowColor,
       surfaceTintColor: cardSurfaceTintColor,
       child: Padding(
