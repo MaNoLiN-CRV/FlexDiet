@@ -27,13 +27,13 @@ class _LoginScreenState extends State<LoginScreen>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(seconds: 10),
+      duration: const Duration(seconds: 6),
       vsync: this,
     )..repeat(reverse: true);
 
     _backgroundColorAnimation = ColorTween(
       begin: backgroundColorWhite,
-      end: const Color.fromARGB(136, 103, 45, 198),
+      end: const Color.fromARGB(115, 98, 15, 231),
     ).animate(_animationController);
   }
 
@@ -56,9 +56,6 @@ class _LoginScreenState extends State<LoginScreen>
               image: const DecorationImage(
                 image: AssetImage('assets/images/background.jpg'),
                 opacity: 0.4,
-                filterQuality: FilterQuality.high,
-                colorFilter: ColorFilter.mode(
-                    Color.fromARGB(115, 232, 225, 225), BlendMode.darken),
                 fit: BoxFit.cover,
               ),
             ),
