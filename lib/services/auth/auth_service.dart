@@ -21,11 +21,16 @@ class AuthService {
     return instance;
   }
 
+  // It takes part of Strategy Pattern
   provider.AuthProvider emailAuth() {
-    return provider.EmailAuthProvider();
+    return provider.EmailAuthProvider(
+      auth: _auth
+    );
   }
 
   provider.AuthProvider googleAuthProvider() {
-    return provider.GoogleAuthProvider();
+    return provider.GoogleAuthProvider(
+      auth: _auth
+    );
   }
 }

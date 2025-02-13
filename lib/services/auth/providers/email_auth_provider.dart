@@ -3,7 +3,10 @@ import 'package:flutter_flexdiet/services/auth/providers/providers.dart' as prov
 
 class EmailAuthProvider implements provider.AuthProvider {
 
-  EmailAuthProvider();
+  final FirebaseAuth _auth;
+
+  EmailAuthProvider({ required FirebaseAuth auth }):
+  _auth = auth;
 
   @override
   Future<UserCredential?> signIn() {
