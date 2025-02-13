@@ -1,26 +1,20 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/widgets/CustomGridCard.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  final Color backgroundColorWhite = const Color(0xFFE3EDF7);
-  final Color backgroundColorBlue = const Color(0xFF4530B3);
-  final Color containersBlue = const Color(0xFF5451D6);
-  final Color selectionBlue = const Color(0xFF21D1FF);
-  final Color textBlue = const Color(0xFF30436E);
-
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: backgroundColorWhite,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: backgroundColorBlue,
+        backgroundColor: theme.colorScheme.primary,
         title: Text(
           'My Diet Diary',
-          style: TextStyle(color: backgroundColorWhite),
+          style: theme.appBarTheme.titleTextStyle,
         ),
         centerTitle: true,
         elevation: 0,
@@ -32,7 +26,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             GridCard(
               cardTheme: CardTheme(
-                color: containersBlue,
+                color: theme.colorScheme.secondary,
                 elevation: 2,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -42,47 +36,45 @@ class HomeScreen extends StatelessWidget {
               rowSpace: 10,
               padding: const EdgeInsets.all(20),
               children: [
-                _buildCaloryInfo('Protein', '120 g'),
-                _buildCalorieWheel(2200, 2500),
-                _buildCaloryInfo('Carbs', '300 g'),
+                _buildCaloryInfo('Protein', '120 g', theme),
+                _buildCalorieWheel(2200, 2500, theme),
+                _buildCaloryInfo('Carbs', '300 g', theme),
               ],
             ),
             const SizedBox(height: 20),
             Text(
               'Today\'s Meals',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textBlue,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.onSurface,
               ),
               textAlign: TextAlign.start,
             ),
             const SizedBox(height: 10),
             GridCard(
               cardTheme: CardTheme(
-                color: containersBlue,
+                color: theme.colorScheme.secondary,
                 elevation: 2,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
               ),
-              columns: 2, 
+              columns: 2,
               columnSpace: 10,
               rowSpace: 10,
               padding: const EdgeInsets.all(15),
               children: [
-                _buildMealItem('Breakfast', 'Whole wheat toast, avocado...'),
-                _buildMealItem('Lunch', 'Quinoa salad, chicken...'),
-                _buildMealItem('Snacks', 'Fruit, nuts...'),
-                _buildMealItem('Dinner', 'Grilled salmon, vegetables...'),
+                _buildMealItem('Breakfast', 'Whole wheat toast, avocado...', theme),
+                _buildMealItem('Lunch', 'Quinoa salad, chicken...', theme),
+                _buildMealItem('Snacks', 'Fruit, nuts...', theme),
+                _buildMealItem('Dinner', 'Grilled salmon, vegetables...', theme),
               ],
             ),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: backgroundColorBlue,
-        selectedItemColor: selectionBlue,
-        unselectedItemColor: backgroundColorWhite.withAlpha(128),
+        backgroundColor: theme.colorScheme.primary,
+        selectedItemColor: theme.colorScheme.secondaryContainer,
+        unselectedItemColor: theme.colorScheme.surface.withAlpha(128),
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -101,25 +93,23 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCaloryInfo(String title, String value) {
+  Widget _buildCaloryInfo(String title, String value, ThemeData theme) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           title,
-          style: TextStyle(
-            color: backgroundColorWhite.withAlpha(128),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.surface.withAlpha(128),
             fontWeight: FontWeight.bold,
-            fontSize: 16,
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
           value,
-          style: TextStyle(
-            color: backgroundColorWhite, 
-            fontSize: 20,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: theme.colorScheme.surface,
             fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.center,
@@ -128,15 +118,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Helper widget for meal items
-  Widget _buildMealItem(String mealType, String description) {
+  Widget _buildMealItem(String mealType, String description, ThemeData theme) {
     return InkWell(
       onTap: () {
         print('Clicked on $mealType');
-  
       },
-      borderRadius: BorderRadius.circular(
-          10), 
+      borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -144,22 +131,18 @@ class HomeScreen extends StatelessWidget {
           children: [
             Text(
               mealType,
-              style: TextStyle(
-                color: backgroundColorWhite,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.surface,
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
               ),
             ),
             const SizedBox(height: 5),
             Text(
               description,
-              style: TextStyle(
-                color: backgroundColorWhite
-                    .withAlpha(128), 
-                fontSize: 14,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.surface.withAlpha(128),
               ),
-              overflow:
-                  TextOverflow.ellipsis,
+              overflow: TextOverflow.ellipsis,
               maxLines: 2,
             ),
           ],
@@ -168,22 +151,21 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCalorieWheel(int consumedCalories, int dailyGoal) {
+  Widget _buildCalorieWheel(int consumedCalories, int dailyGoal, ThemeData theme) {
     double progress = consumedCalories / dailyGoal;
-    if (progress > 1.0) progress = 1.0; 
+    if (progress > 1.0) progress = 1.0;
 
     return Stack(
       alignment: Alignment.center,
       children: [
         SizedBox(
-          width: 80, 
+          width: 80,
           height: 80,
           child: CustomPaint(
             painter: CalorieWheelPainter(
               progress: progress,
-              progressColor: selectionBlue,
-              trackColor:
-                  backgroundColorWhite.withAlpha(50),
+              progressColor: theme.colorScheme.secondaryContainer,
+              trackColor: theme.colorScheme.surface.withAlpha(50),
             ),
           ),
         ),
@@ -192,19 +174,18 @@ class HomeScreen extends StatelessWidget {
           children: [
             Text(
               '$consumedCalories',
-              style: TextStyle(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: backgroundColorWhite,
+                color: theme.colorScheme.surface,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             Text(
               'kcal',
-              style: TextStyle(
+              style: theme.textTheme.bodySmall?.copyWith(
                 fontSize: 12,
-                color: backgroundColorWhite
-                    .withAlpha(128), 
+                color: theme.colorScheme.surface.withAlpha(128),
               ),
             ),
           ],
@@ -232,20 +213,19 @@ class CalorieWheelPainter extends CustomPainter {
 
     final trackPaint = Paint()
       ..color = trackColor
-      ..strokeWidth = 8.0 
+      ..strokeWidth = 8.0
       ..style = PaintingStyle.stroke;
     canvas.drawCircle(center, radius, trackPaint);
 
-    // Progress arc
     final progressPaint = Paint()
       ..color = progressColor
       ..strokeWidth = 8.0
       ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round; 
+      ..strokeCap = StrokeCap.round;
 
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      -pi / 2, 
+      -pi / 2,
       2 * pi * progress,
       false,
       progressPaint,

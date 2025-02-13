@@ -21,12 +21,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/background.jpg'),
             opacity: 0.8,
+            filterQuality: FilterQuality.high,
+            colorFilter:  ColorFilter.mode(Color.fromARGB(115, 141, 141, 141), BlendMode.dstOver),
             fit: BoxFit.cover,
           ),
         ),
@@ -40,26 +43,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(
                   'FlexDiet',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF30436E),
+                  style: theme.textTheme.displayMedium?.copyWith(
+                    color: theme.colorScheme
+                        .onSurface, 
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Tu camino hacia una vida saludable',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: const Color(0xFF30436E),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme
+                        .onSurface, 
                     fontWeight: FontWeight.w400,
                   ),
                 ),
                 const SizedBox(height: 50),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -73,10 +75,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _usernameController,
                     decoration: InputDecoration(
                       labelText: 'Nombre de usuario',
-                      labelStyle: const TextStyle(color: Color(0xFF30436E)),
+                      labelStyle: theme.inputDecorationTheme.labelStyle?.copyWith(
+                          color: theme.colorScheme
+                              .onSurface), 
                       border: InputBorder.none,
-                      prefixIcon: const Icon(Icons.person_outline,
-                          color: Color(0xFF30436E)),
+                      prefixIcon: Icon(Icons.person_outline,
+                          color: theme.colorScheme
+                              .onSurface), 
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 16),
                     ),
@@ -85,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -100,16 +105,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
                       labelText: 'Contraseña',
-                      labelStyle: const TextStyle(color: Color(0xFF30436E)),
+                      labelStyle: theme.inputDecorationTheme.labelStyle?.copyWith(
+                          color: theme.colorScheme
+                              .onSurface), 
                       border: InputBorder.none,
-                      prefixIcon: const Icon(Icons.lock_outline,
-                          color: Color(0xFF30436E)),
+                      prefixIcon: Icon(Icons.lock_outline,
+                          color: theme.colorScheme
+                              .onSurface), 
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordVisible
                               ? Icons.visibility
                               : Icons.visibility_off,
-                          color: const Color(0xFF5451D6),
+                          color: theme.colorScheme.secondary,
                         ),
                         onPressed: () {
                           setState(() {
@@ -125,25 +133,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle login logic here
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => const HomeScreen()),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF30436E),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    textStyle: const TextStyle(fontSize: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Comenzar mi viaje saludable',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  style: theme.elevatedButtonTheme.style,
+                  child: Text('Comenzar mi viaje saludable',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: theme.colorScheme.onPrimary,
+                      )),
                 ),
                 const SizedBox(height: 10),
                 Column(
@@ -151,10 +151,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     TextButton(
                       onPressed: () {},
-                      child: const Text(
+                      child: Text(
                         '¿Olvidaste tu contraseña?',
-                        style: TextStyle(
-                          color: Color(0xFF30436E),
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme
+                              .onSurface, 
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -167,10 +168,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               builder: (context) => const RegisterScreen()),
                         );
                       },
-                      child: const Text(
+                      child: Text(
                         'Únete ahora',
-                        style: TextStyle(
-                          color: Color(0xFF30436E),
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme
+                              .onSurface, 
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -179,19 +181,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
                 Row(
-                  children: const [
+                  children: [
                     Expanded(
-                      child: Divider(color: Color(0xFF30436E), thickness: 0.5),
+                      child: Divider(
+                          color: theme.colorScheme.onSurface,
+                          thickness:
+                              0.5), 
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
                         'O continúa con',
-                        style: TextStyle(color: Color(0xFF30436E)),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme
+                                .onSurface), 
                       ),
                     ),
                     Expanded(
-                      child: Divider(color: Color(0xFF30436E), thickness: 0.5),
+                      child: Divider(
+                          color: theme.colorScheme.onSurface,
+                          thickness:
+                              0.5), 
                     ),
                   ],
                 ),
@@ -202,11 +212,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 250,
                       child: GoogleAuthButton(
                         onPressed: () {},
-                        style: const AuthButtonStyle(
-                            buttonColor: Color(0xFF30436E),
+                        style: AuthButtonStyle(
+                            buttonColor: theme.colorScheme.surface,
                             borderRadius: 12,
-                            textStyle:
-                                TextStyle(fontSize: 16, color: Colors.white),
+                            textStyle: theme.textTheme.bodyLarge?.copyWith(
+                                fontSize: 16,
+                                color: theme.colorScheme.onSurface),
                             iconSize: 20),
                       ),
                     ),
@@ -215,12 +226,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 250,
                       child: AppleAuthButton(
                         onPressed: () {},
-                        style: const AuthButtonStyle(
-                            buttonColor: Color(0xFF30436E),
+                        style: AuthButtonStyle(
+                            buttonColor: theme.colorScheme.surface,
                             borderRadius: 12,
-                            textStyle:
-                                TextStyle(fontSize: 16, color: Colors.white),
-                            iconSize: 20),
+                            textStyle: theme.textTheme.bodyLarge?.copyWith(
+                                fontSize: 16,
+                                color: theme.colorScheme.onSurface),
+                            iconSize: 20,
+                            iconColor: theme.colorScheme.onSurface,
+                            ),
                       ),
                     ),
                   ],
@@ -228,10 +242,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
                 Center(
                   child: IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.fingerprint,
                       size: 40,
-                      color: Color(0xFF30436E),
+                      color: theme.colorScheme
+                          .onSurface, // Use onSurface for better readability
                     ),
                     onPressed: () async {
                       bool canAuthenticate =
