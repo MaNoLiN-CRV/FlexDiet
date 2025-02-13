@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_flexdiet/screens/HomeScreen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
-import 'package:flutter_flexdiet/theme/default.dart';
-import 'package:flutter_flexdiet/widgets/CustomInputText.dart';
+import 'package:flutter_flexdiet/theme/app_theme.dart';
+import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:local_auth/local_auth.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,7 +13,8 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
@@ -27,13 +27,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(seconds: 12),
+      duration: const Duration(seconds: 10),
       vsync: this,
     )..repeat(reverse: true);
 
     _backgroundColorAnimation = ColorTween(
-       begin: backgroundColorWhite,
-       end: const Color.fromARGB(136, 103, 45, 198),
+      begin: backgroundColorWhite,
+      end: const Color.fromARGB(136, 103, 45, 198),
     ).animate(_animationController);
   }
 
@@ -57,23 +57,28 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 image: AssetImage('assets/images/background.jpg'),
                 opacity: 0.4,
                 filterQuality: FilterQuality.high,
-                colorFilter: ColorFilter.mode(Color.fromARGB(115, 232, 225, 225), BlendMode.darken),
+                colorFilter: ColorFilter.mode(
+                    Color.fromARGB(115, 232, 225, 225), BlendMode.darken),
                 fit: BoxFit.cover,
               ),
             ),
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Image.asset(
+                      'assets/images/logo.png',
+                      height: 100,
+                    ),
                     Text(
                       'FlexDiet',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.displayMedium?.copyWith(
-                        color: theme.colorScheme
-                            .onSurface,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -81,8 +86,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       'Tu camino hacia una vida saludable',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme
-                            .onSurface,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -103,13 +107,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         controller: _usernameController,
                         decoration: InputDecoration(
                           labelText: 'Nombre de usuario',
-                          labelStyle: theme.inputDecorationTheme.labelStyle?.copyWith(
-                              color: theme.colorScheme
-                                  .onSurface),
+                          labelStyle: theme.inputDecorationTheme.labelStyle
+                              ?.copyWith(color: theme.colorScheme.onSurface),
                           border: InputBorder.none,
                           prefixIcon: Icon(Icons.person_outline,
-                              color: theme.colorScheme
-                                  .onSurface),
+                              color: theme.colorScheme.onSurface),
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 16),
                         ),
@@ -133,19 +135,17 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
-                          labelStyle: theme.inputDecorationTheme.labelStyle?.copyWith(
-                              color: theme.colorScheme
-                                  .onSurface),
+                          labelStyle: theme.inputDecorationTheme.labelStyle
+                              ?.copyWith(color: theme.colorScheme.onSurface),
                           border: InputBorder.none,
                           prefixIcon: Icon(Icons.lock_outline,
-                              color: theme.colorScheme
-                                  .onSurface),
+                              color: theme.colorScheme.onSurface),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isPasswordVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: theme.colorScheme.secondary,
+                              color: theme.colorScheme.onSurface,
                             ),
                             onPressed: () {
                               setState(() {
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         ),
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.push(
@@ -169,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       },
                       style: theme.elevatedButtonTheme.style,
                       child: Text('Comenzar mi viaje saludable',
-                          style: theme.textTheme.labelMedium?.copyWith(
+                          style: theme.textTheme.labelLarge?.copyWith(
                             color: theme.colorScheme.onPrimary,
                           )),
                     ),
@@ -182,8 +182,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           child: Text(
                             '¿Olvidaste tu contraseña?',
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme
-                                  .onSurface,
+                              color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -199,8 +198,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           child: Text(
                             'Únete ahora',
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme
-                                  .onSurface,
+                              color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -213,68 +211,67 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         Expanded(
                           child: Divider(
                               color: theme.colorScheme.onSurface,
-                              thickness:
-                                  0.5),
+                              thickness: 0.5),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
                             'O continúa con',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme
-                                    .onSurface),
+                            style: theme.textTheme.bodyMedium
+                                ?.copyWith(color: theme.colorScheme.onSurface),
                           ),
                         ),
                         Expanded(
                           child: Divider(
                               color: theme.colorScheme.onSurface,
-                              thickness:
-                                  0.5),
+                              thickness: 0.5),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     Column(
                       children: [
-                        SizedBox(
-                          width: 250,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: GoogleAuthButton(
                             onPressed: () {},
+                            text: "Inicia sesión con Google",
                             style: AuthButtonStyle(
-                                buttonColor: theme.colorScheme.surface,
-                                borderRadius: 12,
-                                textStyle: theme.textTheme.bodyLarge?.copyWith(
-                                    fontSize: 16,
-                                    color: theme.colorScheme.onSurface),
-                                iconSize: 20),
+                              buttonColor: theme.colorScheme.surface,
+                              borderRadius: 12,
+                              textStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  fontSize: 16,
+                                  color: theme.colorScheme.onSurface),
+                              iconSize: 20,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 15),
-                        SizedBox(
-                          width: 250,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: AppleAuthButton(
+                            text: "Inicia sesión con Apple",
                             onPressed: () {},
                             style: AuthButtonStyle(
-                                buttonColor: theme.colorScheme.surface,
-                                borderRadius: 12,
-                                textStyle: theme.textTheme.bodyLarge?.copyWith(
-                                    fontSize: 16,
-                                    color: theme.colorScheme.onSurface),
-                                iconSize: 20,
-                                iconColor: theme.colorScheme.onSurface,
+                              buttonColor: theme.colorScheme.surface,
+                              borderRadius: 12,
+                              textStyle: theme.textTheme.bodyLarge?.copyWith(
+                                  fontSize: 16,
+                                  color: theme.colorScheme.onSurface),
+                              iconSize: 20,
+                              iconColor: theme.colorScheme.onSurface,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     Center(
                       child: IconButton(
                         icon: Icon(
                           Icons.fingerprint,
                           size: 40,
-                          color: theme.colorScheme
-                              .onSurface,
+                          color: theme.colorScheme.onSurface,
                         ),
                         onPressed: () async {
                           bool canAuthenticate =
@@ -283,7 +280,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           if (canAuthenticate) {
                             try {
                               await _localAuth.authenticate(
-                                localizedReason: 'Autentícate para iniciar sesión',
+                                localizedReason:
+                                    'Autentícate para iniciar sesión',
                                 options: const AuthenticationOptions(
                                     biometricOnly: true),
                               );

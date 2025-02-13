@@ -32,10 +32,9 @@ import 'package:flutter/material.dart';
 /// - Padding : The padding around the GridView within the card.
 /// - CardTheme : Defines the visual properties of the card, such as color, elevation, and shape.
 ///
-///  Warning: If no cardTheme is provided, the `GridCard` will use the default `CardTheme` from the ambient theme. 
+///  Warning: If no cardTheme is provided, the `GridCard` will use the default `CardTheme` from the ambient theme.
 
 class GridCard extends StatelessWidget {
-
   final List<Widget> children;
   final int columns;
   final double columnSpace;
@@ -65,15 +64,13 @@ class GridCard extends StatelessWidget {
     Color? cardShadowColor;
     Color? cardSurfaceTintColor;
 
-    if (effectiveCardTheme != null) {
-      final CardTheme themeData = effectiveCardTheme as CardTheme; 
-      cardColor = themeData.color;
-      cardShape = themeData.shape;
-      cardClipBehavior = themeData.clipBehavior;
-      cardElevation = themeData.elevation;
-      cardShadowColor = themeData.shadowColor;
-      cardSurfaceTintColor = themeData.surfaceTintColor;
-    }
+    final CardTheme themeData = effectiveCardTheme as CardTheme;
+    cardColor = themeData.color;
+    cardShape = themeData.shape;
+    cardClipBehavior = themeData.clipBehavior;
+    cardElevation = themeData.elevation;
+    cardShadowColor = themeData.shadowColor;
+    cardSurfaceTintColor = themeData.surfaceTintColor;
 
     return Card(
       color: cardColor,

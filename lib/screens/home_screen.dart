@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/widgets/CustomGridCard.dart';
+import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -62,10 +62,12 @@ class HomeScreen extends StatelessWidget {
               rowSpace: 10,
               padding: const EdgeInsets.all(15),
               children: [
-                _buildMealItem('Breakfast', 'Whole wheat toast, avocado...', theme),
+                _buildMealItem(
+                    'Breakfast', 'Whole wheat toast, avocado...', theme),
                 _buildMealItem('Lunch', 'Quinoa salad, chicken...', theme),
                 _buildMealItem('Snacks', 'Fruit, nuts...', theme),
-                _buildMealItem('Dinner', 'Grilled salmon, vegetables...', theme),
+                _buildMealItem(
+                    'Dinner', 'Grilled salmon, vegetables...', theme),
               ],
             ),
           ],
@@ -151,7 +153,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCalorieWheel(int consumedCalories, int dailyGoal, ThemeData theme) {
+  Widget _buildCalorieWheel(
+      int consumedCalories, int dailyGoal, ThemeData theme) {
     double progress = consumedCalories / dailyGoal;
     if (progress > 1.0) progress = 1.0;
 

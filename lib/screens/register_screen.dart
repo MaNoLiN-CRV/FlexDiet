@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/widgets/CustomInputText.dart';
+import 'package:flutter_flexdiet/theme/app_theme.dart';
+import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -8,203 +9,237 @@ class RegisterScreen extends StatefulWidget {
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends State<RegisterScreen>
+    with TickerProviderStateMixin {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  late AnimationController _animationController;
+  late Animation<Color?> _backgroundColorAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 10),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _backgroundColorAnimation = ColorTween(
+      begin: backgroundColorWhite,
+      end: const Color.fromARGB(136, 103, 45, 198),
+    ).animate(_animationController);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/background.jpg'),
-            opacity: 0.8,
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'FlexDiet',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF30436E),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Regístrate para empezar tu viaje saludable',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: const Color(0xFF30436E),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                const SizedBox(height: 50),
-                // Username input
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black,
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: CustomInput(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Nombre de usuario',
-                      labelStyle: const TextStyle(color: Color(0xFF30436E)),
-                      border: InputBorder.none,
-                      prefixIcon: const Icon(Icons.person_outline,
-                          color: Color(0xFF30436E)),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Password input
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black,
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: CustomInput(
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña',
-                      labelStyle: const TextStyle(color: Color(0xFF30436E)),
-                      border: InputBorder.none,
-                      prefixIcon: const Icon(Icons.lock_outline,
-                          color: Color(0xFF30436E)),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: const Color(0xFF5451D6),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Confirm Password input
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black,
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: CustomInput(
-                    controller: _confirmPasswordController,
-                    obscureText: !_isConfirmPasswordVisible,
-                    decoration: InputDecoration(
-                      labelText: 'Confirmar Contraseña',
-                      labelStyle: const TextStyle(color: Color(0xFF30436E)),
-                      border: InputBorder.none,
-                      prefixIcon: const Icon(Icons.lock_outline,
-                          color: Color(0xFF30436E)),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isConfirmPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: const Color(0xFF5451D6),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isConfirmPasswordVisible =
-                                !_isConfirmPasswordVisible;
-                          });
-                        },
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                // Sign Up button
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle registration logic here
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF30436E),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    textStyle: const TextStyle(fontSize: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Regístrate',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                // Already have an account?
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+      body: AnimatedBuilder(
+        animation: _backgroundColorAnimation,
+        builder: (context, child) {
+          return Container(
+            decoration: BoxDecoration(
+              color: _backgroundColorAnimation.value,
+              image: const DecorationImage(
+                image: AssetImage('assets/images/background.jpg'),
+                opacity: 0.4,
+                filterQuality: FilterQuality.high,
+                colorFilter: ColorFilter.mode(
+                    Color.fromARGB(115, 232, 225, 225), BlendMode.darken),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Center(
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        '¿Ya tienes cuenta? Inicia sesión',
-                        style: TextStyle(
-                          color: Color(0xFF30436E),
-                          fontWeight: FontWeight.w500,
+                    Image.asset(
+                      'assets/images/logo.png',
+                      height: 150,
+                    ),
+                    Text(
+                      'FlexDiet',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.displayMedium?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Regístrate para empezar tu viaje saludable',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.onSurface,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 50),
+                    // Username input
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black,
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: CustomInput(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          labelText: 'Nombre de usuario',
+                          labelStyle: theme.inputDecorationTheme.labelStyle
+                              ?.copyWith(color: theme.colorScheme.onSurface),
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.person_outline,
+                              color: theme.colorScheme.onSurface),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
                         ),
                       ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Password input
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black,
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: CustomInput(
+                        controller: _passwordController,
+                        obscureText: !_isPasswordVisible,
+                        decoration: InputDecoration(
+                          labelText: 'Contraseña',
+                          labelStyle: theme.inputDecorationTheme.labelStyle
+                              ?.copyWith(color: theme.colorScheme.onSurface),
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.lock_outline,
+                              color: theme.colorScheme.onSurface),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Confirm Password input
+                    Container(
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black,
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: CustomInput(
+                        controller: _confirmPasswordController,
+                        obscureText: !_isConfirmPasswordVisible,
+                        decoration: InputDecoration(
+                          labelText: 'Confirmar Contraseña',
+                          labelStyle: theme.inputDecorationTheme.labelStyle
+                              ?.copyWith(color: theme.colorScheme.onSurface),
+                          border: InputBorder.none,
+                          prefixIcon: Icon(Icons.lock_outline,
+                              color: theme.colorScheme.onSurface),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isConfirmPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isConfirmPasswordVisible =
+                                    !_isConfirmPasswordVisible;
+                              });
+                            },
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    // Sign Up button
+                    ElevatedButton(
+                      onPressed: () {
+                        // Handle registration logic here
+                      },
+                      style: theme.elevatedButtonTheme.style,
+                      child: Text(
+                        'Regístrate',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: theme.colorScheme.onPrimary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Already have an account?
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            '¿Ya tienes cuenta? Inicia sesión',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
