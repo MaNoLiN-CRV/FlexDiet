@@ -1,5 +1,6 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_flexdiet/services/auth/providers/providers.dart' as provider;
 
 //* This is a service that manages client authentication.
 class AuthService {
@@ -18,5 +19,13 @@ class AuthService {
     
   factory AuthService() {
     return instance;
+  }
+
+  provider.AuthProvider emailAuth() {
+    return provider.EmailAuthProvider();
+  }
+
+  provider.AuthProvider googleAuthProvider() {
+    return provider.GoogleAuthProvider();
   }
 }
