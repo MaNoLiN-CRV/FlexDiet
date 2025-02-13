@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "665440338027",
+    "project_id": "flexdiet-c2d11",
+    "storage_bucket": "flexdiet-c2d11.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665440338027:android:925baa4408ce4c1ea8712e",
+        "android_client_info": {
+          "package_name": "com.example.flutter_flexdiet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDJ9j-78VyemiPGHe7Mr5rryvi-ZGqaqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
