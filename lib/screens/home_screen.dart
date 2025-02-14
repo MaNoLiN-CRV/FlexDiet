@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
+import 'package:flutter_flexdiet/navigation/navigation_router.dart';
+import 'package:flutter_flexdiet/screens/settings_screen.dart';
+import 'package:flutter_flexdiet/screens/week_screen.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -99,24 +103,11 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: theme.colorScheme.primary,
-        selectedItemColor: theme.colorScheme.secondaryContainer,
-        unselectedItemColor: theme.colorScheme.surface.withAlpha(128),
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+      bottomNavigationBar: BottomNav(
+        selectedIndex: 1,
+        onItemTapped: (index) {
+          navigationRouter(context, index);
+        }, // Navigate to register screen when the register button is tapped
       ),
     );
   }
