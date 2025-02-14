@@ -15,6 +15,7 @@ void navigationRouter(BuildContext context, int index) {
       context,
       MaterialPageRoute(
         builder: (context) => const HomeScreen(),
+        maintainState: true,
       ),
     );
   } else if (index == 2) {

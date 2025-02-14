@@ -5,12 +5,14 @@ class WaveBackground extends StatefulWidget {
   final Color color;
   final double frequency;
   final double phase;
+  final double top;
   
   const WaveBackground({
     super.key,
     this.color = Colors.blue,
     this.frequency = 2.0,
     this.phase = 0.0,
+    this.top = 0.0,
   });
 
   @override
@@ -37,19 +39,21 @@ class _WaveBackgroundState extends State<WaveBackground> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: WavePainter(
-            color: widget.color.withValues( alpha: 0.1),
-            frequency: widget.frequency,
-            phase: _controller.value * 2 * math.pi + widget.phase,
-          ),
-          child: child,
-        );
-      },
-      child: Container(),
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return CustomPaint(
+            isComplex: true,
+            willChange: true, 
+            painter: WavePainter(
+              color: widget.color.withValues(alpha: 0.05),
+              frequency: widget.frequency,
+              phase: _controller.value * 2 * math.pi + widget.phase,
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -69,18 +73,23 @@ class WavePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
-      ..style = PaintingStyle.fill;
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true; // Smooth edges
 
     final path = Path();
     path.moveTo(0, size.height);
 
-    for (double x = 0; x < size.width; x++) {
-      final y = size.height / 2 +
-          math.sin((x / size.width * frequency * math.pi * 2) + phase) * 50.0;
-      path.lineTo(x, y);
-    }
+    final wavePoints = List<Offset>.generate(
+      (size.width).toInt(),
+      (x) => Offset(
+        x.toDouble(),
+        size.height / 2 + math.sin((x / size.width * frequency * math.pi * 2) + phase) * 100.0,
+      ),
+    );
 
+    path.addPolygon(wavePoints, false);
     path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
     path.close();
 
     canvas.drawPath(path, paint);

@@ -27,9 +27,9 @@ class CardScroll extends StatelessWidget {
 }
 
 class CardData {
-  final String title;
-  final String description;
-  final String imageUrl;
+ String title;
+  String description;
+   String imageUrl;
 
   CardData({
     required this.title,
