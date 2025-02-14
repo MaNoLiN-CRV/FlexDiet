@@ -47,7 +47,7 @@ class _WaveBackgroundState extends State<WaveBackground> with SingleTickerProvid
             isComplex: true,
             willChange: true, 
             painter: WavePainter(
-              color: widget.color.withValues(alpha: 0.05),
+              color: widget.color.withValues(alpha: 0.2),
               frequency: widget.frequency,
               phase: _controller.value * 2 * math.pi + widget.phase,
             ),
