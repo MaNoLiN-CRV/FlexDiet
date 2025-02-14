@@ -19,4 +19,13 @@ class EmailAuthProvider implements provider.AuthProvider {
     // TODO: implement singOut
     throw UnimplementedError();
   }
+
+  Future<UserCredential> signUp({ required String email, required String password }) async {
+      UserCredential credential = await _auth.
+      createUserWithEmailAndPassword(
+        email: email,
+        password: password
+      );
+      return credential;
+  }
 }

@@ -15,6 +15,12 @@ class GoogleAuthProvider implements provider.AuthProvider {
   }
 
   @override
+  Future<UserCredential?> signUp() {
+    // TODO: implement signUp
+    throw UnimplementedError();
+  }
+
+  @override
   Future<void> singOut() {
     // TODO: implement singOut
     throw UnimplementedError();

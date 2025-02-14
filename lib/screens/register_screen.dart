@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/services/auth/auth_service.dart';
+import 'package:flutter_flexdiet/services/auth/providers/email_auth_provider.dart';
 import 'package:flutter_flexdiet/theme/app_theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
@@ -19,6 +21,11 @@ class _RegisterScreenState extends State<RegisterScreen>
   bool _isConfirmPasswordVisible = false;
   late AnimationController _animationController;
   late Animation<Color?> _backgroundColorAnimation;
+  final GlobalKey<FormState> myFormKey = GlobalKey<FormState>();
+
+  final AuthService authService = AuthService();
+  late EmailAuthProvider emailAuthService =
+      authService.emailAuth() as EmailAuthProvider;
 
   @override
   void initState() {
@@ -206,6 +213,11 @@ class _RegisterScreenState extends State<RegisterScreen>
                     ElevatedButton(
                       onPressed: () {
                         // Handle registration logic here
+                        if (_passwordController.text == _confirmPasswordController.text) {
+                          emailAuthService.signUp(
+                              email: _usernameController.text,
+                              password: _passwordController.text);
+                        }
                       },
                       style: theme.elevatedButtonTheme.style,
                       child: Text(
