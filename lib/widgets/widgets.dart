@@ -1,5 +1,5 @@
 export 'package:flutter_flexdiet/widgets/custom_button.dart';
-export 'package:flutter_flexdiet/widgets/custom_scroll_view.dart';
+export 'package:flutter_flexdiet/widgets/custom_card_scroll.dart';
 export 'package:flutter_flexdiet/widgets/custom_input_text.dart';
 export 'package:flutter_flexdiet/widgets/custom_toast.dart';
 export 'package:flutter_flexdiet/widgets/custom_grid_card.dart';

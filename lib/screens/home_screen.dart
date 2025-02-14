@@ -36,7 +36,8 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               children: [
                 _buildCaloryInfo('Protein', '120 g', theme),
-                CalorieWheel(consumedCalories: 2000, dailyGoal: 3000, theme: theme),
+                CalorieWheel(
+                    consumedCalories: 2000, dailyGoal: 3000, theme: theme),
                 _buildCaloryInfo('Carbs', '300 g', theme),
               ],
             ),
@@ -49,26 +50,29 @@ class HomeScreen extends StatelessWidget {
               textAlign: TextAlign.start,
             ),
             const SizedBox(height: 10),
-            GridCard(
-              cardTheme: CardTheme(
-                color: theme.colorScheme.secondary,
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-              ),
-              columns: 2,
-              columnSpace: 10,
-              rowSpace: 10,
-              padding: const EdgeInsets.all(15),
-              children: [
-                _buildMealItem(
-                    'Breakfast', 'Whole wheat toast, avocado...', theme),
-                _buildMealItem('Lunch', 'Quinoa salad, chicken...', theme),
-                _buildMealItem('Snacks', 'Fruit, nuts...', theme),
-                _buildMealItem(
-                    'Dinner', 'Grilled salmon, vegetables...', theme),
-              ],
-            ),
+            SizedBox(
+              height: 100,
+              child: CardScroll(cards: [
+                CardData(
+                  title: 'Breakfast',
+                  description: 'Eggs and toast',
+                  imageUrl:
+                      'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
+                ),
+                CardData(
+                  title: 'Lunch',
+                  description: 'Salad with chicken',
+                  imageUrl:
+                      'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
+                ),
+                CardData(
+                  title: 'Dinner',
+                  description: 'Steak and vegetables',
+                  imageUrl:
+                      'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
+                )
+              ]),
+            )
           ],
         ),
       ),
@@ -118,39 +122,4 @@ class HomeScreen extends StatelessWidget {
       ],
     );
   }
-
-  Widget _buildMealItem(String mealType, String description, ThemeData theme) {
-    return InkWell(
-      onTap: () {
-        print('Clicked on $mealType');
-      },
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              mealType,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.surface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              description,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.surface.withAlpha(128),
-              ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
-
-
