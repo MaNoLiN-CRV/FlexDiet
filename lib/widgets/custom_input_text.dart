@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 ///   },
 /// )
 /// ```
-class CustomInput extends StatefulWidget {
+class CustomInputText extends StatefulWidget {
   /// The initial value to be shown in the input field.
   /// If null, the field will be empty.
   final String? initialValue;
@@ -65,7 +65,7 @@ class CustomInput extends StatefulWidget {
   ///InputDecoration
   final InputDecoration decoration;
 
-  const CustomInput({
+  const CustomInputText({
     super.key,
     this.initialValue,
     this.onChanged,
@@ -81,13 +81,13 @@ class CustomInput extends StatefulWidget {
   });
 
   @override
-  _CustomInputState createState() => _CustomInputState();
+  _CustomInputTextState createState() => _CustomInputTextState();
 }
 
 /// The state for the CustomInput widget.
 ///
 /// Manages a [TextEditingController] for the input field and handles its lifecycle.
-class _CustomInputState extends State<CustomInput> {
+class _CustomInputTextState extends State<CustomInputText> {
   /// Controller for the text input field.
   late final TextEditingController _controller;
 
@@ -106,6 +106,7 @@ class _CustomInputState extends State<CustomInput> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: widget.initialValue,
       controller: _controller,
       onChanged: widget.onChanged,
       validator: widget.validator,

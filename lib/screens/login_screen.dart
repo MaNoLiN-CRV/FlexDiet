@@ -110,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ],
                       ),
-                      child: CustomInput(
+                      child: CustomInputText(
                         controller: _usernameController,
                         decoration: InputDecoration(
                           labelText: 'Nombre de usuario',
@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ],
                       ),
-                      child: CustomInput(
+                      child: CustomInputText(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(

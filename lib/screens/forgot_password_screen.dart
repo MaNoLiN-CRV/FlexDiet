@@ -94,7 +94,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                           ),
                         ],
                       ),
-                      child: CustomInput(
+                      child: CustomInputText(
                         controller: _emailController,
                         decoration: InputDecoration(
                           labelText: 'Correo electrónico',
