@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/theme/app_theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // Importa fluttertoast
 
 late AnimationController _animationController;
 late Animation<Color?> _backgroundColorAnimation;
@@ -96,6 +95,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       ),
                       child: CustomInput(
                         controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'Correo electrónico',
                           labelStyle: theme.inputDecorationTheme.labelStyle

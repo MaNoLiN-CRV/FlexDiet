@@ -17,6 +17,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen>
     with TickerProviderStateMixin {
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -72,8 +73,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                 padding:
                     const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
                 child: Form(
+                  key: myFormKey,
                   child: Column(
-                    key: myFormKey,
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -99,7 +100,6 @@ class _RegisterScreenState extends State<RegisterScreen>
                       ),
                       const SizedBox(height: 50),
                       // Username input
-
                       Container(
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surface,
@@ -114,6 +114,41 @@ class _RegisterScreenState extends State<RegisterScreen>
                         ),
                         child: CustomInput(
                           controller: _usernameController,
+                          keyboardType: TextInputType.text,
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Por favor, ingresa un nombre de usuario';
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: 'Nombre de usuario',
+                            labelStyle: theme.inputDecorationTheme.labelStyle
+                                ?.copyWith(color: theme.colorScheme.onSurface),
+                            border: InputBorder.none,
+                            prefixIcon: Icon(Icons.person_outline,
+                                color: theme.colorScheme.onSurface),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 16),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black,
+                              blurRadius: 8,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: CustomInput(
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value!.length < 8) return 'Mínimo 8 caracteres';
@@ -222,32 +257,68 @@ class _RegisterScreenState extends State<RegisterScreen>
                       // Sign Up button
                       ElevatedButton(
                         onPressed: () async {
-                          // Handle registration logic here
-                          if (_passwordController.text ==
+                          // Verificar si todos los campos están llenos
+                          if (_usernameController.text.isEmpty ||
+                              _emailController.text.isEmpty ||
+                              _passwordController.text.isEmpty ||
+                              _confirmPasswordController.text.isEmpty) {
+                            ShowToast(
+                                context, 'Por favor, rellena todos los campos.',
+                                toastType: ToastType.error);
+                            return; // Detener la ejecución si algún campo está vacío
+                          }
+
+                          // Verificar si las contraseñas coinciden
+                          if (_passwordController.text !=
                               _confirmPasswordController.text) {
-                            try {
-                              await emailAuthService.signUp(
-                                  email: _usernameController.text,
-                                  password: _passwordController.text);
-                              // If the registration goes well we navigate to HomeScreen
+                            ShowToast(context, 'Las contraseñas no coinciden.',
+                                toastType: ToastType.error);
+                            return; // Detener la ejecución si las contraseñas no coinciden
+                          }
+
+                          try {
+                            // Intentar registrar al usuario
+                            await emailAuthService.signUp(
+                              email: _emailController.text,
+                              password: _passwordController.text,
+                            );
+
+                            // Si el registro es exitoso, navegar a la pantalla de inicio de sesión
+                            if (context.mounted) {
+                              ShowToast(
+                                  context, 'Has sido registrado correctamente.',
+                                  toastType: ToastType.success);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const LoginScreen()),
+                              );
+                            }
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'email-already-in-use') {
                               if (context.mounted) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomeScreen()),
-                                );
-                              }
-                            } on FirebaseAuthException {
-                              if (context.mounted) {
-                                ShowToast(
-                                    context, 'El correo se encuentra en uso',
+                                ShowToast(context, 'El correo ya está en uso.',
                                     toastType: ToastType.error);
                               }
+                            } else {
+                              if (e.code == 'weak-password') {
+                                if (context.mounted) {
+                                  ShowToast(context,
+                                      'La contraseña debe de tener al menos 6 caracteres.',
+                                      toastType: ToastType.error);
+                                }
+                              } else if (e.code == 'invalid-email') {
+                                if (context.mounted) {
+                                  ShowToast(context, 'El email es inválido',
+                                      toastType: ToastType.error);
+                                }
+                              }
                             }
-                          } else {
-                            ShowToast(context,
-                                'Las contraseñas no coinciden. ¡Intentalo de nuevo!',
-                                toastType: ToastType.error);
+                          } catch (e) {
+                            if (context.mounted) {
+                              ShowToast(context, 'Ocurrió un error inesperado.',
+                                  toastType: ToastType.error);
+                            }
                           }
                         },
                         style: theme.elevatedButtonTheme.style,
