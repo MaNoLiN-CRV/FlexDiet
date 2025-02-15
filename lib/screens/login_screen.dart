@@ -170,9 +170,7 @@ class _LoginScreenState extends State<LoginScreen>
                       onPressed: () async {
                         // Handle login with email logic here and also Navigation
                         try {
-                          await emailAuthService.signIn(
-                              email: _usernameController.text,
-                              password: _usernameController.text);
+                    
                           if(context.mounted) {
                             Navigator.push(
                             context,

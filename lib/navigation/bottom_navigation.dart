@@ -81,11 +81,13 @@ class BottomNav extends StatelessWidget {
         Icon(Icons.person_outline_rounded, color: theme.iconTheme.color),
         Icon(Icons.home_rounded, color: theme.iconTheme.color),
         Icon(Icons.settings_rounded, color: theme.iconTheme.color),
+        Icon(Icons.admin_panel_settings_rounded, color: Colors.grey),
       ],
       inactiveIcons: const [
         Icon(Icons.person_outline_rounded, color: Colors.grey),
         Icon(Icons.home_rounded, color: Colors.grey),
         Icon(Icons.settings_rounded, color: Colors.grey),
+        Icon(Icons.admin_panel_settings_rounded, color: Colors.grey),
       ],
       color: Colors.white,
       circleColor: Colors.white,
