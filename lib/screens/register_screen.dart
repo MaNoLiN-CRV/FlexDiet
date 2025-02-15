@@ -242,25 +242,19 @@ class _RegisterScreenState extends State<RegisterScreen>
                               }
                             } on FirebaseAuthException {
                               if (context.mounted) {
-                                showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (context) => CustomAlertDialog(
-                                        theme: theme,
-                                        title: 'Error al crear la cuenta',
-                                        content:
-                                            'El correo se encuentra en uso.'));
+                                ShowToast(
+                                  context,
+                                  'El correo se encuentra en uso',
+                                  toastType: ToastType.error
+                                );
                               }
                             }
                           } else {
-                            showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) => CustomAlertDialog(
-                                    theme: theme,
-                                    title: 'Error al crear la cuenta',
-                                    content:
-                                        'Las contraseñas no coinciden. ¡Intentalo de nuevo!'));
+                                ShowToast(
+                                    context,
+                                    'Las contraseñas no coinciden. ¡Intentalo de nuevo!',
+                                    toastType: ToastType.error
+                                );
                           }
                         },
                         style: theme.elevatedButtonTheme.style,

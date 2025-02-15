@@ -182,15 +182,11 @@ class _LoginScreenState extends State<LoginScreen>
                           }
                         } on InvalidCredentialsException catch (exception) {
                           if(context.mounted) {
-                            showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (context) => 
-                              CustomAlertDialog(
-                                theme: theme,
-                                title: 'Error al iniciar sesión',
-                                content: exception.getMessage()
-                              ));
+                            ShowToast(
+                              context,
+                              exception.getMessage(),
+                              toastType: ToastType.error
+                            );
                           }
                         } on Exception catch (exception) {
                           print('otro ${exception}');
