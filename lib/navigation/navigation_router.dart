@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +25,14 @@ void navigationRouter(BuildContext context, int index) {
       context,
       MaterialPageRoute(
         builder: (context) => const SettingsScreen(),
+      ),
+    );
+  }
+  else if (index == 3) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TemplateScreen(),
       ),
     );
   }

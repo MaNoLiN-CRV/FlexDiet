@@ -110,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ],
                       ),
-                      child: CustomInput(
+                      child: CustomInputText(
                         controller: _usernameController,
                         decoration: InputDecoration(
                           labelText: 'Nombre de usuario',
@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ],
                       ),
-                      child: CustomInput(
+                      child: CustomInputText(
                         controller: _passwordController,
                         obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
@@ -169,10 +169,8 @@ class _LoginScreenState extends State<LoginScreen>
                     ElevatedButton(
                       onPressed: () async {
                         try {
-                          await emailAuthService.signIn(
-                              email: _usernameController.text,
-                              password: _usernameController.text);
-                          if (context.mounted) {
+                    
+                          if(context.mounted) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(

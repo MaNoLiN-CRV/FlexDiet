@@ -112,7 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             ),
                           ],
                         ),
-                        child: CustomInput(
+                        child: CustomInputText(
                           controller: _usernameController,
                           keyboardType: TextInputType.text,
                           validator: (value) {
@@ -147,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             ),
                           ],
                         ),
-                        child: CustomInput(
+                        child: CustomInputText(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
@@ -179,7 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             ),
                           ],
                         ),
-                        child: CustomInput(
+                        child: CustomInputText(
                           controller: _passwordController,
                           obscureText: !_isPasswordVisible,
                           decoration: InputDecoration(
@@ -221,7 +221,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             ),
                           ],
                         ),
-                        child: CustomInput(
+                        child: CustomInputText(
                           controller: _confirmPasswordController,
                           obscureText: !_isConfirmPasswordVisible,
                           validator: (value) {
