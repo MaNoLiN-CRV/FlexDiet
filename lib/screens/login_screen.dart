@@ -264,7 +264,9 @@ class _LoginScreenState extends State<LoginScreen>
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: GoogleAuthButton(
-                            onPressed: () {},
+                            onPressed: () async {
+                              await googleAuthService.signIn();
+                            },
                             text: "Inicia sesión con Google",
                             style: AuthButtonStyle(
                               buttonColor: theme.colorScheme.surface,

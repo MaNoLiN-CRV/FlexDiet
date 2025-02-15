@@ -12,7 +12,12 @@
           "package_name": "com.example.flutter_flexdiet"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "665440338027-ej2hki5nle09ih6l5vrvi1jmcg6dikke.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCDJ9j-78VyemiPGHe7Mr5rryvi-ZGqaqE"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "665440338027-ej2hki5nle09ih6l5vrvi1jmcg6dikke.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "665440338027-pn5gm5ffi4vsiqtqr00r2t4js8h2hpn4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterFlexdiet"
+              }
+            }
+          ]
         }
       }
     }

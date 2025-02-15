@@ -41,6 +41,7 @@ dependencies:
   firebase_auth: ^5.4.2
   syncfusion_flutter_charts: ^21.2.4
   circle_nav_bar: ^2.2.0
+  google_sign_in: ^6.2.2
 
 dev_dependencies:
   flutter_test:
