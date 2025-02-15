@@ -1,6 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
-import 'package:flutter_flexdiet/services/auth/providers/email_auth_provider.dart';
+import 'package:flutter_flexdiet/services/auth/providers/providers.dart' as provider;
 import 'package:flutter_flexdiet/theme/app_theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
@@ -24,8 +25,8 @@ class _RegisterScreenState extends State<RegisterScreen>
   final GlobalKey<FormState> myFormKey = GlobalKey<FormState>();
 
   final AuthService authService = AuthService();
-  late EmailAuthProvider emailAuthService =
-      authService.emailAuth() as EmailAuthProvider;
+  late provider.EmailAuthProvider emailAuthService =
+      authService.emailAuth() as provider.EmailAuthProvider;
 
   @override
   void initState() {
@@ -221,37 +222,37 @@ class _RegisterScreenState extends State<RegisterScreen>
                       const SizedBox(height: 30),
                       // Sign Up button
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async{
                           // Handle registration logic here
                           if (_passwordController.text ==
                               _confirmPasswordController.text) {
-                            emailAuthService.signUp(
+                            try {
+                              await emailAuthService.signUp(
                                 email: _usernameController.text,
                                 password: _passwordController.text);
+                            } on FirebaseAuthException {
+                              if(context.mounted) {
+                                showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) =>
+                                CustomAlertDialog(
+                                  theme: theme,
+                                  title: 'Error al crear la cuenta',
+                                  content: 'El correo se encuentra en uso.'
+                                ));
+                              }
+                            }
                           } else {
                             showDialog(
                                 context: context,
                                 barrierDismissible: false,
-                                builder: (context) => AlertDialog(
-                                      title: Text('Error al crear la cuenta',
-                                          style: theme.textTheme.headlineSmall),
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                              'Las contraseñas no coinciden. ¡Intentalo de nuevo!'),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                        ],
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: Text('Aceptar', style: theme.textTheme.bodyMedium))
-                                      ],
-                                    ));
+                                builder: (context) =>
+                                CustomAlertDialog(
+                                  theme: theme,
+                                  title: 'Error al crear la cuenta',
+                                  content: 'Las contraseñas no coinciden. ¡Intentalo de nuevo!'
+                                ));
                           }
                         },
                         style: theme.elevatedButtonTheme.style,
@@ -290,5 +291,42 @@ class _RegisterScreenState extends State<RegisterScreen>
         },
       ),
     );
+  }
+}
+
+class CustomAlertDialog extends StatelessWidget {
+  const CustomAlertDialog({
+    super.key,
+    required this.theme,
+    required this.title,
+    required this.content
+  });
+
+  final ThemeData theme;
+  final String title;
+  final String content;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+          title: Text(title,
+              style: theme.textTheme.headlineSmall),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                  content),
+              SizedBox(
+                height: 10,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+                onPressed: () =>
+                    Navigator.pop(context),
+                child: Text('Aceptar', style: theme.textTheme.bodyMedium))
+          ],
+        );
   }
 }
