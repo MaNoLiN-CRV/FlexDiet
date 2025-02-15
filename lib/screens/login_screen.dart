@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_flexdiet/exceptions/invalid_credentials_exception.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
-import 'package:flutter_flexdiet/services/auth/providers/providers.dart' as provider;
+import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
+    as provider;
 import 'package:flutter_flexdiet/theme/app_theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:local_auth/local_auth.dart';
@@ -28,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen>
   final AuthService authService = AuthService();
   late provider.EmailAuth emailAuthService =
       authService.emailAuth() as provider.EmailAuth;
-  late provider.GoogleAuth googleAuthService = 
+  late provider.GoogleAuth googleAuthService =
       authService.googleAuth() as provider.GoogleAuth;
 
   @override
@@ -167,15 +169,18 @@ class _LoginScreenState extends State<LoginScreen>
                     ElevatedButton(
                       onPressed: () {
                         // Handle login with email logic here and also Navigation
-                        emailAuthService.signIn(
-                          email: _usernameController.text,
-                          password:  _usernameController.text
-                        );
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
-                        );
+                        try {
+                          emailAuthService.signIn(
+                              email: _usernameController.text,
+                              password: _usernameController.text);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const HomeScreen()),
+                          );
+                        } on InvalidCredentialsException {
+                          
+                        }
                       },
                       style: theme.elevatedButtonTheme.style,
                       child: Text('Comenzar mi viaje saludable',

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_flexdiet/exceptions/invalid_credentials_exception.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart' as provider;
 
 class EmailAuth implements provider.AuthProvider {
@@ -10,7 +11,7 @@ class EmailAuth implements provider.AuthProvider {
 
   @override
   Future<UserCredential?> signIn({ String? email, String? password }) async {
-    if(email == null || password == null) throw Exception('Debes introducir el correo electrónico y la contraseña'); 
+    if(email == null || password == null) throw InvalidCredentialsException(); 
     UserCredential credential = await _auth.
       signInWithEmailAndPassword(
         email: email,
