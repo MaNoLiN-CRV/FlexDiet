@@ -150,9 +150,6 @@ class _RegisterScreenState extends State<RegisterScreen>
                         child: CustomInputText(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value!.length < 8) return 'Mínimo 8 caracteres';
-                          },
                           decoration: InputDecoration(
                             labelText: 'Correo Electrónico',
                             labelStyle: theme.inputDecorationTheme.labelStyle
@@ -182,6 +179,10 @@ class _RegisterScreenState extends State<RegisterScreen>
                         child: CustomInputText(
                           controller: _passwordController,
                           obscureText: !_isPasswordVisible,
+                          validator: (value) {
+                            if (value!.length < 8) return 'Mínimo 8 caracteres';
+                            return null;
+                          },
                           decoration: InputDecoration(
                             labelText: 'Contraseña',
                             labelStyle: theme.inputDecorationTheme.labelStyle
@@ -226,6 +227,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                           obscureText: !_isConfirmPasswordVisible,
                           validator: (value) {
                             if (value!.length < 8) return 'Mínimo 8 caracteres';
+                            return null;
                           },
                           decoration: InputDecoration(
                             labelText: 'Confirmar Contraseña',

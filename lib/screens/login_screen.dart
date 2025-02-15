@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen>
                       child: CustomInputText(
                         controller: _usernameController,
                         decoration: InputDecoration(
-                          labelText: 'Nombre de usuario',
+                          labelText: 'Correo electrónico',
                           labelStyle: theme.inputDecorationTheme.labelStyle
                               ?.copyWith(color: theme.colorScheme.onSurface),
                           border: InputBorder.none,
@@ -169,7 +169,11 @@ class _LoginScreenState extends State<LoginScreen>
                     ElevatedButton(
                       onPressed: () async {
                         try {
-                    
+                          await emailAuthService.
+                            signIn(
+                              email: _usernameController.text,
+                              password: _passwordController.text
+                            );
                           if(context.mounted) {
                             Navigator.push(
                               context,
