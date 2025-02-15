@@ -221,11 +221,12 @@ class _RegisterScreenState extends State<RegisterScreen>
                       ),
                       const SizedBox(height: 30),
                       // Sign Up button
+                      //* aqui
                       ElevatedButton(
                         onPressed: () async {
                           // Handle registration logic here
                           if (_passwordController.text ==
-                              _confirmPasswordController.text) {
+                              _confirmPasswordController.text && myFormKey.currentState!.validate()) {
                             try {
                               await emailAuthService.signUp(
                                   email: _usernameController.text,
