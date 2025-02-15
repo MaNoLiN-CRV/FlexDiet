@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/screens/login_screen.dart';
+import 'package:flutter_flexdiet/screens/setting_screen.dart';
 import 'package:flutter_flexdiet/theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -21,11 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: defaultTheme,
       title: 'Material App',
-      home: Scaffold(
-        body: Center(
-          child: LoginScreen(),
-        ),
-      ),
+      home: SettingScreen()
     );
   }
 }

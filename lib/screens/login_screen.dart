@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen>
 
     _backgroundColorAnimation = ColorTween(
       begin: backgroundColorWhite,
-      end: const Color.fromARGB(115, 98, 15, 231),
+      end: const Color.fromARGB(48, 98, 15, 231),
     ).animate(_animationController);
   }
 
@@ -168,23 +168,19 @@ class _LoginScreenState extends State<LoginScreen>
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        // Handle login with email logic here and also Navigation
                         try {
                     
                           if(context.mounted) {
                             Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const HomeScreen()),
-                          );
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomeScreen()),
+                            );
                           }
                         } on InvalidCredentialsException catch (exception) {
-                          if(context.mounted) {
-                            ShowToast(
-                              context,
-                              exception.getMessage(),
-                              toastType: ToastType.error
-                            );
+                          if (context.mounted) {
+                            ShowToast(context, exception.getMessage(),
+                                toastType: ToastType.error);
                           }
                         } on Exception catch (exception) {
                           print('otro ${exception}');
@@ -201,7 +197,14 @@ class _LoginScreenState extends State<LoginScreen>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ForgotPasswordScreen()),
+                            );
+                          },
                           child: Text(
                             '¿Olvidaste tu contraseña?',
                             style: theme.textTheme.bodyLarge?.copyWith(
