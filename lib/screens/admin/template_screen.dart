@@ -10,38 +10,55 @@ class TemplateScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return Scaffold(
-        body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          //TODO : Target customer for the template
-          Text(
-            'Target customer for the template, (not implemented)',
-            style: theme.textTheme.bodyMedium,
+      appBar: AppBar(
+        backgroundColor: theme.colorScheme.primary,
+        title: const Text('Admin Panel'),
+        centerTitle: true,
+        
+        ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Target customer for the template (not implemented)',
+                style: theme.textTheme.headlineSmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              CustomButton(
+                text: 'CREATE TEMPLATE',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                },
+                backgroundColor: theme.colorScheme.primary,
+                textColor: theme.colorScheme.onPrimary,
+                textStyle: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onPrimary),
+              ),
+              const SizedBox(height: 16),
+              CustomButton(
+                text: 'USE TEMPLATE',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const UseTemplateScreen()),
+                  );
+                },
+                backgroundColor: theme.colorScheme.primary,
+                textColor: theme.colorScheme.onPrimary, 
+                textStyle: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onPrimary),
+              ),
+            ],
           ),
-          CustomButton(
-            text: 'CREATE TEMPLATE',
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()));
-            },
-            backgroundColor: theme.colorScheme.primary,
-            textColor: theme.colorScheme.onPrimary,
-          ),
-          SizedBox(height: 16),
-          CustomButton(
-            text: 'USE TEMPLATE',
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const UseTemplateScreen()));
-            },
-            backgroundColor: theme.colorScheme.primary,
-            textColor: theme.colorScheme.onPrimary,
-          ),
-        ],
+        ),
       ),
-    ));
+    );
   }
 }

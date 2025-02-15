@@ -14,8 +14,8 @@ class UseTemplateScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: theme.colorScheme.primary,
           elevation: 0,
-          title: const Text('Use Template'),
-          titleTextStyle: TextStyle(color: theme.iconTheme.color, fontWeight: FontWeight.bold, fontSize: 20),
+          title: const Text('Use Templates'),
+          titleTextStyle: TextStyle(color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold, fontSize: 20),
           centerTitle: true,
         ),
         body: Center(
