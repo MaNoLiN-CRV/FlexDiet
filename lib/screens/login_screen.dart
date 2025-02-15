@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
+import 'package:flutter_flexdiet/services/auth/auth_service.dart';
+import 'package:flutter_flexdiet/services/auth/providers/providers.dart' as provider;
 import 'package:flutter_flexdiet/theme/app_theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:local_auth/local_auth.dart';
@@ -23,7 +25,11 @@ class _LoginScreenState extends State<LoginScreen>
   late AnimationController _animationController;
   late Animation<Color?> _backgroundColorAnimation;
 
-  
+  final AuthService authService = AuthService();
+  late provider.EmailAuth emailAuthService =
+      authService.emailAuth() as provider.EmailAuth;
+  late provider.GoogleAuth googleAuthService = 
+      authService.googleAuth() as provider.GoogleAuth;
 
   @override
   void initState() {
@@ -160,6 +166,11 @@ class _LoginScreenState extends State<LoginScreen>
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
+                        // Handle login with email logic here and also Navigation
+                        emailAuthService.signIn(
+                          email: _usernameController.text,
+                          password:  _usernameController.text
+                        );
                         Navigator.push(
                           context,
                           MaterialPageRoute(

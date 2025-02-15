@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
-import 'package:flutter_flexdiet/services/auth/providers/providers.dart' as provider;
+import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
+    as provider;
 import 'package:flutter_flexdiet/theme/app_theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
@@ -25,8 +27,8 @@ class _RegisterScreenState extends State<RegisterScreen>
   final GlobalKey<FormState> myFormKey = GlobalKey<FormState>();
 
   final AuthService authService = AuthService();
-  late provider.EmailAuthProvider emailAuthService =
-      authService.emailAuth() as provider.EmailAuthProvider;
+  late provider.EmailAuth emailAuthService =
+      authService.emailAuth() as provider.EmailAuth;
 
   @override
   void initState() {
@@ -222,37 +224,41 @@ class _RegisterScreenState extends State<RegisterScreen>
                       const SizedBox(height: 30),
                       // Sign Up button
                       ElevatedButton(
-                        onPressed: () async{
+                        onPressed: () async {
                           // Handle registration logic here
                           if (_passwordController.text ==
                               _confirmPasswordController.text) {
                             try {
                               await emailAuthService.signUp(
-                                email: _usernameController.text,
-                                password: _passwordController.text);
+                                  email: _usernameController.text,
+                                  password: _passwordController.text);
+                              // If the registration goes well we navigate to HomeScreen
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const HomeScreen()),
+                              );
                             } on FirebaseAuthException {
-                              if(context.mounted) {
+                              if (context.mounted) {
                                 showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) =>
-                                CustomAlertDialog(
-                                  theme: theme,
-                                  title: 'Error al crear la cuenta',
-                                  content: 'El correo se encuentra en uso.'
-                                ));
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (context) => CustomAlertDialog(
+                                        theme: theme,
+                                        title: 'Error al crear la cuenta',
+                                        content:
+                                            'El correo se encuentra en uso.'));
                               }
                             }
                           } else {
                             showDialog(
                                 context: context,
                                 barrierDismissible: false,
-                                builder: (context) =>
-                                CustomAlertDialog(
-                                  theme: theme,
-                                  title: 'Error al crear la cuenta',
-                                  content: 'Las contraseñas no coinciden. ¡Intentalo de nuevo!'
-                                ));
+                                builder: (context) => CustomAlertDialog(
+                                    theme: theme,
+                                    title: 'Error al crear la cuenta',
+                                    content:
+                                        'Las contraseñas no coinciden. ¡Intentalo de nuevo!'));
                           }
                         },
                         style: theme.elevatedButtonTheme.style,
@@ -295,12 +301,11 @@ class _RegisterScreenState extends State<RegisterScreen>
 }
 
 class CustomAlertDialog extends StatelessWidget {
-  const CustomAlertDialog({
-    super.key,
-    required this.theme,
-    required this.title,
-    required this.content
-  });
+  const CustomAlertDialog(
+      {super.key,
+      required this.theme,
+      required this.title,
+      required this.content});
 
   final ThemeData theme;
   final String title;
@@ -309,24 +314,21 @@ class CustomAlertDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-          title: Text(title,
-              style: theme.textTheme.headlineSmall),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                  content),
-              SizedBox(
-                height: 10,
-              ),
-            ],
+      title: Text(title, style: theme.textTheme.headlineSmall),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(content),
+          SizedBox(
+            height: 10,
           ),
-          actions: [
-            TextButton(
-                onPressed: () =>
-                    Navigator.pop(context),
-                child: Text('Aceptar', style: theme.textTheme.bodyMedium))
-          ],
-        );
+        ],
+      ),
+      actions: [
+        TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Aceptar', style: theme.textTheme.bodyMedium))
+      ],
+    );
   }
 }

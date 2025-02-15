@@ -1,17 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart' as provider;
 
-class EmailAuthProvider implements provider.AuthProvider {
+class EmailAuth implements provider.AuthProvider {
 
   final FirebaseAuth _auth;
 
-  EmailAuthProvider({ required FirebaseAuth auth }):
+  EmailAuth({ required FirebaseAuth auth }):
   _auth = auth;
 
   @override
-  Future<UserCredential?> signIn() {
-    // TODO: implement signIn
-    throw UnimplementedError();
+  Future<UserCredential?> signIn({ String? email, String? password }) async {
+    if(email == null || password == null) throw Exception('Debes introducir el correo electrónico y la contraseña'); 
+    UserCredential credential = await _auth.
+      signInWithEmailAndPassword(
+        email: email,
+        password: password
+      );
+      return credential;
   }
 
   @override
