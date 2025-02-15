@@ -6,10 +6,18 @@ class UseTemplateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  
-    double height = MediaQuery.of(context).size.height;
- 
+    final ThemeData theme = Theme.of(context);
+    final double height = MediaQuery.of(context).size.height * 0.8;
+
     return Scaffold(
+        backgroundColor: theme.colorScheme.surface,
+        appBar: AppBar(
+          backgroundColor: theme.colorScheme.primary,
+          elevation: 0,
+          title: const Text('Use Template'),
+          titleTextStyle: TextStyle(color: theme.iconTheme.color, fontWeight: FontWeight.bold, fontSize: 20),
+          centerTitle: true,
+        ),
         body: Center(
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         SizedBox(
