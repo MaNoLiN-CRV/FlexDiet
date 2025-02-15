@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_flexdiet/exceptions/invalid_credentials_exception.dart';
+import 'package:flutter_flexdiet/exceptions/exceptions.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
@@ -167,19 +167,33 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         // Handle login with email logic here and also Navigation
                         try {
-                          emailAuthService.signIn(
+                          await emailAuthService.signIn(
                               email: _usernameController.text,
                               password: _usernameController.text);
-                          Navigator.push(
+                          if(context.mounted) {
+                            Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const HomeScreen()),
                           );
-                        } on InvalidCredentialsException {
-                          
+                          }
+                        } on InvalidCredentialsException catch (exception) {
+                          if(context.mounted) {
+                            showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => 
+                              CustomAlertDialog(
+                                theme: theme,
+                                title: 'Error al iniciar sesión',
+                                content: exception.getMessage()
+                              ));
+                          }
+                        } on Exception catch (exception) {
+                          print('otro ${exception}');
                         }
                       },
                       style: theme.elevatedButtonTheme.style,

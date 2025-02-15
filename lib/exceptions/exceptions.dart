@@ -1,0 +1,1 @@
+export 'package:flutter_flexdiet/exceptions/invalid_credentials_exception.dart';
