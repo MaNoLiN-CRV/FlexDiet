@@ -303,7 +303,29 @@ class _LoginScreenState extends State<LoginScreen>
                                   );
                                   return;
                                 }
+                                try {
                                 await googleAuthService.signIn();
+                                if (context.mounted) {
+                                  ShowToast(
+                                      context, 'Inicio de sesión correcto',
+                                      toastType: ToastType.success);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const UserInfoScreen(),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ShowToast(
+                                    context,
+                                    'Error al iniciar sesión con Google',
+                                    toastType: ToastType.error,
+                                  );
+                                }
+                              }
                                 if (context.mounted) {
                                   ShowToast(
                                       context, 'Inicio de sesión correcto',
