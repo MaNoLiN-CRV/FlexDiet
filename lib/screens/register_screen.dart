@@ -264,18 +264,21 @@ class _RegisterScreenState extends State<RegisterScreen>
                               _emailController.text.isEmpty ||
                               _passwordController.text.isEmpty ||
                               _confirmPasswordController.text.isEmpty) {
-                            ShowToast(
-                                context, 'Por favor, rellena todos los campos.',
-                                toastType: ToastType.error);
-                            return; // Detener la ejecución si algún campo está vacío
+                            if (context.mounted) {
+                              ShowToast(context,
+                                  'Por favor, rellena todos los campos.',
+                                  toastType: ToastType.error);
+                            }
                           }
 
                           // Verificar si las contraseñas coinciden
                           if (_passwordController.text !=
                               _confirmPasswordController.text) {
-                            ShowToast(context, 'Las contraseñas no coinciden.',
-                                toastType: ToastType.error);
-                            return; // Detener la ejecución si las contraseñas no coinciden
+                            if (context.mounted) {
+                              ShowToast(
+                                  context, 'Las contraseñas no coinciden.',
+                                  toastType: ToastType.error);
+                            }
                           }
 
                           try {

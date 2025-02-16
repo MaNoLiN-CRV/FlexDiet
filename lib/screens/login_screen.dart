@@ -169,16 +169,14 @@ class _LoginScreenState extends State<LoginScreen>
                     ElevatedButton(
                       onPressed: () async {
                         try {
-                          await emailAuthService.
-                            signIn(
+                          await emailAuthService.signIn(
                               email: _usernameController.text,
-                              password: _passwordController.text
-                            );
-                          if(context.mounted) {
+                              password: _passwordController.text);
+                          if (context.mounted) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
+                                  builder: (context) => const UserInfoScreen()),
                             );
                           }
                         } on InvalidCredentialsException catch (exception) {
