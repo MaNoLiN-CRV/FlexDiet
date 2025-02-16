@@ -7,11 +7,11 @@ import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
 import 'package:flutter_flexdiet/theme/app_theme.dart';
-import 'package:flutter_flexdiet/widgets/widgets.dart';
+import 'package:flutter_flexdiet/widgets/widgets.dart'; // Importa el ShowToast
 import 'package:local_auth/local_auth.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -50,6 +50,8 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -168,24 +170,50 @@ class _LoginScreenState extends State<LoginScreen>
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
+                        // Validación de campos vacíos
+                        if (_usernameController.text.isEmpty ||
+                            _passwordController.text.isEmpty) {
+                          ShowToast(
+                            context,
+                            'Por favor, rellena todos los campos',
+                            toastType: ToastType.warning,
+                          );
+                          return;
+                        }
+
                         try {
                           await emailAuthService.signIn(
-                              email: _usernameController.text,
-                              password: _passwordController.text);
+                            email: _usernameController.text,
+                            password: _passwordController.text,
+                          );
+
                           if (context.mounted) {
+                            ShowToast(context, 'Inicio de sesión correcto',
+                                toastType: ToastType.success);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const UserInfoScreen()),
+                                builder: (context) => const UserInfoScreen(),
+                              ),
                             );
                           }
-                        } on InvalidCredentialsException catch (exception) {
+                        } on InvalidCredentialsException {
                           if (context.mounted) {
-                            ShowToast(context, exception.getMessage(),
-                                toastType: ToastType.error);
+                            ShowToast(
+                              context,
+                              'Correo electrónico o contraseña incorrectos',
+                              toastType: ToastType.error,
+                            );
                           }
                         } on Exception catch (exception) {
-                          print('otro ${exception}');
+                          if (context.mounted) {
+                            ShowToast(
+                              context,
+                              'Correo electrónico o contraseña incorrectos',
+                              toastType: ToastType.error,
+                            );
+                            print('Otro error: ${exception.toString()}');
+                          }
                         }
                       },
                       style: theme.elevatedButtonTheme.style,
@@ -203,8 +231,9 @@ class _LoginScreenState extends State<LoginScreen>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ForgotPasswordScreen()),
+                                builder: (context) =>
+                                    const ForgotPasswordScreen(),
+                              ),
                             );
                           },
                           child: Text(
@@ -220,7 +249,8 @@ class _LoginScreenState extends State<LoginScreen>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const RegisterScreen()),
+                                builder: (context) => const RegisterScreen(),
+                              ),
                             );
                           },
                           child: Text(
@@ -263,7 +293,38 @@ class _LoginScreenState extends State<LoginScreen>
                           padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: GoogleAuthButton(
                             onPressed: () async {
-                              await googleAuthService.signIn();
+                              try {
+                                if (_usernameController.text.isEmpty ||
+                                    _passwordController.text.isEmpty) {
+                                  ShowToast(
+                                    context,
+                                    'Por favor, rellena todos los campos',
+                                    toastType: ToastType.warning,
+                                  );
+                                  return;
+                                }
+                                await googleAuthService.signIn();
+                                if (context.mounted) {
+                                  ShowToast(
+                                      context, 'Inicio de sesión correcto',
+                                      toastType: ToastType.success);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const UserInfoScreen(),
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ShowToast(
+                                    context,
+                                    'Error al iniciar sesión con Google',
+                                    toastType: ToastType.error,
+                                  );
+                                }
+                              }
                             },
                             text: "Inicia sesión con Google",
                             style: AuthButtonStyle(
@@ -304,6 +365,16 @@ class _LoginScreenState extends State<LoginScreen>
                           color: theme.colorScheme.onSurface,
                         ),
                         onPressed: () async {
+                          // Validación de campos vacíos
+                          if (_usernameController.text.isEmpty ||
+                              _passwordController.text.isEmpty) {
+                            ShowToast(
+                              context,
+                              'Por favor, rellena todos los campos',
+                              toastType: ToastType.warning,
+                            );
+                            return;
+                          }
                           bool canAuthenticate =
                               await _localAuth.canCheckBiometrics ||
                                   await _localAuth.isDeviceSupported();
@@ -315,8 +386,26 @@ class _LoginScreenState extends State<LoginScreen>
                                 options: const AuthenticationOptions(
                                     biometricOnly: true),
                               );
+                              if (context.mounted) {
+                                ShowToast(context, 'Inicio de sesión correcto',
+                                    toastType: ToastType.success);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const UserInfoScreen(),
+                                  ),
+                                );
+                              }
                             } on PlatformException catch (e) {
-                              print('Error en autenticación: $e');
+                              if (context.mounted) {
+                                ShowToast(
+                                  context,
+                                  'Error en la autenticación biométrica',
+                                  toastType: ToastType.error,
+                                );
+                                print('Error en autenticación: $e');
+                              }
                             }
                           }
                         },

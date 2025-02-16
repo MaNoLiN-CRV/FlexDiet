@@ -267,7 +267,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             if (context.mounted) {
                               ShowToast(context,
                                   'Por favor, rellena todos los campos.',
-                                  toastType: ToastType.error);
+                                  toastType: ToastType.warning);
                             }
                           }
 
