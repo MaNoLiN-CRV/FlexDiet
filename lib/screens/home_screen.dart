@@ -23,7 +23,7 @@ class _HomeScreenContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: _buildAppBar(theme),
@@ -44,7 +44,7 @@ class _HomeScreenContent extends StatelessWidget {
     return AppBar(
       backgroundColor: theme.colorScheme.primary,
       title: Text(
-        'My Diet Diary',
+        'Mi diario de Dietas',
         style: theme.appBarTheme.titleTextStyle,
       ),
       centerTitle: true,
@@ -108,7 +108,7 @@ class _HomeScreenContent extends StatelessWidget {
       padding: const EdgeInsets.all(HomeScreen._mediumSpacing),
       children: [
         _CaloryInfo(
-          title: 'Protein',
+          title: 'Proteínas',
           value: '120 g',
           theme: theme,
         ),
@@ -118,7 +118,7 @@ class _HomeScreenContent extends StatelessWidget {
           theme: theme,
         ),
         _CaloryInfo(
-          title: 'Carbs',
+          title: 'Carbohidratos',
           value: '300 g',
           theme: theme,
         ),
@@ -131,7 +131,7 @@ class _HomeScreenContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Today\'s Meals',
+          'Comidas de Hoy',
           style: theme.textTheme.titleLarge?.copyWith(
             color: theme.colorScheme.onSurface,
           ),
@@ -143,19 +143,22 @@ class _HomeScreenContent extends StatelessWidget {
           child: CardScroll(
             cards: [
               CardData(
-                title: 'Breakfast',
-                description: 'Eggs and toast',
-                imageUrl: 'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
-              ),
-               CardData(
-                title: 'Lunch',
-                description: 'Salad with chicken',
-                imageUrl: 'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
+                title: 'Desayuno',
+                description: 'Huevos y tostadas',
+                imageUrl:
+                    'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
               ),
               CardData(
-                title: 'Dinner',
-                description: 'Steak and vegetables',
-                imageUrl: 'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
+                title: 'Almuerzo',
+                description: 'Ensalada con pollo',
+                imageUrl:
+                    'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
+              ),
+              CardData(
+                title: 'Cena',
+                description: 'Bistec y verduras',
+                imageUrl:
+                    'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
               ),
             ],
           ),

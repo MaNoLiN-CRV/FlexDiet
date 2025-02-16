@@ -10,43 +10,51 @@ class UseTemplateScreen extends StatelessWidget {
     final double height = MediaQuery.of(context).size.height * 0.8;
 
     return Scaffold(
-        backgroundColor: theme.colorScheme.surface,
-        appBar: AppBar(
-          backgroundColor: theme.colorScheme.primary,
-          elevation: 0,
-          title: const Text('Use Templates'),
-          titleTextStyle: TextStyle(color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold, fontSize: 20),
-          centerTitle: true,
+      backgroundColor: theme.colorScheme.surface,
+      appBar: AppBar(
+        backgroundColor: theme.colorScheme.primary,
+        elevation: 0,
+        title: const Text('Usar Plantillas'),
+        titleTextStyle: TextStyle(
+            color: theme.colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 20),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: height,
+              child: CardScroll(
+                cards: [
+                  CardData(
+                    title: 'PLANTILLA PARA MUJERES - PERDER PESO',
+                    description:
+                        '2000kcal diarias, dieta para perder peso para mujeres',
+                    imageUrl:
+                        'https://i.pinimg.com/originals/59/0f/88/590f88779605c7bff6fba423fa2e2492.png',
+                  ),
+                  CardData(
+                    title: 'DIETA PARA CONSTRUIR MÚSCULO',
+                    description: '3500kcal diarias, dieta para ganar peso',
+                    imageUrl:
+                        'https://i.pinimg.com/originals/59/0f/88/590f88779605c7bff6fba423fa2e2492.png',
+                  ),
+                  CardData(
+                    title: 'DIETA PARA ATLETAS',
+                    description: '2500kcal diarias, para atletas',
+                    imageUrl:
+                        'https://i.pinimg.com/originals/59/0f/88/590f88779605c7bff6fba423fa2e2492.png',
+                  ),
+                ],
+                scrollDirection: Axis.vertical,
+              ),
+            ),
+          ],
         ),
-        body: Center(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        SizedBox(
-          height: height,
-          child: CardScroll(
-            cards: [
-              CardData(
-                title: 'WOMEN TEMPLATE LOST WEIGHT',
-                description: '2000kcal daily, lost weight diet for women',
-                imageUrl:
-                    'https://i.pinimg.com/originals/59/0f/88/590f88779605c7bff6fba423fa2e2492.png',
-              ),
-              CardData(
-                title: 'MUSCLE BUILDING DIET',
-                description: '3500kcal daily, weight gain diet',
-                imageUrl:
-                    'https://i.pinimg.com/originals/59/0f/88/590f88779605c7bff6fba423fa2e2492.png',
-              ),
-              CardData(
-                title: 'ATHELETIC DIET',
-                description: '2500kcal daily, for athletes',
-                imageUrl:
-                    'https://i.pinimg.com/originals/59/0f/88/590f88779605c7bff6fba423fa2e2492.png',
-              ),
-            ],
-            scrollDirection: Axis.vertical,
-          ),
-        ),
-      ]),
-    ));
+      ),
+    );
   }
 }

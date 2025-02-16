@@ -7,8 +7,9 @@ import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
 import 'package:flutter_flexdiet/theme/app_theme.dart';
-import 'package:flutter_flexdiet/widgets/widgets.dart'; // Importa el ShowToast
+import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -53,6 +54,18 @@ class _LoginScreenState extends State<LoginScreen>
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  // Función para verificar si el usuario ya ha completado la información
+  Future<bool> _hasCompletedUserInfo() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool('userInfoCompleted') ?? false;
+    } catch (e) {
+      print('Error al acceder a SharedPreferences: $e');
+      // En caso de error, asume que no ha completado la información.
+      return false;
+    }
   }
 
   @override
@@ -114,12 +127,13 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       child: CustomInputText(
                         controller: _usernameController,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'Correo electrónico',
                           labelStyle: theme.inputDecorationTheme.labelStyle
                               ?.copyWith(color: theme.colorScheme.onSurface),
                           border: InputBorder.none,
-                          prefixIcon: Icon(Icons.person_outline,
+                          prefixIcon: Icon(Icons.email_rounded,
                               color: theme.colorScheme.onSurface),
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 16),
@@ -190,12 +204,30 @@ class _LoginScreenState extends State<LoginScreen>
                           if (context.mounted) {
                             ShowToast(context, 'Inicio de sesión correcto',
                                 toastType: ToastType.success);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const UserInfoScreen(),
-                              ),
-                            );
+
+                            // Verifica si el usuario ya ha completado la información
+                            final hasCompleted = await _hasCompletedUserInfo();
+
+                            if (hasCompleted) {
+                              // Si ya completó, ve directamente a HomeScreen
+                              if (context.mounted) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const HomeScreen()),
+                                );
+                              }
+                            } else {
+                              // Si no ha completado, ve a UserInfoScreen
+                              if (context.mounted) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const UserInfoScreen()),
+                                );
+                              }
+                            }
                           }
                         } on InvalidCredentialsException {
                           if (context.mounted) {
@@ -299,13 +331,32 @@ class _LoginScreenState extends State<LoginScreen>
                                   ShowToast(
                                       context, 'Inicio de sesión correcto',
                                       toastType: ToastType.success);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const UserInfoScreen(),
-                                    ),
-                                  );
+
+                                  // Verifica si el usuario ya ha completado la información
+                                  final hasCompleted =
+                                      await _hasCompletedUserInfo();
+
+                                  if (hasCompleted) {
+                                    // Si ya completó, ve directamente a HomeScreen
+                                    if (context.mounted) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomeScreen()),
+                                      );
+                                    }
+                                  } else {
+                                    // Si no ha completado, ve a UserInfoScreen
+                                    if (context.mounted) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const UserInfoScreen()),
+                                      );
+                                    }
+                                  }
                                 }
                               } catch (e) {
                                 if (context.mounted) {
@@ -356,16 +407,6 @@ class _LoginScreenState extends State<LoginScreen>
                           color: theme.colorScheme.onSurface,
                         ),
                         onPressed: () async {
-                          // Validación de campos vacíos
-                          if (_usernameController.text.isEmpty ||
-                              _passwordController.text.isEmpty) {
-                            ShowToast(
-                              context,
-                              'Por favor, rellena todos los campos',
-                              toastType: ToastType.warning,
-                            );
-                            return;
-                          }
                           bool canAuthenticate =
                               await _localAuth.canCheckBiometrics ||
                                   await _localAuth.isDeviceSupported();

@@ -12,10 +12,9 @@ class TemplateScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: theme.colorScheme.primary,
-        title: const Text('Admin Panel'),
+        title: const Text('Panel de Administrador'),
         centerTitle: true,
-        
-        ),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -24,13 +23,13 @@ class TemplateScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Target customer for the template (not implemented)',
+                'Cliente objetivo para la plantilla (no implementado)',
                 style: theme.textTheme.headlineSmall,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
               CustomButton(
-                text: 'CREATE TEMPLATE',
+                text: 'CREAR PLANTILLA',
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -39,11 +38,13 @@ class TemplateScreen extends StatelessWidget {
                 },
                 backgroundColor: theme.colorScheme.primary,
                 textColor: theme.colorScheme.onPrimary,
-                textStyle: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onPrimary),
+                textStyle: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onPrimary),
               ),
               const SizedBox(height: 16),
               CustomButton(
-                text: 'USE TEMPLATE',
+                text: 'USAR PLANTILLA',
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -52,8 +53,10 @@ class TemplateScreen extends StatelessWidget {
                   );
                 },
                 backgroundColor: theme.colorScheme.primary,
-                textColor: theme.colorScheme.onPrimary, 
-                textStyle: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onPrimary),
+                textColor: theme.colorScheme.onPrimary,
+                textStyle: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onPrimary),
               ),
             ],
           ),
