@@ -11,9 +11,12 @@ class CustomUserInfo extends StatelessWidget {
   final List<DropdownMenuItem<String>>? items;
   final String? value;
   final void Function(String?)? onChangedDropdown;
+  final bool isGender;
+  final String? genderValue;
+  final void Function(String?)? onChangedGender;
 
   const CustomUserInfo({
-    super.key,
+    Key? key,
     required this.labelText,
     this.controller,
     this.keyboardType = TextInputType.text,
@@ -24,14 +27,32 @@ class CustomUserInfo extends StatelessWidget {
     this.items,
     this.value,
     this.onChangedDropdown,
-  });
+    this.isGender = false,
+    this.genderValue,
+    this.onChangedGender,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (isDropdown)
+        if (isGender)
+          DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: labelText,
+              border: const UnderlineInputBorder(),
+              contentPadding: const EdgeInsets.symmetric(vertical: 8),
+            ),
+            value: genderValue,
+            items: const [
+              DropdownMenuItem(value: 'hombre', child: Text('Hombre')),
+              DropdownMenuItem(value: 'mujer', child: Text('Mujer')),
+            ],
+            onChanged: onChangedGender,
+            validator: validator,
+          )
+        else if (isDropdown)
           DropdownButtonFormField<String>(
             decoration: InputDecoration(
               labelText: labelText,

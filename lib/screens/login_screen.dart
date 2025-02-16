@@ -326,15 +326,6 @@ class _LoginScreenState extends State<LoginScreen>
                           child: GoogleAuthButton(
                             onPressed: () async {
                               try {
-                                if (_usernameController.text.isEmpty ||
-                                    _passwordController.text.isEmpty) {
-                                  ShowToast(
-                                    context,
-                                    'Por favor, rellena todos los campos',
-                                    toastType: ToastType.warning,
-                                  );
-                                  return;
-                                }
                                 await googleAuthService.signIn();
                                 if (context.mounted) {
                                   ShowToast(
@@ -347,20 +338,24 @@ class _LoginScreenState extends State<LoginScreen>
 
                                   if (hasCompleted) {
                                     // Si ya completó, ve directamente a HomeScreen
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const HomeScreen()),
-                                    );
+                                    if (context.mounted) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomeScreen()),
+                                      );
+                                    }
                                   } else {
                                     // Si no ha completado, ve a UserInfoScreen
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const UserInfoScreen()),
-                                    );
+                                    if (context.mounted) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const UserInfoScreen()),
+                                      );
+                                    }
                                   }
                                 }
                               } catch (e) {
@@ -412,16 +407,6 @@ class _LoginScreenState extends State<LoginScreen>
                           color: theme.colorScheme.onSurface,
                         ),
                         onPressed: () async {
-                          // Validación de campos vacíos
-                          if (_usernameController.text.isEmpty ||
-                              _passwordController.text.isEmpty) {
-                            ShowToast(
-                              context,
-                              'Por favor, rellena todos los campos',
-                              toastType: ToastType.warning,
-                            );
-                            return;
-                          }
                           bool canAuthenticate =
                               await _localAuth.canCheckBiometrics ||
                                   await _localAuth.isDeviceSupported();
