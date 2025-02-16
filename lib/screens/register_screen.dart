@@ -155,7 +155,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                             labelStyle: theme.inputDecorationTheme.labelStyle
                                 ?.copyWith(color: theme.colorScheme.onSurface),
                             border: InputBorder.none,
-                            prefixIcon: Icon(Icons.person_outline,
+                            prefixIcon: Icon(Icons.email_rounded,
                                 color: theme.colorScheme.onSurface),
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 16),
