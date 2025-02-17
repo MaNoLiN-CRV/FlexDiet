@@ -24,19 +24,21 @@ class _LoginScreenState extends State<LoginScreen>
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   final LocalAuthentication _localAuth = LocalAuthentication();
-
-  late AnimationController _animationController;
-  late Animation<Color?> _backgroundColorAnimation;
-
   final AuthService authService = AuthService();
-  late provider.EmailAuth emailAuthService =
-      authService.emailAuth() as provider.EmailAuth;
-  late provider.GoogleAuth googleAuthService =
-      authService.googleAuth() as provider.GoogleAuth;
+
+  late final AnimationController _animationController;
+  late final Animation<Color?> _backgroundColorAnimation;
+  late final provider.EmailAuth emailAuthService;
+  late final provider.GoogleAuth googleAuthService;
 
   @override
   void initState() {
     super.initState();
+    _setupAnimation();
+    _setupAuthServices();
+  }
+
+  void _setupAnimation() {
     _animationController = AnimationController(
       duration: const Duration(seconds: 6),
       vsync: this,
@@ -48,29 +50,221 @@ class _LoginScreenState extends State<LoginScreen>
     ).animate(_animationController);
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+  void _setupAuthServices() {
+    emailAuthService = authService.emailAuth() as provider.EmailAuth;
+    googleAuthService = authService.googleAuth() as provider.GoogleAuth;
   }
 
-  // Función para verificar si el usuario ya ha completado la información
   Future<bool> _hasCompletedUserInfo() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getBool('userInfoCompleted') ?? false;
     } catch (e) {
-      print('Error al acceder a SharedPreferences: $e');
-      // En caso de error, asume que no ha completado la información.
       return false;
     }
+  }
+
+  Future<void> _handleNavigation(BuildContext context) async {
+    final hasCompleted = await _hasCompletedUserInfo();
+    if (!context.mounted) return;
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            hasCompleted ? const HomeScreen() : const UserInfoScreen(),
+      ),
+    );
+  }
+
+  Future<void> _handleEmailSignIn(BuildContext context) async {
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+      ShowToast(context, 'Por favor, rellena todos los campos',
+          toastType: ToastType.warning);
+      return;
+    }
+
+    try {
+      await emailAuthService.signIn(
+        email: _usernameController.text,
+        password: _passwordController.text,
+      );
+
+      if (!context.mounted) return;
+      ShowToast(context, 'Inicio de sesión correcto',
+          toastType: ToastType.success);
+      await _handleNavigation(context);
+    } on InvalidCredentialsException {
+      if (!context.mounted) return;
+      ShowToast(context, 'Correo electrónico o contraseña incorrectos',
+          toastType: ToastType.error);
+    } catch (e) {
+      if (!context.mounted) return;
+      ShowToast(context, 'Correo electrónico o contraseña incorrectos',
+          toastType: ToastType.error);
+    }
+  }
+
+  Future<void> _handleGoogleSignIn(BuildContext context) async {
+    try {
+      await googleAuthService.signIn();
+      if (!context.mounted) return;
+
+      ShowToast(context, 'Inicio de sesión correcto',
+          toastType: ToastType.success);
+      await _handleNavigation(context);
+    } catch (e) {
+      if (!context.mounted) return;
+      ShowToast(context, 'Error al iniciar sesión con Google',
+          toastType: ToastType.error);
+    }
+  }
+
+  Future<void> _handleBiometricAuth(BuildContext context) async {
+    final canAuthenticate = await _localAuth.canCheckBiometrics ||
+        await _localAuth.isDeviceSupported();
+
+    if (!canAuthenticate) return;
+
+    try {
+      final authenticated = await _localAuth.authenticate(
+        localizedReason: 'Autentícate para iniciar sesión',
+        options: const AuthenticationOptions(biometricOnly: true),
+      );
+
+      if (authenticated && context.mounted) {
+        ShowToast(context, 'Inicio de sesión correcto',
+            toastType: ToastType.success);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const UserInfoScreen()),
+        );
+      }
+    } on PlatformException catch (e) {
+      if (!context.mounted) return;
+      ShowToast(context, 'Error en la autenticación biométrica',
+          toastType: ToastType.error);
+    }
+  }
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    bool isPassword = false,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black,
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: CustomInputText(
+        controller: controller,
+        obscureText: isPassword ? !_isPasswordVisible : false,
+        keyboardType: !isPassword ? TextInputType.emailAddress : null,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
+          border: InputBorder.none,
+          prefixIcon: Icon(icon),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(_isPasswordVisible
+                      ? Icons.visibility
+                      : Icons.visibility_off),
+                  onPressed: () =>
+                      setState(() => _isPasswordVisible = !_isPasswordVisible),
+                )
+              : null,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(ThemeData theme) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 8,
+      children: [
+        TextButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const ForgotPasswordScreen()),
+          ),
+          child: Text(
+            '¿Olvidaste tu contraseña?',
+            style: theme.textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        TextButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const RegisterScreen()),
+          ),
+          child: Text(
+            'Únete ahora',
+            style: theme.textTheme.bodyLarge,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialButtons(ThemeData theme, double screenWidth) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: GoogleAuthButton(
+              onPressed: () => _handleGoogleSignIn(context),
+              text: "Iniciar con Google",
+              style: AuthButtonStyle(
+                textStyle: theme.textTheme.bodyLarge,
+                iconSize: 20,
+                width: double.infinity,
+                height: 45,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: AppleAuthButton(
+              text: "Iniciar con Apple",
+              onPressed: () {},
+              style: AuthButtonStyle(
+                textStyle: theme.textTheme.bodyLarge,
+                iconSize: 20,
+                width: double.infinity,
+                height: 45,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenSize = MediaQuery.of(context).size;
+    final horizontalPadding = screenSize.width * 0.05;
+
     return Scaffold(
       body: AnimatedBuilder(
         animation: _backgroundColorAnimation,
@@ -84,348 +278,107 @@ class _LoginScreenState extends State<LoginScreen>
                 fit: BoxFit.cover,
               ),
             ),
-            child: Center(
-              child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Image.asset(
-                      'assets/images/logo.png',
-                      height: 100,
+            child: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: horizontalPadding,
+                      vertical: screenSize.height * 0.01,
                     ),
-                    Text(
-                      'FlexDiet',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.displayMedium?.copyWith(),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Tu camino hacia una vida saludable',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(),
-                    ),
-                    const SizedBox(height: 50),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black,
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Image.asset(
+                            'assets/images/logo.png',
+                            height: screenSize.height * 0.15,
+                          ),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'FlexDiet',
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.displaySmall,
+                            ),
+                          ),
+                          Text(
+                            'Tu camino hacia una vida saludable',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          SizedBox(height: screenSize.height * 0.04),
+                          _buildInputField(
+                            controller: _usernameController,
+                            label: 'Correo electrónico',
+                            icon: Icons.email_rounded,
+                          ),
+                          SizedBox(height: screenSize.height * 0.02),
+                          _buildInputField(
+                            controller: _passwordController,
+                            label: 'Contraseña',
+                            icon: Icons.lock_outline,
+                            isPassword: true,
+                          ),
+                          SizedBox(height: screenSize.height * 0.02),
+                          ElevatedButton(
+                            onPressed: () => _handleEmailSignIn(context),
+                            style: theme.elevatedButtonTheme.style,
+                            child: Text(
+                              'Comenzar mi viaje saludable',
+                              style: theme.textTheme.labelLarge
+                                  ?.copyWith(color: Colors.white),
+                            ),
+                          ),
+                          _buildActionButtons(theme),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: screenSize.height * 0.02),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: Divider(
+                                        color: theme.colorScheme.onSurface)),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  child: Text('O continúa con',
+                                      style: theme.textTheme.bodyMedium),
+                                ),
+                                Expanded(
+                                    child: Divider(
+                                        color: theme.colorScheme.onSurface)),
+                              ],
+                            ),
+                          ),
+                          _buildSocialButtons(theme, screenSize.width),
+                          IconButton(
+                            icon: Icon(Icons.fingerprint,
+                                size: 40, color: theme.colorScheme.onSurface),
+                            onPressed: () => _handleBiometricAuth(context),
                           ),
                         ],
                       ),
-                      child: CustomInputText(
-                        controller: _usernameController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: 'Correo electrónico',
-                          labelStyle:
-                              theme.inputDecorationTheme.labelStyle?.copyWith(),
-                          border: InputBorder.none,
-                          prefixIcon: Icon(
-                            Icons.email_rounded,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 16),
-                        ),
-                      ),
                     ),
-                    const SizedBox(height: 20),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black,
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: CustomInputText(
-                        controller: _passwordController,
-                        obscureText: !_isPasswordVisible,
-                        decoration: InputDecoration(
-                          labelText: 'Contraseña',
-                          labelStyle:
-                              theme.inputDecorationTheme.labelStyle?.copyWith(),
-                          border: InputBorder.none,
-                          prefixIcon: Icon(
-                            Icons.lock_outline,
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 16),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        // Validación de campos vacíos
-                        if (_usernameController.text.isEmpty ||
-                            _passwordController.text.isEmpty) {
-                          ShowToast(
-                            context,
-                            'Por favor, rellena todos los campos',
-                            toastType: ToastType.warning,
-                          );
-                          return;
-                        }
-                        try {
-                          await emailAuthService.signIn(
-                            email: _usernameController.text,
-                            password: _passwordController.text,
-                          );
-
-                          if (context.mounted) {
-                            ShowToast(context, 'Inicio de sesión correcto',
-                                toastType: ToastType.success);
-
-                            // Verifica si el usuario ya ha completado la información
-                            // Si ya completó, ve directamente a HomeScreen
-                            // Verifica si el usuario ya ha completado la información
-                            final hasCompleted = await _hasCompletedUserInfo();
-
-                            if (hasCompleted) {
-                              // Si ya completó, ve directamente a HomeScreen
-                              if (context.mounted) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomeScreen()),
-                                );
-                              }
-                            } else {
-                              // Si no ha completado, ve a UserInfoScreen
-                              if (context.mounted) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const UserInfoScreen()),
-                                );
-                              }
-                            }
-                          }
-                        } on InvalidCredentialsException {
-                          if (context.mounted) {
-                            ShowToast(
-                              context,
-                              'Correo electrónico o contraseña incorrectos',
-                              toastType: ToastType.error,
-                            );
-                          }
-                        } on Exception catch (exception) {
-                          if (context.mounted) {
-                            ShowToast(
-                              context,
-                              'Correo electrónico o contraseña incorrectos',
-                              toastType: ToastType.error,
-                            );
-                            print('Otro error: ${exception.toString()}');
-                          }
-                        }
-                      },
-                      style: theme.elevatedButtonTheme.style,
-                      child: Text('Comenzar mi viaje saludable',
-                          style: theme.textTheme.labelLarge
-                              ?.copyWith(color: Colors.white)),
-                    ),
-                    const SizedBox(height: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const ForgotPasswordScreen(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            '¿Olvidaste tu contraseña?',
-                            style: theme.textTheme.bodyLarge?.copyWith(),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'Únete ahora',
-                            style: theme.textTheme.bodyLarge?.copyWith(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                              color: theme.colorScheme.onSurface,
-                              thickness: 0.5),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(
-                            'O continúa con',
-                            style: theme.textTheme.bodyMedium?.copyWith(),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(thickness: 0.5),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15),
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: GoogleAuthButton(
-                            onPressed: () async {
-                              try {
-                                await googleAuthService.signIn();
-                                if (context.mounted) {
-                                  ShowToast(
-                                      context, 'Inicio de sesión correcto',
-                                      toastType: ToastType.success);
-
-                                  // Verifica si el usuario ya ha completado la información
-                                  final hasCompleted =
-                                      await _hasCompletedUserInfo();
-
-                                  if (hasCompleted) {
-                                    // Si ya completó, ve directamente a HomeScreen
-                                    if (context.mounted) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const HomeScreen()),
-                                      );
-                                    }
-                                  } else {
-                                    // Si no ha completado, ve a UserInfoScreen
-                                    if (context.mounted) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const UserInfoScreen()),
-                                      );
-                                    }
-                                  }
-                                }
-                              } catch (e) {
-                                if (context.mounted) {
-                                  ShowToast(
-                                    context,
-                                    'Error al iniciar sesión con Google',
-                                    toastType: ToastType.error,
-                                  );
-                                }
-                              }
-                            },
-                            text: "Inicia sesión con Google",
-                            style: AuthButtonStyle(
-                              textStyle: theme.textTheme.bodyLarge?.copyWith(),
-                              iconSize: 20,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: AppleAuthButton(
-                            text: "Inicia sesión con Apple",
-                            onPressed: () {},
-                            style: AuthButtonStyle(
-                              textStyle: theme.textTheme.bodyLarge?.copyWith(),
-                              iconSize: 20,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Center(
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.fingerprint,
-                          size: 40,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                        onPressed: () async {
-                          bool canAuthenticate =
-                              await _localAuth.canCheckBiometrics ||
-                                  await _localAuth.isDeviceSupported();
-                          if (canAuthenticate) {
-                            try {
-                              await _localAuth.authenticate(
-                                localizedReason:
-                                    'Autentícate para iniciar sesión',
-                                options: const AuthenticationOptions(
-                                    biometricOnly: true),
-                              );
-                              if (context.mounted) {
-                                ShowToast(context, 'Inicio de sesión correcto',
-                                    toastType: ToastType.success);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const UserInfoScreen(),
-                                  ),
-                                );
-                              }
-                            } on PlatformException catch (e) {
-                              if (context.mounted) {
-                                ShowToast(
-                                  context,
-                                  'Error en la autenticación biométrica',
-                                  toastType: ToastType.error,
-                                );
-                                print('Error en autenticación: $e');
-                              }
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           );
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
