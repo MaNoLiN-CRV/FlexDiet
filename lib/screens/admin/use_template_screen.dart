@@ -14,7 +14,7 @@ class UseTemplateScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: theme.colorScheme.primary,
         elevation: 0,
-        title: const Text('Use Templates'),
+        title: const Text('Usar Plantillas'),
         titleTextStyle: TextStyle(
           color: theme.colorScheme.onPrimary,
           fontWeight: FontWeight.bold,
@@ -33,23 +33,23 @@ class UseTemplateScreen extends StatelessWidget {
                 child: CardScroll(
                   cards: [
                     CardData(
-                      title: 'TEMPLATE FOR WOMEN - WEIGHT LOSS',
+                      title: 'PLANTILLA PARA MUJERES - PERDER PESO',
                       description:
-                          '2000kcal diet specifically designed for women who want to lose weight in a healthy way. Includes a balanced nutritional profile and recipes focused on your goals.',
+                          'Dieta de 2000kcal para mujeres que desean perder peso de manera saludable. Incluye un perfil nutricional equilibrado y recetas enfocadas en tus objetivos.',
                       imageUrl:
                           'https://images.unsplash.com/photo-1607178743429-f34aa08f784d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NjQwNzZ8MHwxfHNlYXJjaHwxfHxkaWV0JTIwd29tYW58ZW58MHx8fHwxNzA3NjY3NzYxfDA&ixlib=rb-4.0.3&q=80&w=200',
                     ),
                     CardData(
-                      title: 'DIET FOR MUSCLE GAIN',
+                      title: 'DIETA PARA GANAR MASA MUSCULAR',
                       description:
-                          '3500kcal meal plan optimized for muscle growth. Rich in protein and complex carbohydrates to support your workouts and muscle recovery.',
+                          'Plan de comidas de 3500kcal optimizado para el crecimiento muscular. Rico en proteInas y carbohidratos complejos para apoyar tus entrenamientos y recuperacion muscular.',
                       imageUrl:
                           'https://images.unsplash.com/photo-1556771512-9804c2c7482f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NjQwNzZ8MHwxfHNlYXJjaHw2fHxidWxrJTIwbXVzY2xlfGVufDB8fHx8MTcwNzY2NzgyOXww&ixlib=rb-4.0.3&q=80&w=200',
                     ),
                     CardData(
-                      title: 'DIET FOR ATHLETES',
+                      title: 'DIETA PARA DEPORTISTAS',
                       description:
-                          'Balanced diet of 2500kcal designed for athletes who want to maintain optimal performance. Provides the energy and nutrients needed for intense training and competition.',
+                          'Dieta equilibrada de 2500kcal para deportistas que desean mantener un rendimiento optimo. Proporciona la energia y nutrientes necesarios para entrenamientos intensivos y competitivos.',
                       imageUrl:
                           'https://images.unsplash.com/photo-1554999212-c68ed64f0a51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NjQwNzZ8MHwxfHNlYXJjaHwxfHNsYWxhZCUyMGF0aGxldGV8ZW58MHx8fHwxNzA3NjY3ODc3fDA&ixlib=rb-4.0.3&q=80&w=200',
                     ),
