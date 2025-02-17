@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/screens/settings_screen.dart';
-import 'package:flutter_flexdiet/theme/app_theme.dart';
+import 'package:flutter_flexdiet/screens/screens.dart';
+import 'package:flutter_flexdiet/theme/app_theme_light.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       title: 'Material App',
       home: Scaffold(
         body: Center(
-          child: SettingsScreen(),
+          child: LoginScreen(),
         ),
       ),
     );

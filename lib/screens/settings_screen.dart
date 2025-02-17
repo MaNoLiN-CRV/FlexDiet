@@ -70,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       radius: 45,
                       backgroundColor: Colors.grey[200],
                       backgroundImage: NetworkImage(
-                          'https://media.istockphoto.com/id/1413766112/es/foto/exitoso-hombre-de-negocios-maduro-mirando-a-la-c%C3%A1mara-con-confianza.jpg?s=612x612&w=0&k=20&c=_wh29d41PN8a3GlqANKphBMIkN2P-QI4KPPIM7bVvDA='),
+                          'https://static.vecteezy.com/system/resources/previews/030/750/807/non_2x/user-icon-in-trendy-outline-style-isolated-on-white-background-user-silhouette-symbol-for-your-website-design-logo-app-ui-illustration-eps10-free-vector.jpg'),
                     ),
                   ),
                   const SizedBox(width: 20),
