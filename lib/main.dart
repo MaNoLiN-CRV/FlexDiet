@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/screens/login_screen.dart';
 import 'package:flutter_flexdiet/screens/settings_screen.dart';
 import 'package:flutter_flexdiet/theme/app_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,7 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: defaultTheme,
+      theme: lightTheme,
       title: 'Material App',
       home: Scaffold(
         body: Center(

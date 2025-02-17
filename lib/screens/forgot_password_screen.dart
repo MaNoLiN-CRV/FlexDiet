@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/theme/app_theme.dart';
+import 'package:flutter_flexdiet/theme/app_theme_light.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 late AnimationController _animationController;

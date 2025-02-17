@@ -31,19 +31,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         centerTitle: true,
         elevation: 0,
         actions: [
-          // Botón para navegar a x
-          TextButton(
-            onPressed: () {
-              //! Dirigir la navegación a algun lado
-            },
-            child: const Text(
-              'Mi Perfil',
-              style: TextStyle(
-                color: Colors.blue,
-                fontWeight: FontWeight.w600,
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: const Text(
+                'Mi Perfil',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
         ],
       ),
       // El tabBar de nuestra aplicación
@@ -95,7 +92,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 40),
-            // Settings Options
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
