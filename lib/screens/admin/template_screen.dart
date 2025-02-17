@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/screens/admin/use_template_screen.dart';
 import 'package:flutter_flexdiet/screens/home_screen.dart';
-import 'package:flutter_flexdiet/widgets/custom_button.dart';
 import 'package:flutter_flexdiet/widgets/custom_card_scroll.dart';
 
 class TemplateScreen extends StatefulWidget {
@@ -16,22 +15,22 @@ class _TemplateScreenState extends State<TemplateScreen> {
   final List<CardData> _clientCards = [
     CardData(
       title: 'Snoop Dogg',
-      description: 'Client with gaining weight routine, 30 years old',
+      description: 'Cliente con rutina de ganar peso, entrena dos dias a la semana.',
       imageUrl: 'https://allhiphop.com/wp-content/uploads/2022/11/Snoop-Dogg.jpg',
     ),
     CardData(
       title: 'Eminem',
-      description: 'Atheletic, 40 years old and a bodybuilder',
+      description: 'Atleta, y fisicoculturista',
       imageUrl: 'https://cdn.britannica.com/63/136263-050-7FBFFBD1/Eminem.jpg',
     ),
     CardData(
       title: 'Ice Cube',
-      description: 'Loose weight routine, 50 years old',
+      description: 'Rutina para perder peso',
       imageUrl: 'https://heavy.com/wp-content/uploads/2017/02/gettyimages-615695594.jpg?quality=65&strip=all',
     ),
     CardData(
       title: 'Juice WRLD',
-      description: 'Cicling routine, 20 years old',
+      description: 'Rutina de ciclismo, ',
       imageUrl: 'https://www.thefamouspeople.com/profiles/images/juice-wrld-1.jpg',
     ),
   ];
@@ -49,7 +48,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.primary,
-        title: const Text('ADMIN PANEL'),
+        title: const Text('PANEL DE ADMINISTRADOR'),
         centerTitle: true,
         titleTextStyle: TextStyle(
           color: theme.colorScheme.onPrimary,
@@ -67,8 +66,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
           children: [
             Text(
               _selectedClientName != null
-                  ? 'Selected Client: $_selectedClientName'
-                  : 'Select a Client',
+                  ? 'Cliente seleccionado: $_selectedClientName'
+                  : 'Seleccione un cliente',
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontStyle: _selectedClientName != null ? FontStyle.normal : FontStyle.italic,
@@ -139,3 +138,4 @@ class _TemplateScreenState extends State<TemplateScreen> {
     );
   }
 }
+
