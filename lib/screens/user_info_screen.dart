@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/screens/loading_screen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/app_theme_light.dart';
 import 'package:flutter_flexdiet/widgets/custom_page_indicator.dart';
@@ -270,7 +271,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const HomeScreen()),
+                            builder: (context) => const LoadingScreen(targetScreen: HomeScreen(), loadingSeconds: 2,)),
                       );
                     }
                   },

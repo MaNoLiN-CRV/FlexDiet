@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen>
       context,
       MaterialPageRoute(
         builder: (context) =>
-            hasCompleted ? const HomeScreen() : const UserInfoScreen(),
+            hasCompleted ? const LoadingScreen(targetScreen: HomeScreen(), loadingSeconds: 2,) : const UserInfoScreen(),
       ),
     );
   }
