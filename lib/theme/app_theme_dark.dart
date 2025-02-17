@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 
-const Color backgroundColorBlack =
-    Color(0xFF121B2B); // Fondo oscuro, azul profundo
-const Color backgroundColorDarkBlue =
-    Color(0xFF1F2A47); // Azul más suave para el fondo
-const Color containersDarkBlue =
-    Color(0xFF3A4D75); // Azul grisáceo para contenedores
+const Color backgroundColorBlack = Color(0xFF121B2B);
+const Color backgroundColorDarkBlue = Color(0xFF1F2A47);
+const Color containersDarkBlue = Color(0xFF3A4D75);
 const Color textLightBlue = Color(0xFFD1D9E6);
 
 ThemeData darkTheme = ThemeData(
@@ -37,17 +34,27 @@ ThemeData darkTheme = ThemeData(
   ),
   textTheme: TextTheme(
     displayLarge: TextStyle(
-        fontSize: 72.0, fontWeight: FontWeight.bold, color: textLightBlue),
+        fontSize: 72.0,
+        fontWeight: FontWeight.bold,
+        color: backgroundColorBlack),
     displayMedium: TextStyle(
-        fontSize: 56.0, fontWeight: FontWeight.bold, color: textLightBlue),
+        fontSize: 56.0,
+        fontWeight: FontWeight.bold,
+        color: backgroundColorBlack),
     displaySmall: TextStyle(
-        fontSize: 48.0, fontWeight: FontWeight.bold, color: textLightBlue),
+        fontSize: 48.0,
+        fontWeight: FontWeight.bold,
+        color: backgroundColorBlack),
     headlineLarge: TextStyle(
-        fontSize: 36.0, fontWeight: FontWeight.bold, color: textLightBlue),
+        fontSize: 36.0,
+        fontWeight: FontWeight.bold,
+        color: backgroundColorBlack),
     headlineMedium: TextStyle(
         fontSize: 28.0, fontWeight: FontWeight.bold, color: textLightBlue),
     headlineSmall: TextStyle(
-        fontSize: 24.0, fontWeight: FontWeight.bold, color: textLightBlue),
+        fontSize: 24.0,
+        fontWeight: FontWeight.bold,
+        color: backgroundColorBlack),
     titleLarge: TextStyle(
         fontSize: 22.0, fontWeight: FontWeight.w600, color: textLightBlue),
     titleMedium: TextStyle(

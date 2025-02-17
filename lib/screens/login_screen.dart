@@ -12,7 +12,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -99,23 +99,17 @@ class _LoginScreenState extends State<LoginScreen>
                     Text(
                       'FlexDiet',
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.displayMedium?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                      ),
+                      style: theme.textTheme.displayMedium?.copyWith(),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Tu camino hacia una vida saludable',
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: theme.textTheme.titleMedium?.copyWith(),
                     ),
                     const SizedBox(height: 50),
                     Container(
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: const [
                           BoxShadow(
@@ -130,11 +124,12 @@ class _LoginScreenState extends State<LoginScreen>
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'Correo electrónico',
-                          labelStyle: theme.inputDecorationTheme.labelStyle
-                              ?.copyWith(color: theme.colorScheme.onSurface),
+                          labelStyle:
+                              theme.inputDecorationTheme.labelStyle?.copyWith(),
                           border: InputBorder.none,
-                          prefixIcon: Icon(Icons.email_rounded,
-                              color: theme.colorScheme.onSurface),
+                          prefixIcon: Icon(
+                            Icons.email_rounded,
+                          ),
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 16),
                         ),
@@ -143,7 +138,6 @@ class _LoginScreenState extends State<LoginScreen>
                     const SizedBox(height: 20),
                     Container(
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: const [
                           BoxShadow(
@@ -158,17 +152,17 @@ class _LoginScreenState extends State<LoginScreen>
                         obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
-                          labelStyle: theme.inputDecorationTheme.labelStyle
-                              ?.copyWith(color: theme.colorScheme.onSurface),
+                          labelStyle:
+                              theme.inputDecorationTheme.labelStyle?.copyWith(),
                           border: InputBorder.none,
-                          prefixIcon: Icon(Icons.lock_outline,
-                              color: theme.colorScheme.onSurface),
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isPasswordVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: theme.colorScheme.onSurface,
                             ),
                             onPressed: () {
                               setState(() {
@@ -194,7 +188,6 @@ class _LoginScreenState extends State<LoginScreen>
                           );
                           return;
                         }
-
                         try {
                           await emailAuthService.signIn(
                             email: _usernameController.text,
@@ -206,7 +199,6 @@ class _LoginScreenState extends State<LoginScreen>
                                 toastType: ToastType.success);
 
                             // Verifica si el usuario ya ha completado la información
-
                             // Si ya completó, ve directamente a HomeScreen
                             if (context.mounted) {
                               Navigator.pushReplacement(
@@ -237,9 +229,8 @@ class _LoginScreenState extends State<LoginScreen>
                       },
                       style: theme.elevatedButtonTheme.style,
                       child: Text('Comenzar mi viaje saludable',
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: theme.colorScheme.onPrimary,
-                          )),
+                          style: theme.textTheme.labelLarge
+                              ?.copyWith(color: Colors.white)),
                     ),
                     const SizedBox(height: 10),
                     Column(
@@ -257,10 +248,7 @@ class _LoginScreenState extends State<LoginScreen>
                           },
                           child: Text(
                             '¿Olvidaste tu contraseña?',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onSurface,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: theme.textTheme.bodyLarge?.copyWith(),
                           ),
                         ),
                         TextButton(
@@ -274,10 +262,7 @@ class _LoginScreenState extends State<LoginScreen>
                           },
                           child: Text(
                             'Únete ahora',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: theme.colorScheme.onSurface,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: theme.textTheme.bodyLarge?.copyWith(),
                           ),
                         ),
                       ],
@@ -294,14 +279,11 @@ class _LoginScreenState extends State<LoginScreen>
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
                             'O continúa con',
-                            style: theme.textTheme.bodyMedium
-                                ?.copyWith(color: theme.colorScheme.onSurface),
+                            style: theme.textTheme.bodyMedium?.copyWith(),
                           ),
                         ),
                         Expanded(
-                          child: Divider(
-                              color: theme.colorScheme.onSurface,
-                              thickness: 0.5),
+                          child: Divider(thickness: 0.5),
                         ),
                       ],
                     ),
@@ -357,11 +339,7 @@ class _LoginScreenState extends State<LoginScreen>
                             },
                             text: "Inicia sesión con Google",
                             style: AuthButtonStyle(
-                              buttonColor: theme.colorScheme.surface,
-                              borderRadius: 12,
-                              textStyle: theme.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 16,
-                                  color: theme.colorScheme.onSurface),
+                              textStyle: theme.textTheme.bodyLarge?.copyWith(),
                               iconSize: 20,
                             ),
                           ),
@@ -373,13 +351,8 @@ class _LoginScreenState extends State<LoginScreen>
                             text: "Inicia sesión con Apple",
                             onPressed: () {},
                             style: AuthButtonStyle(
-                              buttonColor: theme.colorScheme.surface,
-                              borderRadius: 12,
-                              textStyle: theme.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 16,
-                                  color: theme.colorScheme.onSurface),
+                              textStyle: theme.textTheme.bodyLarge?.copyWith(),
                               iconSize: 20,
-                              iconColor: theme.colorScheme.onSurface,
                             ),
                           ),
                         ),
