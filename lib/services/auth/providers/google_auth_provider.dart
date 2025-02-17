@@ -28,7 +28,7 @@ class GoogleAuth implements provider.AuthProvider {
     // Obtener las credenciales de autenticación de Google, te lleva a una zona de registro con google si el
     // usuario inicia sesión te devuelve GoogleSignInAuthentication. Si no null
     if (googleUser == null) {
-      return throw Exception('Jodido');
+      return throw Exception('No se ha registrado ningun usuario de google');
     }
 
     // Contiene accessToken que nos permite acceder a los servicios de google y idToken que sirve para acceder a firebase
@@ -37,7 +37,7 @@ class GoogleAuth implements provider.AuthProvider {
 
     // Creamos una credencial de Firebase con las credenciales de Google
     if (googleAuth == null) {
-      return throw Exception('Jodido');
+      return throw Exception('Error al crear los credenciales de google');
     }
     return GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
