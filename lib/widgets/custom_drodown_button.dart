@@ -5,7 +5,7 @@ class CustomDropdownButton extends StatelessWidget {
   final Icon? icon;
   final int? elevation;
   final TextStyle? textStyle;
-  final ValueChanged<Object?>? onChange;
+  final ValueChanged<dynamic>? onChange;
   final List<dynamic> list;
 
   const CustomDropdownButton({
@@ -20,15 +20,16 @@ class CustomDropdownButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final initialValue = list.isNotEmpty ? list[0] : null;
     return DropdownButton<dynamic>(
       value: value ?? initialValue,
-      icon: icon ?? const Icon(Icons.menu),
+      icon: icon ?? const Icon(Icons.arrow_downward),
       elevation: elevation ?? 16,
-      style: textStyle ?? TextStyle(),
+      style: textStyle ?? theme.textTheme.labelLarge,
       onChanged: onChange,
       items: list.map<DropdownMenuItem<dynamic>>((dynamic value) {
-        return DropdownMenuItem<String>(value: value, child: Text(value));
+        return DropdownMenuItem<dynamic>(value: value, child: Text(value));
       }).toList(),
     );
   }

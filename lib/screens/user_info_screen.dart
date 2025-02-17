@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/app_theme.dart';
+import 'package:flutter_flexdiet/widgets/custom_page_indicator.dart';
+import 'package:flutter_flexdiet/widgets/custom_user_info.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
