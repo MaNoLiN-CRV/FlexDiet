@@ -4,6 +4,7 @@ const Color backgroundColorBlack = Color(0xFF121B2B);
 const Color backgroundColorDarkBlue = Color(0xFF1F2A47);
 const Color containersDarkBlue = Color(0xFF3A4D75);
 const Color textLightBlue = Color(0xFFD1D9E6);
+const Color textDarkBlue = Color.fromARGB(255, 29, 43, 68);
 
 ThemeData darkTheme = ThemeData(
   colorScheme:
@@ -34,27 +35,17 @@ ThemeData darkTheme = ThemeData(
   ),
   textTheme: TextTheme(
     displayLarge: TextStyle(
-        fontSize: 72.0,
-        fontWeight: FontWeight.bold,
-        color: backgroundColorBlack),
+        fontSize: 72.0, fontWeight: FontWeight.bold, color: textLightBlue),
     displayMedium: TextStyle(
-        fontSize: 56.0,
-        fontWeight: FontWeight.bold,
-        color: backgroundColorBlack),
+        fontSize: 56.0, fontWeight: FontWeight.bold, color: textLightBlue),
     displaySmall: TextStyle(
-        fontSize: 48.0,
-        fontWeight: FontWeight.bold,
-        color: backgroundColorBlack),
+        fontSize: 48.0, fontWeight: FontWeight.bold, color: textLightBlue),
     headlineLarge: TextStyle(
-        fontSize: 36.0,
-        fontWeight: FontWeight.bold,
-        color: backgroundColorBlack),
+        fontSize: 36.0, fontWeight: FontWeight.bold, color: textLightBlue),
     headlineMedium: TextStyle(
         fontSize: 28.0, fontWeight: FontWeight.bold, color: textLightBlue),
     headlineSmall: TextStyle(
-        fontSize: 24.0,
-        fontWeight: FontWeight.bold,
-        color: backgroundColorBlack),
+        fontSize: 24.0, fontWeight: FontWeight.bold, color: textLightBlue),
     titleLarge: TextStyle(
         fontSize: 22.0, fontWeight: FontWeight.w600, color: textLightBlue),
     titleMedium: TextStyle(
@@ -73,7 +64,7 @@ ThemeData darkTheme = ThemeData(
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: textLightBlue,
+      backgroundColor: backgroundColorDarkBlue,
       foregroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
@@ -92,7 +83,7 @@ ThemeData darkTheme = ThemeData(
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: containersDarkBlue,
+      foregroundColor: Colors.white,
       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),

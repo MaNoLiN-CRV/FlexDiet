@@ -6,7 +6,7 @@ import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
-import 'package:flutter_flexdiet/theme/app_theme_light.dart';
+import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,15 +66,29 @@ class _LoginScreenState extends State<LoginScreen>
 
   Future<void> _handleNavigation(BuildContext context) async {
     final hasCompleted = await _hasCompletedUserInfo();
-    if (!context.mounted) return;
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            hasCompleted ? const LoadingScreen(targetScreen: HomeScreen(), loadingSeconds: 2,) : const UserInfoScreen(),
-      ),
-    );
+    if (hasCompleted) {
+      // Si ya completó, ve directamente a HomeScreen
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoadingScreen(
+              targetScreen: HomeScreen(),
+              loadingSeconds: 2,
+            ),
+          ),
+        );
+      }
+    } else {
+      // Si no ha completado, ve a UserInfoScreen
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const UserInfoScreen()),
+        );
+      }
+    }
   }
 
   Future<void> _handleEmailSignIn(BuildContext context) async {
@@ -140,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen>
           MaterialPageRoute(builder: (context) => const UserInfoScreen()),
         );
       }
-    } on PlatformException catch (e) {
+    } on PlatformException {
       if (!context.mounted) return;
       ShowToast(context, 'Error en la autenticación biométrica',
           toastType: ToastType.error);
@@ -202,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           child: Text(
             '¿Olvidaste tu contraseña?',
-            style: theme.textTheme.bodyLarge,
+            style: theme.textTheme.bodyLarge?.copyWith(color: textDarkBlue),
             textAlign: TextAlign.center,
           ),
         ),
@@ -213,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           child: Text(
             'Únete ahora',
-            style: theme.textTheme.bodyLarge,
+            style: theme.textTheme.bodyLarge?.copyWith(color: textDarkBlue),
             textAlign: TextAlign.center,
           ),
         ),
@@ -222,6 +236,13 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Widget _buildSocialButtons(ThemeData theme, double screenWidth) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final googleButtonColor =
+        isDarkMode ? backgroundColorDarkBlue : backgroundColorWhite;
+    final appleButtonColor =
+        isDarkMode ? backgroundColorDarkBlue : backgroundColorWhite;
+    final appleIconColor = isDarkMode ? Colors.white : Colors.black;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
       child: Column(
@@ -233,6 +254,7 @@ class _LoginScreenState extends State<LoginScreen>
               onPressed: () => _handleGoogleSignIn(context),
               text: "Iniciar con Google",
               style: AuthButtonStyle(
+                buttonColor: googleButtonColor,
                 textStyle: theme.textTheme.bodyLarge,
                 iconSize: 20,
                 width: double.infinity,
@@ -247,6 +269,8 @@ class _LoginScreenState extends State<LoginScreen>
               text: "Iniciar con Apple",
               onPressed: () {},
               style: AuthButtonStyle(
+                buttonColor: appleButtonColor,
+                iconColor: appleIconColor,
                 textStyle: theme.textTheme.bodyLarge,
                 iconSize: 20,
                 width: double.infinity,
@@ -284,7 +308,6 @@ class _LoginScreenState extends State<LoginScreen>
                   return SingleChildScrollView(
                     padding: EdgeInsets.symmetric(
                       horizontal: horizontalPadding,
-                      vertical: screenSize.height * 0.01,
                     ),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
@@ -303,13 +326,17 @@ class _LoginScreenState extends State<LoginScreen>
                             child: Text(
                               'FlexDiet',
                               textAlign: TextAlign.center,
-                              style: theme.textTheme.displaySmall,
+                              style: theme.textTheme.displaySmall?.copyWith(
+                                color: textDarkBlue,
+                              ),
                             ),
                           ),
                           Text(
                             'Tu camino hacia una vida saludable',
                             textAlign: TextAlign.center,
-                            style: theme.textTheme.titleMedium,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: textDarkBlue,
+                            ),
                           ),
                           SizedBox(height: screenSize.height * 0.04),
                           _buildInputField(
@@ -340,25 +367,22 @@ class _LoginScreenState extends State<LoginScreen>
                                 vertical: screenSize.height * 0.02),
                             child: Row(
                               children: [
-                                Expanded(
-                                    child: Divider(
-                                        color: theme.colorScheme.onSurface)),
+                                Expanded(child: Divider(color: textDarkBlue)),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16),
                                   child: Text('O continúa con',
-                                      style: theme.textTheme.bodyMedium),
+                                      style: theme.textTheme.bodyMedium
+                                          ?.copyWith(color: textDarkBlue)),
                                 ),
-                                Expanded(
-                                    child: Divider(
-                                        color: theme.colorScheme.onSurface)),
+                                Expanded(child: Divider(color: textDarkBlue)),
                               ],
                             ),
                           ),
                           _buildSocialButtons(theme, screenSize.width),
                           IconButton(
                             icon: Icon(Icons.fingerprint,
-                                size: 40, color: theme.colorScheme.onSurface),
+                                size: 40, color: textDarkBlue),
                             onPressed: () => _handleBiometricAuth(context),
                           ),
                         ],

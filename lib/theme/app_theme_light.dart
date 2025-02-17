@@ -70,6 +70,14 @@ ThemeData lightTheme = ThemeData(
       elevation: 3,
     ),
   ),
+  textButtonTheme: TextButtonThemeData(
+    style: TextButton.styleFrom(
+      foregroundColor: Colors.white,
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+    ),
+  ),
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
       foregroundColor: containersBlue,
@@ -77,14 +85,6 @@ ThemeData lightTheme = ThemeData(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       side: const BorderSide(color: containersBlue),
-    ),
-  ),
-  textButtonTheme: TextButtonThemeData(
-    style: TextButton.styleFrom(
-      foregroundColor: containersBlue,
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
     ),
   ),
   inputDecorationTheme: InputDecorationTheme(
