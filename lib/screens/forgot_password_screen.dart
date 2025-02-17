@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/theme/app_theme_light.dart';
+import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 late AnimationController _animationController;
@@ -38,6 +39,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final TextEditingController _emailController = TextEditingController();
+    final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       body: AnimatedBuilder(
@@ -54,32 +56,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
             ),
             child: Center(
               child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+                padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Image.asset(
                       'assets/images/logo.png',
-                      height: 100,
+                      height: screenSize.height * 0.3,
                     ),
-                    Text(
-                      'Recuperar Contraseña',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.displayMedium?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
+                    Text('Recuperar Contraseña',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.displayMedium
+                            ?.copyWith(color: textDarkBlue)),
                     const SizedBox(height: 8),
                     Text(
-                      'Ingresa tu correo electrónico para restablecer tu contraseña',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
+                        'Ingresa tu correo electrónico para restablecer tu contraseña',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(color: textDarkBlue)),
                     const SizedBox(height: 50),
                     Container(
                       decoration: BoxDecoration(
@@ -139,10 +134,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       },
                       child: Text(
                         'Volver al inicio de sesión',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onSurface,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: theme.textTheme.bodyLarge
+                            ?.copyWith(color: textDarkBlue),
                       ),
                     ),
                   ],

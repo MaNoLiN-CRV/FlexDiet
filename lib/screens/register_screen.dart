@@ -54,6 +54,7 @@ class _RegisterScreenState extends State<RegisterScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
       body: AnimatedBuilder(
@@ -80,23 +81,20 @@ class _RegisterScreenState extends State<RegisterScreen>
                     children: [
                       Image.asset(
                         'assets/images/logo.png',
-                        height: 150,
+                        height: screenSize.height * 0.18,
                       ),
                       Text(
                         'FlexDiet',
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.displayMedium?.copyWith(
-                          color: theme.colorScheme.onSurface,
-                        ),
+                        style: theme.textTheme.displayMedium
+                            ?.copyWith(color: textDarkBlue),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Regístrate para empezar tu viaje saludable',
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onSurface,
-                          fontWeight: FontWeight.w400,
-                        ),
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(color: textDarkBlue),
                       ),
                       const SizedBox(height: 50),
                       // Username input
@@ -123,13 +121,11 @@ class _RegisterScreenState extends State<RegisterScreen>
                           },
                           decoration: InputDecoration(
                             labelText: 'Nombre de usuario',
-                            labelStyle: theme.inputDecorationTheme.labelStyle
-                                ?.copyWith(color: theme.colorScheme.onSurface),
+                            labelStyle: theme.inputDecorationTheme.labelStyle,
                             border: InputBorder.none,
-                            prefixIcon: Icon(Icons.person_outline,
-                                color: theme.colorScheme.onSurface),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 16),
+                            prefixIcon: Icon(
+                              Icons.person_outline,
+                            ),
                           ),
                         ),
                       ),
@@ -152,11 +148,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             labelText: 'Correo Electrónico',
-                            labelStyle: theme.inputDecorationTheme.labelStyle
-                                ?.copyWith(color: theme.colorScheme.onSurface),
+                            labelStyle: theme.inputDecorationTheme.labelStyle,
                             border: InputBorder.none,
-                            prefixIcon: Icon(Icons.email_rounded,
-                                color: theme.colorScheme.onSurface),
+                            prefixIcon: Icon(Icons.email_rounded),
                             contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 16),
                           ),
@@ -185,17 +179,14 @@ class _RegisterScreenState extends State<RegisterScreen>
                           },
                           decoration: InputDecoration(
                             labelText: 'Contraseña',
-                            labelStyle: theme.inputDecorationTheme.labelStyle
-                                ?.copyWith(color: theme.colorScheme.onSurface),
+                            labelStyle: theme.inputDecorationTheme.labelStyle,
                             border: InputBorder.none,
-                            prefixIcon: Icon(Icons.lock_outline,
-                                color: theme.colorScheme.onSurface),
+                            prefixIcon: Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _isPasswordVisible
                                     ? Icons.visibility
                                     : Icons.visibility_off,
-                                color: theme.colorScheme.onSurface,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -231,8 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                           },
                           decoration: InputDecoration(
                             labelText: 'Confirmar Contraseña',
-                            labelStyle: theme.inputDecorationTheme.labelStyle
-                                ?.copyWith(color: theme.colorScheme.onSurface),
+                            labelStyle: theme.inputDecorationTheme.labelStyle,
                             border: InputBorder.none,
                             prefixIcon: Icon(Icons.lock_outline,
                                 color: theme.colorScheme.onSurface),
@@ -327,12 +317,9 @@ class _RegisterScreenState extends State<RegisterScreen>
                           }
                         },
                         style: theme.elevatedButtonTheme.style,
-                        child: Text(
-                          'Regístrate',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.colorScheme.onPrimary,
-                          ),
-                        ),
+                        child: Text('Regístrate',
+                            style: theme.textTheme.labelMedium
+                                ?.copyWith(color: textLightBlue)),
                       ),
                       const SizedBox(height: 10),
                       // Already have an account?
@@ -345,10 +332,8 @@ class _RegisterScreenState extends State<RegisterScreen>
                             },
                             child: Text(
                               '¿Ya tienes cuenta? Inicia sesión',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.onSurface,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: theme.textTheme.bodyLarge
+                                  ?.copyWith(color: textDarkBlue),
                             ),
                           ),
                         ],
