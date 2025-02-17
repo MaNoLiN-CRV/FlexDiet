@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +9,7 @@ void navigationRouter(BuildContext context, int index) {
         builder: (context) => const WeekScreen(),
       ),
     );
-  }
-  else if (index == 1) {
+  } else if (index == 1) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -27,8 +24,7 @@ void navigationRouter(BuildContext context, int index) {
         builder: (context) => const SettingsScreen(),
       ),
     );
-  }
-  else if (index == 3) {
+  } else if (index == 3) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(

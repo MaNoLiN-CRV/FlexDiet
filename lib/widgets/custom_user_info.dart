@@ -16,7 +16,7 @@ class CustomUserInfo extends StatelessWidget {
   final void Function(String?)? onChangedGender;
 
   const CustomUserInfo({
-    Key? key,
+    super.key,
     required this.labelText,
     this.controller,
     this.keyboardType = TextInputType.text,
@@ -30,7 +30,7 @@ class CustomUserInfo extends StatelessWidget {
     this.isGender = false,
     this.genderValue,
     this.onChangedGender,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

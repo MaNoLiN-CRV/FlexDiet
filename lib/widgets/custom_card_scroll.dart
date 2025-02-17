@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class CardScroll extends StatelessWidget {
   final List<CardData> cards;
   final Axis scrollDirection;
+  final void Function( int index)? onCardTap;
 
   const CardScroll({
     super.key,
     required this.cards,
     this.scrollDirection = Axis.horizontal,
+    this.onCardTap,
   });
 
   @override
@@ -18,7 +20,10 @@ class CardScroll extends StatelessWidget {
           scrollDirection: scrollDirection,
           itemCount: cards.length,
           itemBuilder: (context, index) {
-            return CardItem(cardData: cards[index]);
+            return GestureDetector(
+              onTap: () => onCardTap?.call(index),
+              child: CardItem(cardData: cards[index]),
+            );
           },
         ),
       ],
@@ -27,9 +32,9 @@ class CardScroll extends StatelessWidget {
 }
 
 class CardData {
- String title;
+  String title;
   String description;
-   String imageUrl;
+  String imageUrl;
 
   CardData({
     required this.title,
@@ -56,7 +61,7 @@ class CardItem extends StatelessWidget {
         borderRadius: borderRadius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: Colors.black.withOpacity(0.2),
             spreadRadius: 0,
             blurRadius: 8,
             offset: const Offset(0, 2),

@@ -2,18 +2,15 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-
-
 class CalorieWheel extends StatelessWidget {
   final int consumedCalories;
   final int dailyGoal;
   final ThemeData theme;
-  const CalorieWheel({
-    super.key,
-    required this.consumedCalories,
-    required this.dailyGoal,
-    required this.theme
-  });
+  const CalorieWheel(
+      {super.key,
+      required this.consumedCalories,
+      required this.dailyGoal,
+      required this.theme});
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +55,7 @@ class CalorieWheel extends StatelessWidget {
     );
   }
 }
+
 class CalorieWheelPainter extends CustomPainter {
   final double progress;
   final Color progressColor;

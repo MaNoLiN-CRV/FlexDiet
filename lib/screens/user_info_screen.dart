@@ -7,7 +7,7 @@ import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserInfoScreen extends StatefulWidget {
-  const UserInfoScreen({Key? key}) : super(key: key);
+  const UserInfoScreen({super.key});
 
   @override
   _UserInfoScreenState createState() => _UserInfoScreenState();
