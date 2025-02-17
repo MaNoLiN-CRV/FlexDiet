@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_flexdiet/screens/splash_screen.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'FlexDiet',
             theme: themeProvider.themeData,
-            home: const LoginScreen(),
+            home: const SplashScreen(),
           );
         },
       ),
