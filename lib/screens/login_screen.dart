@@ -206,27 +206,14 @@ class _LoginScreenState extends State<LoginScreen>
                                 toastType: ToastType.success);
 
                             // Verifica si el usuario ya ha completado la información
-                            final hasCompleted = await _hasCompletedUserInfo();
 
-                            if (hasCompleted) {
-                              // Si ya completó, ve directamente a HomeScreen
-                              if (context.mounted) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomeScreen()),
-                                );
-                              }
-                            } else {
-                              // Si no ha completado, ve a UserInfoScreen
-                              if (context.mounted) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const UserInfoScreen()),
-                                );
-                              }
+                            // Si ya completó, ve directamente a HomeScreen
+                            if (context.mounted) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const HomeScreen()),
+                              );
                             }
                           }
                         } on InvalidCredentialsException {
