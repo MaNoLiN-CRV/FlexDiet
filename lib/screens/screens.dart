@@ -9,3 +9,5 @@ export 'package:flutter_flexdiet/screens/login/forgot_password_screen.dart';
 export 'package:flutter_flexdiet/screens/user_info_screen.dart';
 export 'package:flutter_flexdiet/screens/misc/loading_screen.dart';
 export 'package:flutter_flexdiet/screens/misc/splash_screen.dart';
+export 'package:flutter_flexdiet/screens/misc/camera_screen.dart';
+export 'package:flutter_flexdiet/screens/admin/edit_person_screen.dart';
