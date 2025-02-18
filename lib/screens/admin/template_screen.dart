@@ -157,10 +157,13 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 );
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 14.0),
-                  shape: RoundedRectangleBorder()),
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: 14.0),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0)),
+                elevation: 3,
+              ),
               child: Text(
                 'EDITAR CLIENTE',
                 style: theme.textTheme.titleMedium?.copyWith(
