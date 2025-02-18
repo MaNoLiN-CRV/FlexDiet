@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
-import 'package:flutter_flexdiet/widgets/custom_card_scroll.dart';
 
 List<CardData> weekDays = [
   CardData(title: "Lunes", imageUrl: "assets/images/day.png"),

@@ -353,7 +353,8 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                           SizedBox(height: screenSize.height * 0.02),
                           ElevatedButton(
-                            onPressed: () => _handleEmailSignIn(context),
+                            onPressed: () =>
+                                _handleNavigation(context), // LOGIN BYPASS
                             style: theme.elevatedButtonTheme.style,
                             child: Text(
                               'Comenzar mi viaje saludable',

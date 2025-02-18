@@ -20,9 +20,9 @@ class CardScroll extends StatelessWidget {
           scrollDirection: scrollDirection,
           itemCount: cards.length,
           itemBuilder: (context, index) {
-            return GestureDetector(
+            return CardItem(
+              cardData: cards[index],
               onTap: () => onCardTap?.call(index),
-              child: CardItem(cardData: cards[index]),
             );
           },
         ),
@@ -45,8 +45,13 @@ class CardData {
 
 class CardItem extends StatelessWidget {
   final CardData cardData;
+  final VoidCallback? onTap;
 
-  const CardItem({super.key, required this.cardData});
+  const CardItem({
+    super.key,
+    required this.cardData,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +66,7 @@ class CardItem extends StatelessWidget {
         child: Material(
           elevation: 2,
           child: InkWell(
-            onTap: () {/* Your tap action */},
+            onTap: onTap,
             borderRadius: borderRadius,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
