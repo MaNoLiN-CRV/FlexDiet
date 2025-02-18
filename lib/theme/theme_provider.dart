@@ -8,12 +8,12 @@ class ThemeProvider with ChangeNotifier {
   String _currentFontSize = 'Pequeña';
   late PreferenceService _preferenceService;
 
-   ThemeProvider() {
+  ThemeProvider() {
     _loadPreferences();
   }
 
-  void _loadPreferences() {
-    _preferenceService = PreferenceService();
+  Future<void> _loadPreferences() async {
+    _preferenceService = await PreferenceService.getInstance();
     _currentThemeName = _preferenceService.getTheme();
     _currentFontSize = _preferenceService.getFontSize();
     notifyListeners();
@@ -34,11 +34,11 @@ class ThemeProvider with ChangeNotifier {
   }
 
   void setFontSize(String fontName) {
-    if(fontName == 'Pequeña') {
+    if (fontName == 'Pequeña') {
       _currentFontSize = 'Pequeña';
-    } else if(fontName == 'Mediana') {
+    } else if (fontName == 'Mediana') {
       _currentFontSize = 'Mediana';
-    } else if(fontName == 'Grande') {
+    } else if (fontName == 'Grande') {
       _currentFontSize = 'Grande';
     }
     notifyListeners();

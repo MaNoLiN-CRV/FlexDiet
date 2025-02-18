@@ -33,12 +33,12 @@ class CardScroll extends StatelessWidget {
 
 class CardData {
   String title;
-  String description;
+  String? description;
   String imageUrl;
 
   CardData({
     required this.title,
-    required this.description,
+    this.description,
     required this.imageUrl,
   });
 }
@@ -117,15 +117,16 @@ class CardItem extends StatelessWidget {
                           const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      cardData.description,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ) ??
-                          const TextStyle(color: Colors.grey),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    if (cardData.description != null)
+                      Text(
+                        cardData.description!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ) ??
+                            const TextStyle(color: Colors.grey),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                   ],
                 ),
               ),
