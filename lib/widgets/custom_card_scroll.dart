@@ -56,36 +56,24 @@ class CardItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       width: 200,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+      child: ClipRRect(
         borderRadius: borderRadius,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            spreadRadius: 0,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                      maxHeight: 120, minWidth: double.infinity),
+        child: Material(
+          elevation: 2,
+          child: InkWell(
+            onTap: () {/* Your tap action */},
+            borderRadius: borderRadius,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 120,
+                  width: double.infinity,
                   child: Image.network(
                     cardData.imageUrl,
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) {
-                        return child;
-                      }
+                      if (loadingProgress == null) return child;
                       return Center(
                         child: CircularProgressIndicator(
                           value: loadingProgress.expectedTotalBytes != null
@@ -96,43 +84,43 @@ class CardItem extends StatelessWidget {
                       );
                     },
                     errorBuilder: (context, object, stackTrace) {
-                      return Image(
-                        image: const AssetImage('assets/images/logo.png'),
+                      return Image.asset(
+                        'assets/images/logo.png',
                         fit: BoxFit.cover,
                       );
                     },
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      cardData.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ) ??
-                          const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 4),
-                    if (cardData.description != null)
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        cardData.description!,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                        cardData.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
                             ) ??
-                            const TextStyle(color: Colors.grey),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                            const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                  ],
+                      const SizedBox(height: 4),
+                      if (cardData.description != null)
+                        Text(
+                          cardData.description!,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ) ??
+                              const TextStyle(color: Colors.black),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
