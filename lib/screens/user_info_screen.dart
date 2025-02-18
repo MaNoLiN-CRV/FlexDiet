@@ -18,10 +18,11 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _targetWeightController = TextEditingController();
   //String? _goal; <-- REMOVE THIS
-  String? _gender;
+  //String? _gender; <-- REMOVE THIS
 
   int _currentPage = 0;
   String? _selectedGoal; // Add this
+  String? _selectedGender; //Add this
 
   @override
   void dispose() {
@@ -185,44 +186,39 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     ),
                   ),
 
+                  //Page 3: Gender selection
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        horizontal: 16.0, vertical: 16.0),
+                    child: Column(
+                      children: [
+                        GenderSelectionCard(
+                          title: "Hombre",
+                          icon: Icons.man,
+                          value: "hombre",
+                          selectedValue: _selectedGender,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGender = value;
+                            });
+                          },
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              CustomUserInfo(
-                                labelText: 'Sexo',
-                                isDropdown: true,
-                                items: const [
-                                  DropdownMenuItem(
-                                      value: 'hombre', child: Text('Hombre')),
-                                  DropdownMenuItem(
-                                      value: 'mujer', child: Text('Mujer')),
-                                ],
-                                value: _gender,
-                                onChangedDropdown: (value) {
-                                  setState(() {
-                                    _gender = value;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                        const SizedBox(height: 16),
+                        GenderSelectionCard(
+                          title: "Mujer",
+                          icon: Icons.woman,
+                          value: "mujer",
+                          selectedValue: _selectedGender,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGender = value;
+                            });
+                          },
                         ),
-                      ),
+                      ],
                     ),
                   ),
+                  // Page 4: Desired Weight
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 32.0, vertical: 16.0),
@@ -263,7 +259,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                     if (_weightController.text.isEmpty ||
                         _heightController.text.isEmpty ||
                         _selectedGoal == null || // USE _selectedGoal here
-                        _gender == null) {
+                        _selectedGender == null) {
                       ShowToast(
                           context, "Por favor, rellena la información anterior",
                           toastType: ToastType.warning);
