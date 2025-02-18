@@ -1,0 +1,2 @@
+/Users/manu/projects/flutter/FlexDiet/android/app/.cxx/Debug/r716f2s3/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/manu/projects/flutter/FlexDiet/android/app/.cxx/Debug/r716f2s3/armeabi-v7a/CMakeFiles/rebuild_cache.dir

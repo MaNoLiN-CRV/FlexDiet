@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
+import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/admin/use_template_screen.dart';
 import 'package:flutter_flexdiet/screens/home_screen.dart';
 import 'package:flutter_flexdiet/widgets/custom_card_scroll.dart';
@@ -15,8 +17,10 @@ class _TemplateScreenState extends State<TemplateScreen> {
   final List<CardData> _clientCards = [
     CardData(
       title: 'Snoop Dogg',
-      description: 'Cliente con rutina de ganar peso, entrena dos dias a la semana.',
-      imageUrl: 'https://allhiphop.com/wp-content/uploads/2022/11/Snoop-Dogg.jpg',
+      description:
+          'Cliente con rutina de ganar peso, entrena dos dias a la semana.',
+      imageUrl:
+          'https://allhiphop.com/wp-content/uploads/2022/11/Snoop-Dogg.jpg',
     ),
     CardData(
       title: 'Eminem',
@@ -26,12 +30,14 @@ class _TemplateScreenState extends State<TemplateScreen> {
     CardData(
       title: 'Ice Cube',
       description: 'Rutina para perder peso',
-      imageUrl: 'https://heavy.com/wp-content/uploads/2017/02/gettyimages-615695594.jpg?quality=65&strip=all',
+      imageUrl:
+          'https://heavy.com/wp-content/uploads/2017/02/gettyimages-615695594.jpg?quality=65&strip=all',
     ),
     CardData(
       title: 'Juice WRLD',
       description: 'Rutina de ciclismo, ',
-      imageUrl: 'https://www.thefamouspeople.com/profiles/images/juice-wrld-1.jpg',
+      imageUrl:
+          'https://www.thefamouspeople.com/profiles/images/juice-wrld-1.jpg',
     ),
   ];
 
@@ -58,6 +64,9 @@ class _TemplateScreenState extends State<TemplateScreen> {
         elevation: 2,
         iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
       ),
+      bottomNavigationBar: BottomNav(
+          selectedIndex: 3,
+          onItemTapped: (index) => navigationRouter(context, index)),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
         child: Column(
@@ -70,7 +79,9 @@ class _TemplateScreenState extends State<TemplateScreen> {
                   : 'Seleccione un cliente',
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
-                fontStyle: _selectedClientName != null ? FontStyle.normal : FontStyle.italic,
+                fontStyle: _selectedClientName != null
+                    ? FontStyle.normal
+                    : FontStyle.italic,
               ),
               textAlign: TextAlign.center,
             ),
@@ -97,7 +108,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 backgroundColor: theme.colorScheme.secondary,
                 foregroundColor: theme.colorScheme.onSecondary,
                 padding: const EdgeInsets.symmetric(vertical: 14.0),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0)),
                 elevation: 3,
               ),
               child: Text(
@@ -121,7 +133,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 14.0),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0)),
                 elevation: 3,
               ),
               child: Text(
@@ -138,4 +151,3 @@ class _TemplateScreenState extends State<TemplateScreen> {
     );
   }
 }
-

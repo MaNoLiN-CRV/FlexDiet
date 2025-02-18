@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:flutter_flexdiet/screens/login_screen.dart';
+import 'package:flutter_flexdiet/screens/login/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -52,9 +52,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 return LinearGradient(
                   colors: [
                     const Color.fromARGB(255, 28, 27, 27),
-                    const Color.fromARGB(255, 34, 29, 74) , 
-                    const Color.fromARGB(255, 41, 84, 154) , 
-                    const Color.fromARGB(255, 2, 81, 227)],
+                    const Color.fromARGB(255, 34, 29, 74),
+                    const Color.fromARGB(255, 41, 84, 154),
+                    const Color.fromARGB(255, 2, 81, 227)
+                  ],
                   begin: Alignment.bottomLeft,
                   end: Alignment.topRight,
                 ).createShader(bounds);
@@ -64,7 +65,6 @@ class _SplashScreenState extends State<SplashScreen> {
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: Colors.white,
                   fontSize: 20,
-              
                 ),
                 textAlign: TextAlign.center,
               ),
