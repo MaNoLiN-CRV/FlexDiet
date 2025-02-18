@@ -31,7 +31,7 @@ class AppleAuthProvider implements provider.AuthProvider {
     // Obtener las credenciales de autenticación de Google, te lleva a una zona de registro con google si el
     // usuario inicia sesión te devuelve GoogleSignInAuthentication. Si no null
     if (appleUser == null) {
-      return throw Exception('Jodido');
+      return throw Exception('Error');
     }
 
     return GoogleAuthProvider.credential(
