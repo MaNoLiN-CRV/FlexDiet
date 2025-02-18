@@ -10,3 +10,4 @@ export 'package:flutter_flexdiet/widgets/custom_drodown_button.dart';
 export 'package:flutter_flexdiet/widgets/custom_user_info.dart';
 export 'package:flutter_flexdiet/widgets/custom_page_indicator.dart';
 export 'package:flutter_flexdiet/widgets/custom_loading_wheel.dart';
+export 'package:flutter_flexdiet/widgets/goal_selection_card.dart';

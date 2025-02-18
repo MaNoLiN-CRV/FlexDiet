@@ -17,10 +17,11 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _targetWeightController = TextEditingController();
-  String? _goal;
+  //String? _goal; <-- REMOVE THIS
   String? _gender;
 
   int _currentPage = 0;
+  String? _selectedGoal; // Add this
 
   @override
   void dispose() {
@@ -99,6 +100,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   });
                 },
                 children: [
+                  // Page 1: Weight and Height
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 32.0, vertical: 16.0),
@@ -132,52 +134,57 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                       ),
                     ),
                   ),
+                  // Page 2: Goal Selection
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        horizontal: 16.0, vertical: 16.0),
+                    child: Column(
+                      children: [
+                        GoalSelectionCard(
+                          title: "Perder Grasa",
+                          subtitle:
+                              "Maximiza la pérdida de grasa y conserva tu masa muscular",
+                          icon: Icons.whatshot,
+                          value: "perder",
+                          selectedValue: _selectedGoal,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGoal = value;
+                            });
+                          },
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              CustomUserInfo(
-                                labelText: 'Objetivo',
-                                isDropdown: true,
-                                items: const [
-                                  DropdownMenuItem(
-                                      value: 'perder',
-                                      child: Text('Perder peso')),
-                                  DropdownMenuItem(
-                                      value: 'mantener',
-                                      child: Text('Mantener peso')),
-                                  DropdownMenuItem(
-                                      value: 'ganar',
-                                      child: Text('Ganar peso')),
-                                  DropdownMenuItem(
-                                      value: 'tonificar',
-                                      child: Text('Tonificar')),
-                                ],
-                                value: _goal,
-                                onChangedDropdown: (value) {
-                                  setState(() {
-                                    _goal = value;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                        const SizedBox(height: 16),
+                        GoalSelectionCard(
+                          title: "Mantener Peso",
+                          subtitle:
+                              "Conserva tu estado físico y mantente saludable",
+                          icon: Icons.apple,
+                          value: "mantener",
+                          selectedValue: _selectedGoal,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGoal = value;
+                            });
+                          },
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        GoalSelectionCard(
+                          title: "Ganar Músculo",
+                          subtitle:
+                              "Incrementa tu masa muscular y vuélvete más fuerte",
+                          icon: Icons.fitness_center,
+                          value: "ganar",
+                          selectedValue: _selectedGoal,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGoal = value;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 32.0, vertical: 16.0),
@@ -255,7 +262,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   onPressed: () async {
                     if (_weightController.text.isEmpty ||
                         _heightController.text.isEmpty ||
-                        _goal == null ||
+                        _selectedGoal == null || // USE _selectedGoal here
                         _gender == null) {
                       ShowToast(
                           context, "Por favor, rellena la información anterior",
