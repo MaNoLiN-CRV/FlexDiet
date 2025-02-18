@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
+import 'package:flutter_flexdiet/screens/admin/edit_person_screen.dart';
 import 'package:flutter_flexdiet/screens/admin/use_template_screen.dart';
 import 'package:flutter_flexdiet/screens/home_screen.dart';
 import 'package:flutter_flexdiet/widgets/custom_card_scroll.dart';
@@ -13,7 +14,7 @@ class TemplateScreen extends StatefulWidget {
 }
 
 class _TemplateScreenState extends State<TemplateScreen> {
-  String? _selectedClientName;
+  String? _selectedClientName; // TODO : CHANGE THIS TO A PERSON ENTITY
   final List<CardData> _clientCards = [
     CardData(
       title: 'Snoop Dogg',
@@ -142,6 +143,29 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.onPrimary,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          EditPerson(name: _selectedClientName ?? '')),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(vertical: 14.0),
+                  shape: RoundedRectangleBorder()),
+              child: Text(
+                'EDITAR CLIENTE',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onError,
                 ),
               ),
             ),
