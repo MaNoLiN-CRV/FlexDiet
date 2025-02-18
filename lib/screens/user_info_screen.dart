@@ -3,6 +3,7 @@ import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/app_theme_light.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_animate/flutter_animate.dart'; // Import flutter_animate
 
 class UserInfoScreen extends StatefulWidget {
   const UserInfoScreen({super.key});
@@ -14,8 +15,8 @@ class UserInfoScreen extends StatefulWidget {
 class _UserInfoScreenState extends State<UserInfoScreen> {
   final _pageController = PageController(initialPage: 0);
 
-  final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _heightController = TextEditingController();
+  //final TextEditingController _weightController = TextEditingController(); <-- Remove these
+  //final TextEditingController _heightController = TextEditingController();
   final TextEditingController _targetWeightController = TextEditingController();
   //String? _goal; <-- REMOVE THIS
   //String? _gender; <-- REMOVE THIS
@@ -23,12 +24,14 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   int _currentPage = 0;
   String? _selectedGoal; // Add this
   String? _selectedGender; //Add this
+  double? _selectedWeight;
+  double? _selectedHeight;
 
   @override
   void dispose() {
     _pageController.dispose();
-    _weightController.dispose();
-    _heightController.dispose();
+    //_weightController.dispose(); <-- Remove these
+    //_heightController.dispose();
     _targetWeightController.dispose();
     super.dispose();
   }
@@ -104,35 +107,31 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   // Page 1: Weight and Height
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        horizontal: 16.0, vertical: 16.0),
+                    child: Column(
+                      children: [
+                        WeightSelectionCard(
+                          title: "Peso (kg)",
+                          icon: Icons.balance,
+                          selectedValue: _selectedWeight,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedWeight = value;
+                            });
+                          },
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              CustomUserInfo(
-                                labelText: 'Peso (kg)',
-                                controller: _weightController,
-                                keyboardType: TextInputType.number,
-                              ),
-                              const SizedBox(height: 10),
-                              CustomUserInfo(
-                                labelText: 'Altura (cm)',
-                                controller: _heightController,
-                                keyboardType: TextInputType.number,
-                              ),
-                            ],
-                          ),
+                        const SizedBox(height: 16),
+                        HeightSelectionCard(
+                          title: "Altura (cm)",
+                          icon: Icons.height,
+                          selectedValue: _selectedHeight,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedHeight = value;
+                            });
+                          },
                         ),
-                      ),
+                      ],
                     ),
                   ),
                   // Page 2: Goal Selection
@@ -221,23 +220,23 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   // Page 4: Desired Weight
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        horizontal: 16.0, vertical: 16.0),
+                    child: Column(
+                      children: [
+                        WeightSelectionCard(
+                          title: "Peso Deseado (kg)",
+                          icon: Icons.flag,
+                          selectedValue: _targetWeightController.text.isNotEmpty
+                              ? double.tryParse(_targetWeightController.text)
+                              : null,
+                          onChanged: (value) {
+                            setState(() {
+                              _targetWeightController.text =
+                                  value?.toString() ?? '';
+                            });
+                          },
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: CustomUserInfo(
-                            labelText: 'Peso Deseado (opcional)',
-                            controller: _targetWeightController,
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                 ],
@@ -256,8 +255,8 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 child: ElevatedButton(
                   style: theme.elevatedButtonTheme.style,
                   onPressed: () async {
-                    if (_weightController.text.isEmpty ||
-                        _heightController.text.isEmpty ||
+                    if (_selectedWeight == null ||
+                        _selectedHeight == null ||
                         _selectedGoal == null || // USE _selectedGoal here
                         _selectedGender == null) {
                       ShowToast(
