@@ -1,11 +1,47 @@
+// Constants
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
-import 'package:flutter_flexdiet/screens/admin/use_template_screen.dart';
-import 'package:flutter_flexdiet/screens/home_screen.dart';
-import 'package:flutter_flexdiet/widgets/custom_card_scroll.dart';
-import 'package:flutter_flexdiet/screens/admin/edit_person_screen.dart';
+import 'package:flutter_flexdiet/screens/screens.dart';
+import 'package:flutter_flexdiet/widgets/widgets.dart';
 
+class UIConstants {
+  static const double defaultPadding = 24.0;
+  static const double defaultSpacing = 16.0;
+  static const double cardHeight = 0.25;
+  static const double buttonHeight = 14.0;
+  static const double borderRadius = 12.0;
+
+  static const EdgeInsets screenPadding = EdgeInsets.symmetric(
+    horizontal: defaultPadding,
+    vertical: defaultPadding,
+  );
+
+  static const EdgeInsets buttonPadding = EdgeInsets.symmetric(
+    vertical: buttonHeight,
+  );
+}
+
+// Models
+class Client {
+  final String name;
+  final String description;
+  final String imageUrl;
+
+  const Client({
+    required this.name,
+    required this.description,
+    required this.imageUrl,
+  });
+
+  CardData toCardData() => CardData(
+        title: name,
+        description: description,
+        imageUrl: imageUrl,
+      );
+}
+
+// Screen
 class TemplateScreen extends StatefulWidget {
   const TemplateScreen({super.key});
 
@@ -14,243 +50,291 @@ class TemplateScreen extends StatefulWidget {
 }
 
 class _TemplateScreenState extends State<TemplateScreen> {
-  String? _selectedClientName = null;
-  final List<CardData> _clientCards = [
-    CardData(
-      title: 'Snoop Dogg',
+  String? _selectedClientName;
+  final TextEditingController _searchController = TextEditingController();
+
+  // Move sample data to a separate file in a real app
+  final List<Client> _clients = [
+    Client(
+      name: 'Snoop Dogg',
       description:
           'Cliente con rutina de ganar peso, entrena dos dias a la semana.',
       imageUrl:
           'https://allhiphop.com/wp-content/uploads/2022/11/Snoop-Dogg.jpg',
     ),
-    CardData(
-      title: 'Eminem',
+    Client(
+      name: 'Eminem',
       description: 'Atleta, y fisicoculturista',
       imageUrl: 'https://cdn.britannica.com/63/136263-050-7FBFFBD1/Eminem.jpg',
     ),
-    CardData(
-      title: 'Ice Cube',
+    Client(
+      name: 'Ice Cube',
       description: 'Rutina para perder peso',
       imageUrl:
           'https://heavy.com/wp-content/uploads/2017/02/gettyimages-615695594.jpg?quality=65&strip=all',
     ),
-    CardData(
-      title: 'Juice WRLD',
-      description: 'Rutina de ciclismo, ',
+    Client(
+      name: 'Juice WRLD',
+      description: 'Rutina de ciclismo',
       imageUrl:
           'https://www.thefamouspeople.com/profiles/images/juice-wrld-1.jpg',
     ),
   ];
-  List<CardData> _filteredClientCards = [];
-  final TextEditingController _searchController = TextEditingController();
+
+  late List<Client> _filteredClients;
 
   @override
   void initState() {
     super.initState();
-    _filteredClientCards = List.from(_clientCards);
+    _filteredClients = List.from(_clients);
   }
 
   void _selectClient(String clientName) {
-    setState(() {
-      _selectedClientName = clientName;
-    });
+    setState(() => _selectedClientName = clientName);
   }
 
   void _filterClients(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredClientCards = List.from(_clientCards);
+        _filteredClients = List.from(_clients);
       } else {
-        _filteredClientCards = _clientCards
-            .where((client) =>
-                client.title.toLowerCase().contains(query.toLowerCase()) ||
-                (client.description != null &&
-                    client.description!
-                        .toLowerCase()
-                        .contains(query.toLowerCase())))
-            .toList();
+        final lowercaseQuery = query.toLowerCase();
+        _filteredClients = _clients.where((client) {
+          return client.name.toLowerCase().contains(lowercaseQuery) ||
+              client.description.toLowerCase().contains(lowercaseQuery);
+        }).toList();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: theme.colorScheme.primary,
-        title: const Text('Panel de administrador'),
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: theme.colorScheme.onPrimary,
-          fontWeight: FontWeight.w700,
-          fontSize: 22,
-        ),
-        elevation: 0,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-      ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: _buildAppBar(context),
       bottomNavigationBar: BottomNav(
-          selectedIndex: 3,
-          onItemTapped: (index) => navigationRouter(context, index)),
+        selectedIndex: 3,
+        onItemTapped: (index) => navigationRouter(context, index),
+      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+        padding: UIConstants.screenPadding,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Selecciona un cliente para editar o asignar plantillas',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8),
+            _buildHeader(context),
             if (_selectedClientName != null)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Cliente seleccionado: $_selectedClientName',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            const SizedBox(height: 12),
-            Text(
-              'Clientes disponibles',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color:
-                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                fontStyle: FontStyle.italic,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _searchController,
-              onChanged: _filterClients,
-              decoration: InputDecoration(
-                hintText: 'Buscar cliente...',
-                prefixIcon: Icon(Icons.search,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.6)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.5),
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 14.0),
-              ),
-              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.25,
-              child: CardScroll(
-                scrollDirection: Axis.horizontal,
-                cards: _filteredClientCards,
-                onCardTap: (index) {
-                  if (index >= 0 && index < _filteredClientCards.length) {
-                    _selectClient(_filteredClientCards[index].title);
-                  }
-                },
-              ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _selectedClientName != null
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomeScreen()),
-                      );
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.secondary,
-                foregroundColor: theme.colorScheme.onSecondary,
-                padding: const EdgeInsets.symmetric(vertical: 14.0),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0)),
-                elevation: 2,
-              ),
-              child: Text(
-                'CREAR PLANTILLA',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onSecondary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const UseTemplateScreen()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 14.0),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0)),
-                elevation: 2,
-              ),
-              child: Text(
-                'USAR PLANTILLA EXISTENTE',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onPrimary,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _selectedClientName != null
-                  ? () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                EditPerson(name: _selectedClientName!)),
-                      );
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 14.0),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0)),
-                elevation: 2,
-              ),
-              child: Text(
-                'EDITAR CLIENTE',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onPrimary,
-                ),
-              ),
-            ),
+              _buildSelectedClientBanner(context),
+            _buildAvailableClientsSection(context),
+            _buildSearchField(context),
+            SizedBox(height: UIConstants.defaultSpacing),
+            _buildClientsList(context),
+            _buildActionButtons(context),
           ],
         ),
       ),
     );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    final theme = Theme.of(context);
+    return AppBar(
+      backgroundColor: theme.colorScheme.primary,
+      title: const Text('Panel de administrador'),
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        color: theme.colorScheme.onPrimary,
+        fontWeight: FontWeight.w700,
+        fontSize: 22,
+      ),
+      elevation: 0,
+      iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Text(
+      'Selecciona un cliente para editar o asignar plantillas',
+      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
+          ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildSelectedClientBanner(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: UIConstants.defaultSpacing),
+      padding: const EdgeInsets.symmetric(
+        horizontal: UIConstants.defaultPadding / 2,
+        vertical: UIConstants.defaultSpacing / 2,
+      ),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary,
+        borderRadius: BorderRadius.circular(UIConstants.borderRadius),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        'Cliente seleccionado: $_selectedClientName',
+        style: theme.textTheme.titleMedium?.copyWith(
+          color: theme.colorScheme.onPrimary,
+          fontWeight: FontWeight.bold,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildAvailableClientsSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: UIConstants.defaultSpacing),
+      child: Text(
+        'Clientes disponibles',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurfaceVariant
+                  .withOpacity(0.8),
+              fontStyle: FontStyle.italic,
+            ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildSearchField(BuildContext context) {
+    final theme = Theme.of(context);
+    return TextField(
+      controller: _searchController,
+      onChanged: _filterClients,
+      decoration: InputDecoration(
+        hintText: 'Buscar cliente...',
+        prefixIcon: Icon(
+          Icons.search,
+          color: theme.colorScheme.primary.withOpacity(0.6),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(UIConstants.borderRadius),
+          borderSide: BorderSide.none,
+        ),
+        filled: true,
+        fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: UIConstants.defaultPadding,
+          vertical: UIConstants.buttonHeight,
+        ),
+      ),
+      style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+    );
+  }
+
+  Widget _buildClientsList(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * UIConstants.cardHeight,
+      child: CardScroll(
+        scrollDirection: Axis.horizontal,
+        cards: _filteredClients.map((client) => client.toCardData()).toList(),
+        onCardTap: (index) {
+          if (index >= 0 && index < _filteredClients.length) {
+            _selectClient(_filteredClients[index].name);
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: UIConstants.defaultSpacing * 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildActionButton(
+            context: context,
+            title: 'CREAR PLANTILLA',
+            onPressed: _selectedClientName != null
+                ? () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()),
+                    )
+                : null,
+            isSecondary: true,
+          ),
+          const SizedBox(height: UIConstants.defaultSpacing),
+          _buildActionButton(
+            context: context,
+            title: 'USAR PLANTILLA EXISTENTE',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const UseTemplateScreen()),
+            ),
+          ),
+          const SizedBox(height: UIConstants.defaultSpacing),
+          _buildActionButton(
+            context: context,
+            title: 'EDITAR CLIENTE',
+            onPressed: _selectedClientName != null
+                ? () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EditPerson(name: _selectedClientName!),
+                      ),
+                    )
+                : null,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required BuildContext context,
+    required String title,
+    required VoidCallback? onPressed,
+    bool isSecondary = false,
+  }) {
+    final theme = Theme.of(context);
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSecondary
+            ? theme.colorScheme.secondary
+            : theme.colorScheme.primary,
+        foregroundColor: isSecondary
+            ? theme.colorScheme.onSecondary
+            : theme.colorScheme.onPrimary,
+        padding: UIConstants.buttonPadding,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(UIConstants.borderRadius),
+        ),
+        elevation: 2,
+      ),
+      child: Text(
+        title,
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: isSecondary
+              ? theme.colorScheme.onSecondary
+              : theme.colorScheme.onPrimary,
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }
