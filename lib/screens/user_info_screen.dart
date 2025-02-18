@@ -14,19 +14,23 @@ class UserInfoScreen extends StatefulWidget {
 class _UserInfoScreenState extends State<UserInfoScreen> {
   final _pageController = PageController(initialPage: 0);
 
-  final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _heightController = TextEditingController();
+  //final TextEditingController _weightController = TextEditingController(); <-- Remove these
+  //final TextEditingController _heightController = TextEditingController();
   final TextEditingController _targetWeightController = TextEditingController();
-  String? _goal;
-  String? _gender;
+  //String? _goal; <-- REMOVE THIS
+  //String? _gender; <-- REMOVE THIS
 
   int _currentPage = 0;
+  String? _selectedGoal; // Add this
+  String? _selectedGender; //Add this
+  double? _selectedWeight;
+  double? _selectedHeight;
 
   @override
   void dispose() {
     _pageController.dispose();
-    _weightController.dispose();
-    _heightController.dispose();
+    //_weightController.dispose(); <-- Remove these
+    //_heightController.dispose();
     _targetWeightController.dispose();
     super.dispose();
   }
@@ -99,142 +103,139 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   });
                 },
                 children: [
+                  // Page 1: Weight and Height
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        horizontal: 16.0, vertical: 16.0),
+                    child: Column(
+                      children: [
+                        WeightSelectionCard(
+                          title: "Peso (kg)",
+                          icon: Icons.balance,
+                          selectedValue: _selectedWeight,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedWeight = value;
+                            });
+                          },
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              CustomUserInfo(
-                                labelText: 'Peso (kg)',
-                                controller: _weightController,
-                                keyboardType: TextInputType.number,
-                              ),
-                              const SizedBox(height: 10),
-                              CustomUserInfo(
-                                labelText: 'Altura (cm)',
-                                controller: _heightController,
-                                keyboardType: TextInputType.number,
-                              ),
-                            ],
-                          ),
+                        const SizedBox(height: 16),
+                        HeightSelectionCard(
+                          title: "Altura (cm)",
+                          icon: Icons.height,
+                          selectedValue: _selectedHeight,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedHeight = value;
+                            });
+                          },
                         ),
-                      ),
+                      ],
                     ),
                   ),
+                  // Page 2: Goal Selection
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        horizontal: 16.0, vertical: 16.0),
+                    child: Column(
+                      children: [
+                        GoalSelectionCard(
+                          title: "Perder Grasa",
+                          subtitle:
+                              "Maximiza la pérdida de grasa y conserva tu masa muscular",
+                          icon: Icons.whatshot,
+                          value: "perder",
+                          selectedValue: _selectedGoal,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGoal = value;
+                            });
+                          },
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              CustomUserInfo(
-                                labelText: 'Objetivo',
-                                isDropdown: true,
-                                items: const [
-                                  DropdownMenuItem(
-                                      value: 'perder',
-                                      child: Text('Perder peso')),
-                                  DropdownMenuItem(
-                                      value: 'mantener',
-                                      child: Text('Mantener peso')),
-                                  DropdownMenuItem(
-                                      value: 'ganar',
-                                      child: Text('Ganar peso')),
-                                  DropdownMenuItem(
-                                      value: 'tonificar',
-                                      child: Text('Tonificar')),
-                                ],
-                                value: _goal,
-                                onChangedDropdown: (value) {
-                                  setState(() {
-                                    _goal = value;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                        const SizedBox(height: 16),
+                        GoalSelectionCard(
+                          title: "Mantener Peso",
+                          subtitle:
+                              "Conserva tu estado físico y mantente saludable",
+                          icon: Icons.apple,
+                          value: "mantener",
+                          selectedValue: _selectedGoal,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGoal = value;
+                            });
+                          },
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        GoalSelectionCard(
+                          title: "Ganar Músculo",
+                          subtitle:
+                              "Incrementa tu masa muscular y vuélvete más fuerte",
+                          icon: Icons.fitness_center,
+                          value: "ganar",
+                          selectedValue: _selectedGoal,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGoal = value;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
+
+                  //Page 3: Gender selection
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        horizontal: 16.0, vertical: 16.0),
+                    child: Column(
+                      children: [
+                        GenderSelectionCard(
+                          title: "Hombre",
+                          icon: Icons.man,
+                          value: "hombre",
+                          selectedValue: _selectedGender,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGender = value;
+                            });
+                          },
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              CustomUserInfo(
-                                labelText: 'Sexo',
-                                isDropdown: true,
-                                items: const [
-                                  DropdownMenuItem(
-                                      value: 'hombre', child: Text('Hombre')),
-                                  DropdownMenuItem(
-                                      value: 'mujer', child: Text('Mujer')),
-                                ],
-                                value: _gender,
-                                onChangedDropdown: (value) {
-                                  setState(() {
-                                    _gender = value;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                        const SizedBox(height: 16),
+                        GenderSelectionCard(
+                          title: "Mujer",
+                          icon: Icons.woman,
+                          value: "mujer",
+                          selectedValue: _selectedGender,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGender = value;
+                            });
+                          },
                         ),
-                      ),
+                      ],
                     ),
                   ),
+                  // Page 4: Desired Weight
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 32.0, vertical: 16.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Card(
-                        elevation: 1,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        horizontal: 16.0, vertical: 16.0),
+                    child: Column(
+                      children: [
+                        WeightSelectionCard(
+                          title: "Peso Deseado (kg)",
+                          icon: Icons.flag,
+                          selectedValue: _targetWeightController.text.isNotEmpty
+                              ? double.tryParse(_targetWeightController.text)
+                              : null,
+                          onChanged: (value) {
+                            setState(() {
+                              _targetWeightController.text =
+                                  value?.toString() ?? '';
+                            });
+                          },
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: CustomUserInfo(
-                            labelText: 'Peso Deseado (opcional)',
-                            controller: _targetWeightController,
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                 ],
@@ -253,10 +254,10 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 child: ElevatedButton(
                   style: theme.elevatedButtonTheme.style,
                   onPressed: () async {
-                    if (_weightController.text.isEmpty ||
-                        _heightController.text.isEmpty ||
-                        _goal == null ||
-                        _gender == null) {
+                    if (_selectedWeight == null ||
+                        _selectedHeight == null ||
+                        _selectedGoal == null || // USE _selectedGoal here
+                        _selectedGender == null) {
                       ShowToast(
                           context, "Por favor, rellena la información anterior",
                           toastType: ToastType.warning);

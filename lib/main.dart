@@ -4,12 +4,18 @@ import 'package:flutter_flexdiet/screens/misc/splash_screen.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart'; // Ensure import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  //Set default locale
+  Intl.defaultLocale = 'es';
+
   runApp(const MyApp());
 }
 
@@ -27,6 +33,14 @@ class MyApp extends StatelessWidget {
             title: 'FlexDiet',
             theme: themeProvider.themeData,
             home: const SplashScreen(),
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('es', 'ES'), // Spanish, Spain
+            ],
           );
         },
       ),
