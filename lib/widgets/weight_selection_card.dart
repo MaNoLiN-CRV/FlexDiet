@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_flexdiet/theme/theme.dart';
 
 class WeightSelectionCard extends StatefulWidget {
   final String title;
@@ -41,12 +42,11 @@ class _WeightSelectionCardState extends State<WeightSelectionCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     final Color backgroundColor =
         isDarkMode ? Colors.grey.shade800 : Colors.white;
-    final Color selectedColor = theme.colorScheme.secondary;
+    final Color selectedColor = isDarkMode ? textLightBlue : Colors.black;
     final Color textColor = isDarkMode ? Colors.white : Colors.black;
 
     return Container(

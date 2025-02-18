@@ -103,7 +103,7 @@ class _CustomUserInfoState extends State<CustomUserInfo> {
             else if (widget.isDropdown)
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
-                  border: InputBorder.none, // Remove underline
+                  border: InputBorder.none,
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 8, horizontal: 0),
                 ),
@@ -121,7 +121,7 @@ class _CustomUserInfoState extends State<CustomUserInfo> {
                 controller: widget.controller,
                 keyboardType: widget.keyboardType,
                 decoration: const InputDecoration(
-                  border: InputBorder.none, // Remove underline
+                  border: InputBorder.none,
                   contentPadding:
                       EdgeInsets.symmetric(vertical: 8, horizontal: 0),
                 ),

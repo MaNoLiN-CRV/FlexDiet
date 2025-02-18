@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_flexdiet/theme/theme.dart';
 
 class GoalSelectionCard extends StatefulWidget {
   final String title;
@@ -50,7 +51,8 @@ class _GoalSelectionCardState extends State<GoalSelectionCard> {
 
     final Color backgroundColor =
         isDarkMode ? Colors.grey.shade800 : Colors.white;
-    final Color selectedColor = theme.colorScheme.secondary;
+    final Color selectedColor =
+        isDarkMode ? textLightBlue : theme.colorScheme.secondary;
     final Color textColor = isDarkMode ? Colors.white : Colors.black;
 
     return GestureDetector(

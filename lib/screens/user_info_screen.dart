@@ -3,7 +3,6 @@ import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/app_theme_light.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_animate/flutter_animate.dart'; // Import flutter_animate
 
 class UserInfoScreen extends StatefulWidget {
   const UserInfoScreen({super.key});
