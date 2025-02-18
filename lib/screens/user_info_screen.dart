@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
+import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/app_theme_light.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
@@ -39,7 +41,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('userInfoCompleted', true);
   }
-
+  
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
