@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/screens/admin/template_screen.dart';
 
 class SelectFoodsScreen extends StatefulWidget {
   final List<String> selectedDays;
@@ -55,6 +56,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
           _buildDaySelector(theme),
           _buildNutritionSummary(theme),
           Expanded(child: _buildMealsList(theme)),
+          _buildFinishButton(theme),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -63,6 +65,34 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         icon: const Icon(Icons.add),
       ),
     );
+  }
+
+  Widget _buildFinishButton(ThemeData theme) {
+    return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TemplateScreen(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              'Finalizar',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.onPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            )));
   }
 
   Widget _buildDaySelector(ThemeData theme) {
