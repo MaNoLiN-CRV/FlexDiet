@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
-import 'package:flutter_flexdiet/screens/admin/create_template_screen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
@@ -240,14 +239,17 @@ class _TemplateScreenState extends State<TemplateScreen> {
   }
 
   Widget _buildClientsList(BuildContext context) {
-    return CardScroll(
-      scrollDirection: Axis.horizontal,
-      cards: _filteredClients.map((client) => client.toCardData()).toList(),
-      onCardTap: (index) {
-        if (index >= 0 && index < _filteredClients.length) {
-          _selectClient(_filteredClients[index].name);
-        }
-      },
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * UIConstants.cardHeight,
+      child: CardScroll(
+        scrollDirection: Axis.horizontal,
+        cards: _filteredClients.map((client) => client.toCardData()).toList(),
+        onCardTap: (index) {
+          if (index >= 0 && index < _filteredClients.length) {
+            _selectClient(_filteredClients[index].name);
+          }
+        },
+      ),
     );
   }
 
