@@ -201,7 +201,6 @@ class _EditPersonState extends State<EditPerson> {
                     ),
                   ).then((value) {
                     if (value == true) {
-                      // TODO : DELETE THE CLIENT
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             backgroundColor: Colors.redAccent,

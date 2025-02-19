@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
+import 'package:flutter_flexdiet/screens/admin/create_template_screen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
@@ -264,7 +265,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const HomeScreen()),
+                          builder: (context) => const CreateTemplateScreen()),
                     )
                 : null,
             isSecondary: true,
