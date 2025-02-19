@@ -8,7 +8,7 @@ import 'package:flutter_flexdiet/widgets/widgets.dart';
 class UIConstants {
   static const double defaultPadding = 24.0;
   static const double defaultSpacing = 16.0;
-  static const double cardHeight = 0.25;
+  static const double cardHeight = 0.27;
   static const double buttonHeight = 14.0;
   static const double borderRadius = 12.0;
 
@@ -22,7 +22,6 @@ class UIConstants {
   );
 }
 
-// Models
 class Client {
   final String name;
   final String description;
@@ -41,7 +40,6 @@ class Client {
       );
 }
 
-// Screen
 class TemplateScreen extends StatefulWidget {
   const TemplateScreen({super.key});
 
@@ -52,8 +50,6 @@ class TemplateScreen extends StatefulWidget {
 class _TemplateScreenState extends State<TemplateScreen> {
   String? _selectedClientName;
   final TextEditingController _searchController = TextEditingController();
-
-  // Move sample data to a separate file in a real app
   final List<Client> _clients = [
     Client(
       name: 'Snoop Dogg',
@@ -116,21 +112,23 @@ class _TemplateScreenState extends State<TemplateScreen> {
         selectedIndex: 3,
         onItemTapped: (index) => navigationRouter(context, index),
       ),
-      body: Padding(
-        padding: UIConstants.screenPadding,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHeader(context),
-            if (_selectedClientName != null)
-              _buildSelectedClientBanner(context),
-            _buildAvailableClientsSection(context),
-            _buildSearchField(context),
-            SizedBox(height: UIConstants.defaultSpacing),
-            _buildClientsList(context),
-            _buildActionButtons(context),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: UIConstants.screenPadding,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildHeader(context),
+              if (_selectedClientName != null)
+                _buildSelectedClientBanner(context),
+              _buildAvailableClientsSection(context),
+              _buildSearchField(context),
+              SizedBox(height: UIConstants.defaultSpacing),
+              _buildClientsList(context),
+              _buildActionButtons(context),
+            ],
+          ),
         ),
       ),
     );
@@ -176,7 +174,9 @@ class _TemplateScreenState extends State<TemplateScreen> {
         borderRadius: BorderRadius.circular(UIConstants.borderRadius),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.shadow.withOpacity(0.1),
+            color: theme.colorScheme.shadow.withValues(
+              alpha: 0.1,
+            ),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -199,10 +199,9 @@ class _TemplateScreenState extends State<TemplateScreen> {
       child: Text(
         'Clientes disponibles',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurfaceVariant
-                  .withOpacity(0.8),
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.8,
+                  ),
               fontStyle: FontStyle.italic,
             ),
         textAlign: TextAlign.center,
@@ -219,14 +218,18 @@ class _TemplateScreenState extends State<TemplateScreen> {
         hintText: 'Buscar cliente...',
         prefixIcon: Icon(
           Icons.search,
-          color: theme.colorScheme.primary.withOpacity(0.6),
+          color: theme.colorScheme.primary.withValues(
+            alpha: 0.6,
+          ),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(UIConstants.borderRadius),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.3,
+        ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: UIConstants.defaultPadding,
           vertical: UIConstants.buttonHeight,
@@ -264,7 +267,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const HomeScreen()),
+                          builder: (context) => const CreateTemplateScreen()),
                     )
                 : null,
             isSecondary: true,

@@ -46,8 +46,7 @@ class _GoalSelectionCardState extends State<GoalSelectionCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode =
-        Theme.of(context).brightness == Brightness.dark; // Check for dark mode
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     final Color backgroundColor =
         isDarkMode ? Colors.grey.shade800 : Colors.white;
@@ -71,7 +70,9 @@ class _GoalSelectionCardState extends State<GoalSelectionCard> {
           boxShadow: [
             if (_isSelected)
               BoxShadow(
-                color: selectedColor.withOpacity(0.3),
+                color: selectedColor.withValues(
+                  alpha: 0.3,
+                ),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -99,7 +100,9 @@ class _GoalSelectionCardState extends State<GoalSelectionCard> {
                     widget.subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: textColor.withOpacity(0.7),
+                      color: textColor.withValues(
+                        alpha: 0.7,
+                      ),
                     ),
                   ),
                 ],

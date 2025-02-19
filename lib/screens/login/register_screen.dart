@@ -249,38 +249,33 @@ class _RegisterScreenState extends State<RegisterScreen>
                       // Sign Up button
                       ElevatedButton(
                         onPressed: () async {
-                          // Verificar si todos los campos están llenos
                           if (_usernameController.text.isEmpty ||
                               _emailController.text.isEmpty ||
                               _passwordController.text.isEmpty ||
                               _confirmPasswordController.text.isEmpty) {
                             if (context.mounted) {
-                              ShowToast(context,
+                              showToast(context,
                                   'Por favor, rellena todos los campos.',
                                   toastType: ToastType.warning);
                             }
                           }
 
-                          // Verificar si las contraseñas coinciden
                           if (_passwordController.text !=
                               _confirmPasswordController.text) {
                             if (context.mounted) {
-                              ShowToast(
+                              showToast(
                                   context, 'Las contraseñas no coinciden.',
                                   toastType: ToastType.error);
                             }
                           }
 
                           try {
-                            // Intentar registrar al usuario
                             await emailAuthService.signUp(
                               email: _emailController.text,
                               password: _passwordController.text,
                             );
-
-                            // Si el registro es exitoso, navegar a la pantalla de inicio de sesión
                             if (context.mounted) {
-                              ShowToast(
+                              showToast(
                                   context, 'Has sido registrado correctamente.',
                                   toastType: ToastType.success);
                               Navigator.push(
@@ -292,26 +287,26 @@ class _RegisterScreenState extends State<RegisterScreen>
                           } on FirebaseAuthException catch (e) {
                             if (e.code == 'email-already-in-use') {
                               if (context.mounted) {
-                                ShowToast(context, 'El correo ya está en uso.',
+                                showToast(context, 'El correo ya está en uso.',
                                     toastType: ToastType.error);
                               }
                             } else {
                               if (e.code == 'weak-password') {
                                 if (context.mounted) {
-                                  ShowToast(context,
+                                  showToast(context,
                                       'La contraseña debe de tener al menos 6 caracteres.',
                                       toastType: ToastType.error);
                                 }
                               } else if (e.code == 'invalid-email') {
                                 if (context.mounted) {
-                                  ShowToast(context, 'El email es inválido',
+                                  showToast(context, 'El email es inválido',
                                       toastType: ToastType.error);
                                 }
                               }
                             }
                           } catch (e) {
                             if (context.mounted) {
-                              ShowToast(context, 'Ocurrió un error inesperado.',
+                              showToast(context, 'Ocurrió un error inesperado.',
                                   toastType: ToastType.error);
                             }
                           }

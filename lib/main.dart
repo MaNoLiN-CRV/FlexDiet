@@ -5,7 +5,7 @@ import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:intl/intl.dart'; // Ensure import
+import 'package:intl/intl.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +13,6 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  //Set default locale
   Intl.defaultLocale = 'es';
 
   runApp(const MyApp());
@@ -39,7 +38,7 @@ class MyApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: const [
-              Locale('es', 'ES'), // Spanish, Spain
+              Locale('es', 'ES'),
             ],
           );
         },

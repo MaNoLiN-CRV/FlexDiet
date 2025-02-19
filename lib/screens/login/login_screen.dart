@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_flexdiet/exceptions/exceptions.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
@@ -68,7 +67,6 @@ class _LoginScreenState extends State<LoginScreen>
     final hasCompleted = await _hasCompletedUserInfo();
 
     if (hasCompleted) {
-      // Si ya completó, ve directamente a HomeScreen
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
@@ -81,7 +79,6 @@ class _LoginScreenState extends State<LoginScreen>
         );
       }
     } else {
-      // Si no ha completado, ve a UserInfoScreen
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
@@ -91,45 +88,17 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  Future<void> _handleEmailSignIn(BuildContext context) async {
-    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
-      ShowToast(context, 'Por favor, rellena todos los campos',
-          toastType: ToastType.warning);
-      return;
-    }
-
-    try {
-      await emailAuthService.signIn(
-        email: _usernameController.text,
-        password: _passwordController.text,
-      );
-
-      if (!context.mounted) return;
-      ShowToast(context, 'Inicio de sesión correcto',
-          toastType: ToastType.success);
-      await _handleNavigation(context);
-    } on InvalidCredentialsException {
-      if (!context.mounted) return;
-      ShowToast(context, 'Correo electrónico o contraseña incorrectos',
-          toastType: ToastType.error);
-    } catch (e) {
-      if (!context.mounted) return;
-      ShowToast(context, 'Correo electrónico o contraseña incorrectos',
-          toastType: ToastType.error);
-    }
-  }
-
   Future<void> _handleGoogleSignIn(BuildContext context) async {
     try {
       await googleAuthService.signIn();
       if (!context.mounted) return;
 
-      ShowToast(context, 'Inicio de sesión correcto',
+      showToast(context, 'Inicio de sesión correcto',
           toastType: ToastType.success);
       await _handleNavigation(context);
     } catch (e) {
       if (!context.mounted) return;
-      ShowToast(context, 'Error al iniciar sesión con Google',
+      showToast(context, 'Error al iniciar sesión con Google',
           toastType: ToastType.error);
     }
   }
@@ -147,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (authenticated && context.mounted) {
-        ShowToast(context, 'Inicio de sesión correcto',
+        showToast(context, 'Inicio de sesión correcto',
             toastType: ToastType.success);
         Navigator.push(
           context,
@@ -156,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen>
       }
     } on PlatformException {
       if (!context.mounted) return;
-      ShowToast(context, 'Error en la autenticación biométrica',
+      showToast(context, 'Error en la autenticación biométrica',
           toastType: ToastType.error);
     }
   }

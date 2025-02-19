@@ -89,8 +89,8 @@ class BottomNav extends StatelessWidget {
         Icon(Icons.settings_rounded, color: Colors.grey),
         Icon(Icons.admin_panel_settings_rounded, color: Colors.grey),
       ],
-      color: Colors.white,
-      circleColor: Colors.white,
+      color: theme.dialogBackgroundColor,
+      circleColor: theme.dialogBackgroundColor,
       height: 60,
       circleWidth: 60,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -101,7 +101,7 @@ class BottomNav extends StatelessWidget {
         bottomLeft: Radius.circular(24),
       ),
       shadowColor: Colors.black26,
-      circleShadowColor: Colors.white,
+      circleShadowColor: theme.hintColor,
       elevation: 8,
       gradient: LinearGradient(
         begin: Alignment.topLeft,
@@ -111,7 +111,7 @@ class BottomNav extends StatelessWidget {
       circleGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Colors.white, Colors.white],
+        colors: [theme.dialogBackgroundColor, theme.dialogBackgroundColor],
       ),
     );
   }

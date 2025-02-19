@@ -161,6 +161,63 @@ class _EditPersonState extends State<EditPerson> {
                   ),
                 ],
               ),
+              const SizedBox(height: 40),
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Text(
+                  'Zona de peligro',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Colors.red.shade700,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text('Eliminar Cliente'),
+                      content: const Text(
+                          '¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.pop(context, false), // Cancel button
+                          child: const Text('Cancelar'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context, true); // Confirm delete
+                          },
+                          style:
+                              TextButton.styleFrom(foregroundColor: Colors.red),
+                          child: const Text('Eliminar'),
+                        ),
+                      ],
+                    ),
+                  ).then((value) {
+                    if (value == true) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              backgroundColor: Colors.redAccent,
+                              content: Text('Cliente eliminado')),
+                        );
+                        Navigator.pop(context);
+                      }
+                    }
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Eliminar Cliente'),
+              ),
             ],
           ),
         ),

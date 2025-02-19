@@ -26,8 +26,7 @@ class _HeightSelectionCardState extends State<HeightSelectionCard> {
   @override
   void initState() {
     super.initState();
-    _sliderValue = widget.selectedValue ??
-        160.0; // Initialize with selectedValue or default 160.0
+    _sliderValue = widget.selectedValue ?? 160.0;
   }
 
   @override
@@ -59,7 +58,9 @@ class _HeightSelectionCardState extends State<HeightSelectionCard> {
         ),
         boxShadow: [
           BoxShadow(
-            color: selectedColor.withOpacity(0.3),
+            color: selectedColor.withValues(
+              alpha: 0.3,
+            ),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

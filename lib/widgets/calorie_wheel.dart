@@ -35,18 +35,16 @@ class CalorieWheel extends StatelessWidget {
           children: [
             Text(
               '$consumedCalories',
-              style: theme.textTheme.bodyMedium?.copyWith(
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: theme.colorScheme.surface,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             Text(
               'kcal',
-              style: theme.textTheme.bodySmall?.copyWith(
+              style: theme.textTheme.titleSmall?.copyWith(
                 fontSize: 12,
-                color: theme.colorScheme.surface.withAlpha(128),
               ),
             ),
           ],

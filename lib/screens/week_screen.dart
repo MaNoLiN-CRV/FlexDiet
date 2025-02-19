@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:calendar_timeline/calendar_timeline.dart';
+import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
+import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 
 class Meal {
   final String name;
@@ -37,6 +39,10 @@ class _WeekScreenState extends State<WeekScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calendario de Comidas'),
+      ),
+      bottomNavigationBar: BottomNav(
+        selectedIndex: 0,
+        onItemTapped: (index) => navigationRouter(context, index),
       ),
       body: Column(
         children: [
