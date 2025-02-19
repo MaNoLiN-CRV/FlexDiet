@@ -4,6 +4,7 @@ import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
+import 'dart:math' as math;
 
 class UIConstants {
   static const double defaultPadding = 24.0;
@@ -105,31 +106,34 @@ class _TemplateScreenState extends State<TemplateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.colorScheme.surface,
       appBar: _buildAppBar(context),
       bottomNavigationBar: BottomNav(
         selectedIndex: 3,
         onItemTapped: (index) => navigationRouter(context, index),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: UIConstants.screenPadding,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildHeader(context),
-              if (_selectedClientName != null)
-                _buildSelectedClientBanner(context),
-              _buildAvailableClientsSection(context),
-              _buildSearchField(context),
-              SizedBox(height: UIConstants.defaultSpacing),
-              _buildClientsList(context),
-              _buildActionButtons(context),
-            ],
+      body: Stack(
+        children: [
+          _buildWaveBackgrounds(theme),
+          Expanded(
+            child: Padding(
+              padding: UIConstants.screenPadding,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildHeader(context),
+                  _buildSearchField(context),
+                  SizedBox(height: UIConstants.defaultSpacing),
+                  _buildClientsList(context),
+                  _buildActionButtons(context),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -161,54 +165,6 @@ class _TemplateScreenState extends State<TemplateScreen> {
     );
   }
 
-  Widget _buildSelectedClientBanner(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: UIConstants.defaultSpacing),
-      padding: const EdgeInsets.symmetric(
-        horizontal: UIConstants.defaultPadding / 2,
-        vertical: UIConstants.defaultSpacing / 2,
-      ),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary,
-        borderRadius: BorderRadius.circular(UIConstants.borderRadius),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.shadow.withValues(
-              alpha: 0.1,
-            ),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Text(
-        'Cliente seleccionado: $_selectedClientName',
-        style: theme.textTheme.titleMedium?.copyWith(
-          color: theme.colorScheme.onPrimary,
-          fontWeight: FontWeight.bold,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
-  Widget _buildAvailableClientsSection(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: UIConstants.defaultSpacing),
-      child: Text(
-        'Clientes disponibles',
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.8,
-                  ),
-              fontStyle: FontStyle.italic,
-            ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
   Widget _buildSearchField(BuildContext context) {
     final theme = Theme.of(context);
     return TextField(
@@ -218,18 +174,14 @@ class _TemplateScreenState extends State<TemplateScreen> {
         hintText: 'Buscar cliente...',
         prefixIcon: Icon(
           Icons.search,
-          color: theme.colorScheme.primary.withValues(
-            alpha: 0.6,
-          ),
+          color: theme.colorScheme.primary.withAlpha(153),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(UIConstants.borderRadius),
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
-          alpha: 0.3,
-        ),
+        fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: UIConstants.defaultPadding,
           vertical: UIConstants.buttonHeight,
@@ -250,6 +202,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
             _selectClient(_filteredClients[index].name);
           }
         },
+        selectedCard: _selectedClientName, // Pass the selected client name
       ),
     );
   }
@@ -330,6 +283,18 @@ class _TemplateScreenState extends State<TemplateScreen> {
           color: isSecondary
               ? theme.colorScheme.onSecondary
               : theme.colorScheme.onPrimary,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWaveBackgrounds(ThemeData theme) {
+    return Positioned.fill(
+      child: RepaintBoundary(
+        child: WaveBackground(
+          color: theme.colorScheme.primary,
+          frequency: 0.5,
+          phase: 1,
         ),
       ),
     );

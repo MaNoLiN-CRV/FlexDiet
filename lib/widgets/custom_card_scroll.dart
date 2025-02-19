@@ -4,12 +4,14 @@ class CardScroll extends StatelessWidget {
   final List<CardData> cards;
   final Axis scrollDirection;
   final void Function(int index)? onCardTap;
+  final String? selectedCard;
 
   const CardScroll({
     super.key,
     required this.cards,
     this.scrollDirection = Axis.horizontal,
     this.onCardTap,
+    this.selectedCard,
   });
 
   @override
@@ -21,6 +23,7 @@ class CardScroll extends StatelessWidget {
         return CardItem(
           cardData: cards[index],
           onTap: () => onCardTap?.call(index),
+          isSelected: cards[index].title == selectedCard,
         );
       },
     );
@@ -42,11 +45,13 @@ class CardData {
 class CardItem extends StatelessWidget {
   final CardData cardData;
   final VoidCallback? onTap;
+  final bool isSelected;
 
   const CardItem({
     super.key,
     required this.cardData,
     this.onTap,
+    this.isSelected = false,
   });
 
   @override
@@ -60,6 +65,7 @@ class CardItem extends StatelessWidget {
       child: Material(
         elevation: 2,
         borderRadius: borderRadius,
+        color: isSelected ? theme.colorScheme.secondary : null,
         child: InkWell(
           onTap: onTap,
           borderRadius: borderRadius,
@@ -106,6 +112,8 @@ class CardItem extends StatelessWidget {
                       cardData.title,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color:
+                            isSelected ? theme.colorScheme.onSecondary : null,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -115,7 +123,9 @@ class CardItem extends StatelessWidget {
                       Text(
                         cardData.description!,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                          color: isSelected
+                              ? theme.colorScheme.onSecondary
+                              : theme.textTheme.bodyMedium?.color,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

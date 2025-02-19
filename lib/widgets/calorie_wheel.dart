@@ -33,20 +33,12 @@ class CalorieWheel extends StatelessWidget {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              '$consumedCalories',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Text(
-              'kcal',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontSize: 12,
-              ),
-            ),
+            Text('$consumedCalories',
+                style: theme.textTheme.bodyLarge
+                    ?.copyWith(color: theme.colorScheme.onPrimary)),
+            Text('kcal',
+                style: theme.textTheme.bodySmall
+                    ?.copyWith(color: theme.colorScheme.onPrimary)),
           ],
         )
       ],

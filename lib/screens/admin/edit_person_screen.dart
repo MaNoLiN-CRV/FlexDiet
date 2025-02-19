@@ -185,13 +185,14 @@ class _EditPersonState extends State<EditPerson> {
                           '¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.'),
                       actions: <Widget>[
                         TextButton(
-                          onPressed: () =>
-                              Navigator.pop(context, false), // Cancel button
+                          onPressed: () => Navigator.pop(context, false),
+                          style: TextButton.styleFrom(
+                              foregroundColor: Colors.grey),
                           child: const Text('Cancelar'),
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pop(context, true); // Confirm delete
+                            Navigator.pop(context, true);
                           },
                           style:
                               TextButton.styleFrom(foregroundColor: Colors.red),

@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
@@ -9,7 +9,6 @@ import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -106,6 +105,20 @@ class _UsernameInfoSettings extends StatefulWidget {
 class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   final ImagePickerService _imagePickerService = ImagePickerService();
   XFile? _imagenSeleccionada;
+  String? _userName;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      _userName = user?.displayName ?? user?.email ?? 'Nombre de Usuario';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,9 +161,9 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Username Name',
-                style: TextStyle(
+              Text(
+                _userName ?? 'Nombre de Usuario',
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -158,8 +171,12 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
               const SizedBox(height: 4),
               ElevatedButton(
                 onPressed: _seleccionarImagenDeGaleria,
-                child: Text('Edit Profile',
-                    style: widget.theme.textTheme.labelLarge),
+                child: Text('Establecer Imagen de Perfil',
+                    style: ThemeProvider()
+                        .themeData
+                        .textTheme
+                        .labelLarge
+                        ?.copyWith(color: ThemeData().colorScheme.onPrimary)),
               )
             ],
           ),
@@ -176,15 +193,10 @@ class _ElevatedButtonSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
-        // Make the function async
-        // Get an instance of SharedPreferences
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-
-        // Clear all stored data
-        await prefs.clear();
+        await FirebaseAuth.instance.signOut();
 
         if (context.mounted) {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => const LoginScreen(),

@@ -130,12 +130,7 @@ class _HomeScreenContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Comidas de Hoy',
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.onSurface,
-          ),
-        ),
+        Text('Comidas de Hoy', style: theme.textTheme.titleLarge),
         const SizedBox(height: HomeScreen._smallSpacing),
         SizedBox(
           height: HomeScreen._cardHeight,
@@ -186,17 +181,16 @@ class _CaloryInfo extends StatelessWidget {
       children: [
         Text(
           title,
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.bold,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onPrimary,
           ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
           value,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.colorScheme.surface,
-            fontWeight: FontWeight.bold,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onPrimary,
           ),
           textAlign: TextAlign.center,
         ),
