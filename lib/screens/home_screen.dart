@@ -186,8 +186,7 @@ class _CaloryInfo extends StatelessWidget {
       children: [
         Text(
           title,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.surface.withAlpha(128),
+          style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.center,

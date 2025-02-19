@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/login/login_screen.dart';
+import 'package:flutter_flexdiet/services/image_service/image_service.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,8 +19,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-
-
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -52,7 +54,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            _UsernameInfoSettings(theme: theme),
+            _UsernameInfoSettings(
+              theme: theme
+            ),
             const SizedBox(height: 40),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -92,16 +96,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-class _UsernameInfoSettings extends StatelessWidget {
+class _UsernameInfoSettings extends StatefulWidget {
   const _UsernameInfoSettings({
     super.key,
-    required this.theme,
+    required this.theme
   });
 
   final ThemeData theme;
 
   @override
+  State<_UsernameInfoSettings> createState() => _UsernameInfoSettingsState();
+}
+
+class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
+ final ImagePickerService _imagePickerService = ImagePickerService();
+    XFile? _imagenSeleccionada;
+
+  @override
   Widget build(BuildContext context) {
+    void _seleccionarImagenDeGaleria() async {
+      final XFile? imagen =
+          await _imagePickerService.seleccionarImagen(ImageSource.gallery);
+      if (imagen != null) {
+        setState(() {
+          _imagenSeleccionada = imagen;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se seleccionó ninguna imagen')),
+        );
+      }
+    }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -117,8 +142,12 @@ class _UsernameInfoSettings extends StatelessWidget {
             child: CircleAvatar(
               radius: 45,
               backgroundColor: Colors.grey[200],
-              backgroundImage: const NetworkImage(
-                  'https://static.vecteezy.com/system/resources/previews/030/750/807/non_2x/user-icon-in-trendy-outline-style-isolated-on-white-background-user-silhouette-symbol-for-your-website-design-logo-app-ui-illustration-eps10-free-vector.jpg'),
+              backgroundImage: _imagenSeleccionada != null ? 
+              FileImage(
+                File(_imagenSeleccionada!.path)
+              )
+              :
+              null
             ),
           ),
           const SizedBox(width: 20),
@@ -133,7 +162,10 @@ class _UsernameInfoSettings extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text('Edit Profile', style: theme.textTheme.labelLarge),
+              ElevatedButton(
+                onPressed: _seleccionarImagenDeGaleria,
+                child: Text('Edit Profile', style: widget.theme.textTheme.labelLarge),
+              )
             ],
           ),
         ],
@@ -153,12 +185,11 @@ class _ElevatedButtonSettings extends StatelessWidget {
       onPressed: () async {
         // Make the function async
         // Get an instance of SharedPreferences
-        SharedPreferences prefs =
-            await SharedPreferences.getInstance();
-    
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+
         // Clear all stored data
         await prefs.clear();
-    
+
         if (context.mounted) {
           Navigator.push(
             context,
@@ -171,10 +202,8 @@ class _ElevatedButtonSettings extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.redAccent,
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(
-            horizontal: 20, vertical: 15),
-        textStyle: const TextStyle(
-            fontSize: 16, fontWeight: FontWeight.w500),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
@@ -190,7 +219,7 @@ class _CardLogic extends StatelessWidget {
     super.key,
     required this.text,
     required this.list,
-    required this.value, 
+    required this.value,
     required this.onChange,
     required this.themeProvider,
     required this.theme,
@@ -226,8 +255,7 @@ class _CardLogic extends StatelessWidget {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Text(text,
-                      style: theme.textTheme.bodyLarge),
+                  Text(text, style: theme.textTheme.bodyLarge),
                 ],
               ),
               const SizedBox(height: 8),
@@ -236,8 +264,7 @@ class _CardLogic extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: CustomDropdownButton(
                   value: value,
                   onChange: onChange,
