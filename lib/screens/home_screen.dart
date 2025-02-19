@@ -145,7 +145,9 @@ class _HomeScreenContent extends StatelessWidget {
                   subtitle: 'Empieza el día con energía',
                   description: 'Huevos y tostadas',
                   image: 'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
-                  macros: 'Información nutricional detallada: \n\n- Calorías: 350 kcal \n- Proteínas: 20g \nCarbohidratos: 40g \nGrasas: 15g \n\nRecuerda que estos valores son aproximados y pueden variar según los ingredientes y las porciones.'
+                  kcal: '460 kcal',
+                  proteins: '20 g',
+                  carbs: '101 g',
                   ),));
             },
             cards: [

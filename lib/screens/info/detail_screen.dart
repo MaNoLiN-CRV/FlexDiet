@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
-class DetailsScreen extends StatefulWidget {
-  // Cambiado a StatefulWidget
+//* The function of this screen is to display the macros
+class DetailsScreen extends StatelessWidget {
   final String title;
   final String subtitle;
   final String description;
   final String image;
-  final String macros;
+  final String kcal;
+  final String proteins;
+  final String carbs;
 
   const DetailsScreen({
     super.key,
@@ -14,67 +16,180 @@ class DetailsScreen extends StatefulWidget {
     required this.subtitle,
     required this.description,
     required this.image,
-    required this.macros,
-  });
+    required this.kcal,
+    required this.proteins,
+    required this.carbs
+  }) : super(key: key);
 
-  @override
-  State<DetailsScreen> createState() =>
-      _DetailsScreenState(); // Método createState correcto
-}
-
-class _DetailsScreenState extends State<DetailsScreen> {
-  // Clase State genérica con DetallesScreen
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title), // Acceder a las propiedades con widget.
-      ),
+      backgroundColor: theme.colorScheme.surface,
+      appBar: _buildAppBar(theme),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(
-              widget.image, // Acceder a las propiedades con widget.
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.title, // Acceder a las propiedades con widget.
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.subtitle, // Acceder a las propiedades con widget.
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    widget.description, // Acceder a las propiedades con widget.
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    widget.macros, // Acceder a las propiedades con widget.
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            ),
+            // Tarjeta de macros principal
+            _buildCardMacros(theme),
+            // Imagen del plato
+            _buildImageContainer(image),
+            // Detalles de la comida
+            _buildPrincipalContainer(
+              theme,
+              subtitle,
+              description,
+              kcal,
+              proteins,
+              carbs
+            )
           ],
         ),
       ),
     );
   }
+
+  PreferredSizeWidget _buildAppBar(ThemeData theme) {
+    return AppBar(
+      backgroundColor: theme.colorScheme.primary,
+      elevation: 0,
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardMacros(ThemeData theme) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.secondary,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.secondary,
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildMacroInfo('Calorías', '350 kcal'),
+          _buildMacroInfo('Proteínas', '20g'),
+          _buildMacroInfo('Carbohidratos', '40g'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMacroInfo(String label, String value) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
 }
+
+Widget _buildImageContainer(String image) {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16),
+    height: 200,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20),
+      image: DecorationImage(
+        image: NetworkImage(image),
+        fit: BoxFit.cover,
+      ),
+      boxShadow: [
+        BoxShadow(
+          blurRadius: 10,
+          offset: const Offset(0, 5),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildPrincipalContainer(ThemeData theme, String subtitle, String description, String kcal, String proteins, String carbs) {
+  return Container(
+      margin: EdgeInsets.symmetric(vertical: 20),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        child: Card(
+          shadowColor: theme.cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  subtitle,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  description,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontSize: 16,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Información nutricional',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Información nutricional detallada: \n\n- Calorías: $kcal \n- Proteínas: $proteins \n- Carbohidratos: $carbs \n- Grasas: 15g \n\nRecuerda que estos valores son aproximados y pueden variar según los ingredientes y las porciones.',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ));
+}
+
