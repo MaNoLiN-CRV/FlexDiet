@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
+import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -30,7 +31,7 @@ class _HomeScreenContent extends StatelessWidget {
       body: Stack(
         children: [
           _buildWaveBackgrounds(theme),
-          _buildMainContent(theme),
+          _buildMainContent(theme, context),
         ],
       ),
       bottomNavigationBar: BottomNav(
@@ -79,7 +80,7 @@ class _HomeScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildMainContent(ThemeData theme) {
+  Widget _buildMainContent(ThemeData theme, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(HomeScreen._standardPadding),
       child: Column(
@@ -87,7 +88,7 @@ class _HomeScreenContent extends StatelessWidget {
         children: [
           _buildNutritionCard(theme),
           const SizedBox(height: HomeScreen._mediumSpacing),
-          _buildMealsSection(theme),
+          _buildMealsSection(theme, context),
         ],
       ),
     );
@@ -126,7 +127,8 @@ class _HomeScreenContent extends StatelessWidget {
     );
   }
 
-  Widget _buildMealsSection(ThemeData theme) {
+  Widget _buildMealsSection(ThemeData theme, BuildContext context) {
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -136,6 +138,16 @@ class _HomeScreenContent extends StatelessWidget {
           height: HomeScreen._cardHeight,
           width: double.infinity,
           child: CardScroll(
+            onCardTap: (index) {
+              Navigator.push(context,  MaterialPageRoute(builder: (BuildContext context) =>
+                DetailsScreen(
+                  title: 'Desayuno',
+                  subtitle: 'Empieza el día con energía',
+                  description: 'Huevos y tostadas',
+                  image: 'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
+                  macros: 'Información nutricional detallada: \n\n- Calorías: 350 kcal \n- Proteínas: 20g \nCarbohidratos: 40g \nGrasas: 15g \n\nRecuerda que estos valores son aproximados y pueden variar según los ingredientes y las porciones.'
+                  ),));
+            },
             cards: [
               CardData(
                 title: 'Desayuno',
