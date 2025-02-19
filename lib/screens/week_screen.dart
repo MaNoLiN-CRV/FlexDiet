@@ -48,8 +48,7 @@ class _WeekScreenState extends State<WeekScreen> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final DateFormat formatter =
-        DateFormat('EEEE, d MMMM yyyy', 'es_ES'); // Added yyyy for the year
+    final DateFormat formatter = DateFormat('EEEE, d MMMM yyyy', 'es_ES');
     final String formattedDate = formatter.format(_selectedDate);
 
     final mealsForSelectedDate = _mealData[_selectedDate] ?? [];
@@ -71,28 +70,39 @@ class _WeekScreenState extends State<WeekScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios),
-                  onPressed: () {
-                    setState(() {
-                      _selectedDate =
-                          _selectedDate.subtract(const Duration(days: 1));
-                    });
-                  },
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back_ios),
+                      onPressed: () {
+                        setState(() {
+                          _selectedDate =
+                              _selectedDate.subtract(const Duration(days: 1));
+                        });
+                      },
+                    ),
+                  ),
                 ),
                 Text(
                   formattedDate,
-                  style: theme.textTheme.headlineSmall!
+                  style: theme.textTheme.titleMedium!
                       .copyWith(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
                 ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward_ios),
-                  onPressed: () {
-                    setState(() {
-                      _selectedDate =
-                          _selectedDate.add(const Duration(days: 1));
-                    });
-                  },
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_forward_ios),
+                      onPressed: () {
+                        setState(() {
+                          _selectedDate =
+                              _selectedDate.add(const Duration(days: 1));
+                        });
+                      },
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -102,7 +112,8 @@ class _WeekScreenState extends State<WeekScreen> {
           Expanded(
             child: mealsForSelectedDate.isEmpty
                 ? const Center(
-                    child: Text('No hay comidas asociadas a esta fecha'),
+                    child: Center(
+                        child: Text('No hay comidas asociadas a esta fecha')),
                   )
                 : ListView.builder(
                     itemCount: mealsForSelectedDate.length,
