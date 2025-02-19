@@ -201,12 +201,14 @@ class _EditPersonState extends State<EditPerson> {
                     ),
                   ).then((value) {
                     if (value == true) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            backgroundColor: Colors.redAccent,
-                            content: Text('Cliente eliminado')),
-                      );
-                      Navigator.pop(context);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              backgroundColor: Colors.redAccent,
+                              content: Text('Cliente eliminado')),
+                        );
+                        Navigator.pop(context);
+                      }
                     }
                   });
                 },

@@ -108,13 +108,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       onPressed: () {
                         final email = _emailController.text;
                         if (email.isNotEmpty) {
-                          ShowToast(
+                          showToast(
                             context,
                             'Se ha enviado un correo de recuperación a $email',
                             toastType: ToastType.success,
                           );
                         } else {
-                          ShowToast(
+                          showToast(
                             context,
                             'Por favor, ingresa un correo válido',
                             toastType: ToastType.error,

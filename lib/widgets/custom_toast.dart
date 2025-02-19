@@ -24,7 +24,7 @@ enum ToastType {
 /// ```dart
 /// ShowToast(context, "An error occurred.", toastType: ToastType.error);
 /// ```
-void ShowToast(BuildContext context, String mensaje,
+void showToast(BuildContext context, String mensaje,
     {ToastType toastType = ToastType.info}) {
   FToast fToast = FToast();
   fToast.init(context);

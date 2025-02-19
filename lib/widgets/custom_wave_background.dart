@@ -6,7 +6,7 @@ class WaveBackground extends StatefulWidget {
   final double frequency;
   final double phase;
   final double top;
-  
+
   const WaveBackground({
     super.key,
     this.color = Colors.blue,
@@ -19,7 +19,8 @@ class WaveBackground extends StatefulWidget {
   State<WaveBackground> createState() => _WaveBackgroundState();
 }
 
-class _WaveBackgroundState extends State<WaveBackground> with SingleTickerProviderStateMixin {
+class _WaveBackgroundState extends State<WaveBackground>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -45,7 +46,7 @@ class _WaveBackgroundState extends State<WaveBackground> with SingleTickerProvid
         builder: (context, child) {
           return CustomPaint(
             isComplex: true,
-            willChange: true, 
+            willChange: true,
             painter: WavePainter(
               color: widget.color.withValues(alpha: 0.2),
               frequency: widget.frequency,
@@ -74,7 +75,7 @@ class WavePainter extends CustomPainter {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.fill
-      ..isAntiAlias = true; // Smooth edges
+      ..isAntiAlias = true;
 
     final path = Path();
     path.moveTo(0, size.height);
@@ -83,7 +84,9 @@ class WavePainter extends CustomPainter {
       (size.width).toInt(),
       (x) => Offset(
         x.toDouble(),
-        size.height / 2 + math.sin((x / size.width * frequency * math.pi * 2) + phase) * 100.0,
+        size.height / 2 +
+            math.sin((x / size.width * frequency * math.pi * 2) + phase) *
+                100.0,
       ),
     );
 

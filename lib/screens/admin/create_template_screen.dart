@@ -41,7 +41,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              theme.colorScheme.background,
+              theme.colorScheme.surface,
               theme.colorScheme.surface,
             ],
           ),
@@ -75,7 +75,9 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.primary.withOpacity(0.2),
+            color: theme.colorScheme.primary.withValues(
+              alpha: 0.2,
+            ),
             width: 2,
           ),
         ),
@@ -96,7 +98,9 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.shadow.withOpacity(0.1),
+            color: theme.colorScheme.shadow.withValues(
+              alpha: 0.1,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -188,7 +192,9 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: theme.colorScheme.primary.withOpacity(0.3),
+              color: theme.colorScheme.primary.withValues(
+                alpha: 0.3,
+              ),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -196,7 +202,6 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
         ),
         child: FilledButton(
           onPressed: () {
-            // TODO: NEXT STEP
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text('Plantilla guardada con éxito'),

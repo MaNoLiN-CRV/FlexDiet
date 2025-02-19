@@ -64,7 +64,9 @@ class _CustomUserInfoState extends State<CustomUserInfo> {
           boxShadow: [
             if (_isFocused)
               BoxShadow(
-                color: focusColor.withOpacity(0.3),
+                color: focusColor.withValues(
+                  alpha: 0.3,
+                ),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

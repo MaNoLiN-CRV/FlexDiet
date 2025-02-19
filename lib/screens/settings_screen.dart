@@ -54,9 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            _UsernameInfoSettings(
-              theme: theme
-            ),
+            _UsernameInfoSettings(theme: theme),
             const SizedBox(height: 40),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -97,10 +95,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 }
 
 class _UsernameInfoSettings extends StatefulWidget {
-  const _UsernameInfoSettings({
-    super.key,
-    required this.theme
-  });
+  const _UsernameInfoSettings({required this.theme});
 
   final ThemeData theme;
 
@@ -109,8 +104,8 @@ class _UsernameInfoSettings extends StatefulWidget {
 }
 
 class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
- final ImagePickerService _imagePickerService = ImagePickerService();
-    XFile? _imagenSeleccionada;
+  final ImagePickerService _imagePickerService = ImagePickerService();
+  XFile? _imagenSeleccionada;
 
   @override
   Widget build(BuildContext context) {
@@ -122,11 +117,14 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
           _imagenSeleccionada = imagen;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se seleccionó ninguna imagen')),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No se seleccionó ninguna imagen')),
+          );
+        }
       }
     }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -140,15 +138,11 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
               ),
             ),
             child: CircleAvatar(
-              radius: 45,
-              backgroundColor: Colors.grey[200],
-              backgroundImage: _imagenSeleccionada != null ? 
-              FileImage(
-                File(_imagenSeleccionada!.path)
-              )
-              :
-              null
-            ),
+                radius: 45,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: _imagenSeleccionada != null
+                    ? FileImage(File(_imagenSeleccionada!.path))
+                    : null),
           ),
           const SizedBox(width: 20),
           Column(
@@ -164,7 +158,8 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
               const SizedBox(height: 4),
               ElevatedButton(
                 onPressed: _seleccionarImagenDeGaleria,
-                child: Text('Edit Profile', style: widget.theme.textTheme.labelLarge),
+                child: Text('Edit Profile',
+                    style: widget.theme.textTheme.labelLarge),
               )
             ],
           ),
@@ -175,9 +170,7 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
 }
 
 class _ElevatedButtonSettings extends StatelessWidget {
-  const _ElevatedButtonSettings({
-    super.key,
-  });
+  const _ElevatedButtonSettings();
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +209,6 @@ class _ElevatedButtonSettings extends StatelessWidget {
 
 class _CardLogic extends StatelessWidget {
   const _CardLogic({
-    super.key,
     required this.text,
     required this.list,
     required this.value,

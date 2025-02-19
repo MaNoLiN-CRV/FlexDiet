@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
-import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/app_theme_light.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
@@ -16,23 +14,17 @@ class UserInfoScreen extends StatefulWidget {
 class _UserInfoScreenState extends State<UserInfoScreen> {
   final _pageController = PageController(initialPage: 0);
 
-  //final TextEditingController _weightController = TextEditingController(); <-- Remove these
-  //final TextEditingController _heightController = TextEditingController();
   final TextEditingController _targetWeightController = TextEditingController();
-  //String? _goal; <-- REMOVE THIS
-  //String? _gender; <-- REMOVE THIS
 
   int _currentPage = 0;
-  String? _selectedGoal; // Add this
-  String? _selectedGender; //Add this
+  String? _selectedGoal;
+  String? _selectedGender;
   double? _selectedWeight;
   double? _selectedHeight;
 
   @override
   void dispose() {
     _pageController.dispose();
-    //_weightController.dispose(); <-- Remove these
-    //_heightController.dispose();
     _targetWeightController.dispose();
     super.dispose();
   }
@@ -41,7 +33,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('userInfoCompleted', true);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -105,7 +97,6 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   });
                 },
                 children: [
-                  // Page 1: Weight and Height
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 16.0),
@@ -135,7 +126,6 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                       ],
                     ),
                   ),
-                  // Page 2: Goal Selection
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 16.0),
@@ -185,8 +175,6 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                       ],
                     ),
                   ),
-
-                  //Page 3: Gender selection
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 16.0),
@@ -218,7 +206,6 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                       ],
                     ),
                   ),
-                  // Page 4: Desired Weight
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 16.0),
@@ -245,10 +232,9 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
             ),
             CustomPageIndicator(
               currentPage: _currentPage,
-              pageCount: 4, // El número de páginas
-              activeColor:
-                  theme.colorScheme.secondary, // Color del indicador activo
-              inactiveColor: Colors.grey[300]!, // Color del indicador inactivo
+              pageCount: 4,
+              activeColor: theme.colorScheme.secondary,
+              inactiveColor: Colors.grey[300]!,
             ),
             if (_currentPage == 3)
               Padding(
@@ -258,9 +244,9 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                   onPressed: () async {
                     if (_selectedWeight == null ||
                         _selectedHeight == null ||
-                        _selectedGoal == null || // USE _selectedGoal here
+                        _selectedGoal == null ||
                         _selectedGender == null) {
-                      ShowToast(
+                      showToast(
                           context, "Por favor, rellena la información anterior",
                           toastType: ToastType.warning);
                       return;
