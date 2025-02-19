@@ -4,6 +4,7 @@ const Color backgroundColorWhite = Color(0xFFE3EDF7);
 const Color backgroundColorBlue = Color(0xFF4530B3);
 const Color containersBlue = Color(0xFF5451D6);
 const Color textBlue = Color(0xFF30436E);
+const Color buttonTextWhite = Color(0xFFD1D9E6);
 
 ThemeData lightTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(seedColor: backgroundColorBlue).copyWith(
@@ -11,8 +12,8 @@ ThemeData lightTheme = ThemeData(
     primary: backgroundColorBlue,
     secondary: containersBlue,
     error: Colors.red,
-    onPrimary: Colors.white,
-    onSecondary: Colors.white,
+    onPrimary: buttonTextWhite,
+    onSecondary: buttonTextWhite,
     onSurface: textBlue,
     onError: Colors.white,
     brightness: Brightness.light,
@@ -45,14 +46,17 @@ ThemeData lightTheme = ThemeData(
     headlineSmall:
         TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: textBlue),
     titleLarge:
-        TextStyle(fontSize: 22.0, fontWeight: FontWeight.w600, color: textBlue),
+        TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold, color: textBlue),
     titleMedium:
-        TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500, color: textBlue),
+        TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: textBlue),
     titleSmall:
-        TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400, color: textBlue),
-    bodyLarge: TextStyle(fontSize: 16.0, color: textBlue),
-    bodyMedium: TextStyle(fontSize: 14.0, color: textBlue),
-    bodySmall: TextStyle(fontSize: 12.0, color: textBlue),
+        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: textBlue),
+    bodyLarge:
+        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: textBlue),
+    bodyMedium:
+        TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: textBlue),
+    bodySmall:
+        TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold, color: textBlue),
     labelLarge:
         TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold, color: textBlue),
     labelMedium:
@@ -63,17 +67,17 @@ ThemeData lightTheme = ThemeData(
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: textBlue,
-      foregroundColor: Colors.white,
+      foregroundColor: buttonTextWhite,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       elevation: 3,
     ),
   ),
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
-      foregroundColor: Colors.white,
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      foregroundColor: buttonTextWhite,
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
     ),
@@ -81,7 +85,7 @@ ThemeData lightTheme = ThemeData(
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
       foregroundColor: containersBlue,
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       side: const BorderSide(color: containersBlue),
@@ -91,7 +95,7 @@ ThemeData lightTheme = ThemeData(
     filled: true,
     fillColor: backgroundColorWhite,
     hintStyle: TextStyle(color: textBlue.withAlpha(128)),
-    labelStyle: const TextStyle(color: textBlue, fontWeight: FontWeight.w500),
+    labelStyle: const TextStyle(color: textBlue, fontWeight: FontWeight.bold),
     floatingLabelStyle: const TextStyle(color: textBlue),
     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
     border: OutlineInputBorder(
@@ -103,7 +107,7 @@ ThemeData lightTheme = ThemeData(
       borderRadius: BorderRadius.circular(12.0),
     ),
     focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: textBlue), // Color del cursor
+      borderSide: BorderSide(color: textBlue),
       borderRadius: BorderRadius.circular(12.0),
     ),
     errorBorder: OutlineInputBorder(
@@ -120,7 +124,7 @@ ThemeData lightTheme = ThemeData(
   cardTheme: CardTheme(
     elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
-    color: Colors.white,
+    color: buttonTextWhite,
   ),
   iconTheme: const IconThemeData(
     color: textBlue,

@@ -47,14 +47,17 @@ ThemeData darkTheme = ThemeData(
     headlineSmall: TextStyle(
         fontSize: 24.0, fontWeight: FontWeight.bold, color: textLightBlue),
     titleLarge: TextStyle(
-        fontSize: 22.0, fontWeight: FontWeight.w600, color: textLightBlue),
+        fontSize: 22.0, fontWeight: FontWeight.bold, color: textLightBlue),
     titleMedium: TextStyle(
-        fontSize: 18.0, fontWeight: FontWeight.w500, color: textLightBlue),
+        fontSize: 18.0, fontWeight: FontWeight.bold, color: textLightBlue),
     titleSmall: TextStyle(
-        fontSize: 16.0, fontWeight: FontWeight.w400, color: textLightBlue),
-    bodyLarge: TextStyle(fontSize: 16.0, color: textLightBlue),
-    bodyMedium: TextStyle(fontSize: 14.0, color: textLightBlue),
-    bodySmall: TextStyle(fontSize: 12.0, color: textLightBlue),
+        fontSize: 16.0, fontWeight: FontWeight.bold, color: textLightBlue),
+    bodyLarge: TextStyle(
+        fontSize: 16.0, fontWeight: FontWeight.bold, color: textLightBlue),
+    bodyMedium: TextStyle(
+        fontSize: 14.0, fontWeight: FontWeight.bold, color: textLightBlue),
+    bodySmall: TextStyle(
+        fontSize: 12.0, fontWeight: FontWeight.bold, color: textLightBlue),
     labelLarge: TextStyle(
         fontSize: 14.0, fontWeight: FontWeight.bold, color: textLightBlue),
     labelMedium: TextStyle(
@@ -67,7 +70,7 @@ ThemeData darkTheme = ThemeData(
       backgroundColor: backgroundColorDarkBlue,
       foregroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       elevation: 3,
     ),
@@ -75,7 +78,7 @@ ThemeData darkTheme = ThemeData(
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
       foregroundColor: containersDarkBlue,
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
       side: const BorderSide(color: containersDarkBlue),
@@ -84,7 +87,7 @@ ThemeData darkTheme = ThemeData(
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       foregroundColor: Colors.white,
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
     ),
@@ -94,7 +97,7 @@ ThemeData darkTheme = ThemeData(
     fillColor: backgroundColorBlack,
     hintStyle: TextStyle(color: textLightBlue.withAlpha(128)),
     labelStyle:
-        const TextStyle(color: textLightBlue, fontWeight: FontWeight.w500),
+        const TextStyle(color: textLightBlue, fontWeight: FontWeight.bold),
     floatingLabelStyle: const TextStyle(color: textLightBlue),
     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
     border: OutlineInputBorder(
@@ -106,7 +109,7 @@ ThemeData darkTheme = ThemeData(
       borderRadius: BorderRadius.circular(12.0),
     ),
     focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: textLightBlue), // Color del cursor
+      borderSide: BorderSide(color: textLightBlue),
       borderRadius: BorderRadius.circular(12.0),
     ),
     errorBorder: OutlineInputBorder(
