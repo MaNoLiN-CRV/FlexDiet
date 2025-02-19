@@ -43,7 +43,7 @@ class UseTemplateScreen extends StatelessWidget {
           top: 50,
           child: RepaintBoundary(
             child: WaveBackground(
-              color: theme.colorScheme.primary.withOpacity(0.7),
+              color: theme.colorScheme.primary.withValues(alpha: 0.7),
               frequency: 0.5,
               phase: 1,
             ),
@@ -53,7 +53,7 @@ class UseTemplateScreen extends StatelessWidget {
           top: 250,
           child: RepaintBoundary(
             child: WaveBackground(
-              color: theme.colorScheme.secondary.withOpacity(0.5),
+              color: theme.colorScheme.secondary.withValues(alpha: 0.5),
               frequency: 0.3,
               phase: 0,
             ),
@@ -95,7 +95,7 @@ class UseTemplateScreen extends StatelessWidget {
         Text(
           'Selecciona la plantilla que mejor se adapte a tus objetivos',
           style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ],

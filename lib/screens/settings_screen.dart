@@ -105,7 +105,7 @@ class _UsernameInfoSettings extends StatefulWidget {
 class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   final ImagePickerService _imagePickerService = ImagePickerService();
   XFile? _imagenSeleccionada;
-  String? _userName;
+  late String _userName;
 
   @override
   void initState() {
@@ -158,27 +158,31 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
                     : null),
           ),
           const SizedBox(width: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _userName ?? 'Nombre de Usuario',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _userName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
-              ),
-              const SizedBox(height: 4),
-              ElevatedButton(
-                onPressed: _seleccionarImagenDeGaleria,
-                child: Text('Establecer Imagen de Perfil',
-                    style: ThemeProvider()
-                        .themeData
-                        .textTheme
-                        .labelLarge
-                        ?.copyWith(color: ThemeData().colorScheme.onPrimary)),
-              )
-            ],
+                const SizedBox(height: 4),
+                ElevatedButton(
+                  onPressed: _seleccionarImagenDeGaleria,
+                  child: Text('Establecer Imagen de Perfil',
+                      style: ThemeProvider()
+                          .themeData
+                          .textTheme
+                          .labelLarge
+                          ?.copyWith(color: ThemeData().colorScheme.onPrimary)),
+                )
+              ],
+            ),
           ),
         ],
       ),

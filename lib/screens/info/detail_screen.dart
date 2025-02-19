@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
 
-class DetailsScreen extends StatefulWidget { // Cambiado a StatefulWidget
+class DetailsScreen extends StatefulWidget {
+  // Cambiado a StatefulWidget
   final String title;
   final String subtitle;
   final String description;
   final String image;
-  final String macros; 
+  final String macros;
 
   const DetailsScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.description,
     required this.image,
-    required this.macros, 
-  }) : super(key: key);
+    required this.macros,
+  });
 
   @override
-  State<DetailsScreen> createState() => _DetailsScreenState(); // Método createState correcto
+  State<DetailsScreen> createState() =>
+      _DetailsScreenState(); // Método createState correcto
 }
 
-class _DetailsScreenState extends State<DetailsScreen> { // Clase State genérica con DetallesScreen
+class _DetailsScreenState extends State<DetailsScreen> {
+  // Clase State genérica con DetallesScreen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +65,7 @@ class _DetailsScreenState extends State<DetailsScreen> { // Clase State genéric
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 16),
-                  Text( 
+                  Text(
                     widget.macros, // Acceder a las propiedades con widget.
                     style: const TextStyle(fontSize: 16),
                   ),

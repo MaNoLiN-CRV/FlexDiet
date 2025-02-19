@@ -48,7 +48,10 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: theme.colorScheme.surface,
         elevation: 0,
         title: const Text('Minimalist Navigation'),
-        titleTextStyle: TextStyle(color: theme.iconTheme.color, fontWeight: FontWeight.bold, fontSize: 20),
+        titleTextStyle: TextStyle(
+            color: theme.iconTheme.color,
+            fontWeight: FontWeight.bold,
+            fontSize: 20),
         centerTitle: true,
       ),
       backgroundColor: theme.colorScheme.surface,
@@ -78,7 +81,7 @@ class BottomNav extends StatelessWidget {
       activeIndex: selectedIndex,
       onTap: onItemTapped,
       activeIcons: [
-        Icon(Icons.person_outline_rounded, color: theme.iconTheme.color),
+        Icon(Icons.person, color: theme.iconTheme.color),
         Icon(Icons.home_rounded, color: theme.iconTheme.color),
         Icon(Icons.settings_rounded, color: theme.iconTheme.color),
         Icon(Icons.admin_panel_settings_rounded, color: Colors.grey),

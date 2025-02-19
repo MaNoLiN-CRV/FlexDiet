@@ -7,10 +7,10 @@ class LoadingWheel extends StatefulWidget {
   final int seconds;
 
   const LoadingWheel({
-    Key? key,
+    super.key,
     required this.theme,
     this.seconds = 2,
-  }) : super(key: key);
+  });
 
   @override
   _LoadingWheelState createState() => _LoadingWheelState();

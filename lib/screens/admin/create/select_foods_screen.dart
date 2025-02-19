@@ -43,11 +43,11 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         title: Text(
           'Planificar Comidas',
           style: theme.textTheme.titleLarge?.copyWith(
+            color: theme.colorScheme.surface,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        backgroundColor: theme.colorScheme.surface,
         elevation: 0,
       ),
       body: Column(
@@ -68,46 +68,60 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
   Widget _buildDaySelector(ThemeData theme) {
     return SizedBox(
       height: 60,
-      child: PageView.builder(
-        controller: _pageController,
-        onPageChanged: (index) => setState(() => selectedDayIndex = index),
-        itemCount: daysData.length,
-        itemBuilder: (context, index) {
-          final isSelected = selectedDayIndex == index;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            margin: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 8,
-            ),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.surfaceVariant,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: theme.colorScheme.primary.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Center(
-              child: Text(
-                daysData[index].day,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: isSelected
-                      ? theme.colorScheme.onPrimary
-                      : theme.colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.bold,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) => setState(() => selectedDayIndex = index),
+            itemCount: daysData.length,
+            itemBuilder: (context, index) {
+              final isSelected = selectedDayIndex == index;
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 8,
                 ),
-              ),
-            ),
-          );
-        },
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: theme.colorScheme.primary
+                                .withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Center(
+                  child: Text(
+                    daysData[index].day,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: isSelected
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          Positioned(
+            left: 7,
+            child: Icon(Icons.arrow_back_ios, color: theme.hintColor),
+          ),
+          Positioned(
+            right: 2,
+            child: Icon(Icons.arrow_forward_ios, color: theme.hintColor),
+          ),
+        ],
       ),
     );
   }
@@ -173,7 +187,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         Text(
           title,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
           ),
         ),
       ],
@@ -309,7 +323,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
 
     final inputDecoration = InputDecoration(
       filled: true,
-      fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+      fillColor:
+          theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
@@ -317,7 +332,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(
-          color: theme.colorScheme.outline.withOpacity(0.3),
+          color: theme.colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       focusedBorder: OutlineInputBorder(

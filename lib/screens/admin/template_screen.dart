@@ -1,10 +1,8 @@
-// Constants
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
-import 'dart:math' as math;
 
 class UIConstants {
   static const double defaultPadding = 24.0;
@@ -181,7 +179,9 @@ class _TemplateScreenState extends State<TemplateScreen> {
           borderSide: BorderSide.none,
         ),
         filled: true,
-        fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.3,
+        ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: UIConstants.defaultPadding,
           vertical: UIConstants.buttonHeight,
@@ -202,7 +202,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
             _selectClient(_filteredClients[index].name);
           }
         },
-        selectedCard: _selectedClientName, // Pass the selected client name
+        selectedCard: _selectedClientName,
       ),
     );
   }
