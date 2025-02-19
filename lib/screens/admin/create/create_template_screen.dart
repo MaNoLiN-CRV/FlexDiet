@@ -207,7 +207,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
               MaterialPageRoute(
                 builder: (context) => SelectFoodsScreen(
                     selectedDays: selectedDays.toList(),
-                    daylyCalories: dailyCalories),
+                    dailyCalories: dailyCalories),
               ),
             );
           },
