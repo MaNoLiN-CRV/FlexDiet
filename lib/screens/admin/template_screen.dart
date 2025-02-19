@@ -115,20 +115,18 @@ class _TemplateScreenState extends State<TemplateScreen> {
       body: Stack(
         children: [
           _buildWaveBackgrounds(theme),
-          Expanded(
-            child: Padding(
-              padding: UIConstants.screenPadding,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildHeader(context),
-                  _buildSearchField(context),
-                  SizedBox(height: UIConstants.defaultSpacing),
-                  _buildClientsList(context),
-                  _buildActionButtons(context),
-                ],
-              ),
+          Padding(
+            padding: UIConstants.screenPadding,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeader(context),
+                _buildSearchField(context),
+                SizedBox(height: UIConstants.defaultSpacing),
+                _buildClientsList(context),
+                _buildActionButtons(context),
+              ],
             ),
           ),
         ],
