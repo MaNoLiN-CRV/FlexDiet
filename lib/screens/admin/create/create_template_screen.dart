@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/screens/admin/create/select_foods_screen.dart';
 
 class CreateTemplateScreen extends StatefulWidget {
   const CreateTemplateScreen({super.key});
@@ -202,14 +203,11 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
         ),
         child: FilledButton(
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Plantilla guardada con éxito'),
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                backgroundColor: theme.colorScheme.primary,
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => SelectFoodsScreen(
+                    selectedDays: selectedDays.toList(),
+                    daylyCalories: dailyCalories),
               ),
             );
           },

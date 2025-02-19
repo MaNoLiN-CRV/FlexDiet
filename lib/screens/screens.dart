@@ -11,4 +11,4 @@ export 'package:flutter_flexdiet/screens/misc/loading_screen.dart';
 export 'package:flutter_flexdiet/screens/misc/splash_screen.dart';
 export 'package:flutter_flexdiet/screens/misc/camera_screen.dart';
 export 'package:flutter_flexdiet/screens/admin/edit_person_screen.dart';
-export 'package:flutter_flexdiet/screens/admin/create_template_screen.dart';
+export 'package:flutter_flexdiet/screens/admin/create/create_template_screen.dart';
