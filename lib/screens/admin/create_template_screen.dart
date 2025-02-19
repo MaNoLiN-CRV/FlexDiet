@@ -9,7 +9,7 @@ class CreateTemplateScreen extends StatefulWidget {
 
 class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
   int dailyCalories = 2000;
-  List<String> daysOfWeek = [
+  final List<String> daysOfWeek = [
     'Lunes',
     'Martes',
     'Miércoles',
@@ -18,6 +18,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
     'Sábado',
     'Domingo'
   ];
+  Set<String> selectedDays = {};
 
   @override
   Widget build(BuildContext context) {
@@ -26,102 +27,210 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
       appBar: AppBar(
         title: const Text('Crear Plantilla de Dieta'),
         backgroundColor: theme.colorScheme.primary,
-        titleTextStyle: theme.textTheme.headlineSmall
-            ?.copyWith(color: theme.colorScheme.onPrimary),
+        titleTextStyle: theme.textTheme.titleLarge?.copyWith(
+          color: theme.colorScheme.onPrimary,
+          fontWeight: FontWeight.bold,
+        ),
         iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
         centerTitle: true,
-        elevation: 0,
+        elevation: 2,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Calorías Diarias',
-              style: theme.textTheme.headlineMedium,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              theme.colorScheme.background,
+              theme.colorScheme.surface,
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _buildSectionTitle('Calorías Diarias', theme),
+                const SizedBox(height: 16),
+                _buildCaloriesInput(theme),
+                const SizedBox(height: 40),
+                _buildSectionTitle('Días de la Semana', theme),
+                const SizedBox(height: 20),
+                _buildDaysSelection(theme),
+                const SizedBox(height: 48),
+                _buildSaveButton(theme),
+              ],
             ),
-            const SizedBox(height: 16),
-            TextField(
-              keyboardType: TextInputType.number,
-              style: theme.textTheme.bodyLarge,
-              decoration: InputDecoration(
-                hintText: 'Ej. 2000',
-                hintStyle:
-                    theme.textTheme.bodyLarge?.copyWith(color: theme.hintColor),
-                border: InputBorder.none,
-                focusedBorder: UnderlineInputBorder(
-                  borderSide:
-                      BorderSide(color: theme.colorScheme.primary, width: 2.0),
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: theme.dividerColor),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  dailyCalories = int.tryParse(value) ?? 2000;
-                });
-              },
-              controller: TextEditingController(text: dailyCalories.toString()),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: theme.colorScheme.primary.withOpacity(0.2),
+            width: 2,
+          ),
+        ),
+      ),
+      child: Text(
+        title,
+        style: theme.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.primary,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCaloriesInput(ThemeData theme) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        keyboardType: TextInputType.number,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Ej. 2000',
+          hintStyle: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.hintColor,
+          ),
+          prefixIcon: Icon(
+            Icons.local_fire_department_rounded,
+            color: theme.colorScheme.primary,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: theme.colorScheme.surface,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 16.0,
+            horizontal: 16.0,
+          ),
+        ),
+        onChanged: (value) {
+          setState(() {
+            dailyCalories = int.tryParse(value) ?? 2000;
+          });
+        },
+        controller: TextEditingController(text: dailyCalories.toString()),
+      ),
+    );
+  }
+
+  Widget _buildDaysSelection(ThemeData theme) {
+    return Wrap(
+      spacing: 12.0,
+      runSpacing: 12.0,
+      children: daysOfWeek.map((day) {
+        final isSelected = selectedDays.contains(day);
+        return FilterChip(
+          label: Text(
+            day,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: isSelected
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.onSurfaceVariant,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
-            const SizedBox(height: 40),
-            Text(
-              'Días de la Semana',
-              style: theme.textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 10.0,
-              runSpacing: 10.0,
-              children: daysOfWeek
-                  .map((day) => Chip(
-                        label: Text(
-                          day,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSecondaryContainer,
-                              fontWeight: FontWeight.w500),
-                        ),
-                        backgroundColor: theme.colorScheme.secondaryContainer,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 8.0),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0)),
-                      ))
-                  .toList(),
-            ),
-            const SizedBox(height: 48),
-            Center(
-              child: FilledButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text(
-                            'Plantilla guardada (funcionalidad no implementada)')),
-                  );
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: theme.colorScheme.secondary,
-                  foregroundColor: theme.colorScheme.onSecondary,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0)),
-                  elevation: 0,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 12.0),
-                  child: Text(
-                    'Guardar Plantilla',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onSecondary,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
+          ),
+          selected: isSelected,
+          onSelected: (bool selected) {
+            setState(() {
+              if (selected) {
+                selectedDays.add(day);
+              } else {
+                selectedDays.remove(day);
+              }
+            });
+          },
+          backgroundColor: theme.colorScheme.surface,
+          selectedColor: theme.colorScheme.primary,
+          checkmarkColor: theme.colorScheme.onPrimary,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 12.0,
+          ),
+          elevation: 2,
+          pressElevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildSaveButton(ThemeData theme) {
+    return Center(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
+        ),
+        child: FilledButton(
+          onPressed: () {
+            // TODO: NEXT STEP
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Plantilla guardada con éxito'),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: theme.colorScheme.primary,
+              ),
+            );
+          },
+          style: FilledButton.styleFrom(
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
+            minimumSize: const Size(200, 50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            elevation: 0,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 32.0,
+              vertical: 16.0,
+            ),
+            child: Text(
+              'SIGUIENTE PASO',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.onPrimary,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ),
         ),
       ),
     );
