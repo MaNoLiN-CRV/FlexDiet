@@ -112,10 +112,10 @@ class CardItem extends StatelessWidget {
                       if (cardData.description != null)
                         Text(
                           cardData.description!,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ) ??
-                              const TextStyle(color: Colors.black),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                                fontSize: 14
+                            ) ??
+                            const TextStyle(color: Colors.black),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
