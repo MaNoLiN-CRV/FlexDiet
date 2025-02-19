@@ -57,20 +57,32 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
           _buildNutritionSummary(theme),
           Expanded(child: _buildMealsList(theme)),
           _buildFinishButton(theme),
+          const SizedBox(height: 16),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddMealDialog(context),
-        label: const Text('Añadir Comida'),
-        icon: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 16.0, bottom: 65),
+        child: FloatingActionButton.extended(
+          onPressed: () => _showAddMealDialog(context),
+          label: const Text('Añadir Comida'),
+          icon: const Icon(Icons.add),
+          backgroundColor: theme.colorScheme.secondary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildFinishButton(ThemeData theme) {
     return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
             onPressed: () {
               Navigator.push(
                 context,
@@ -82,17 +94,23 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
               padding: const EdgeInsets.symmetric(vertical: 16),
+              elevation: 2,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
             child: Text(
-              'Finalizar',
+              'FINALIZAR',
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
               ),
-            )));
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildDaySelector(ThemeData theme) {
