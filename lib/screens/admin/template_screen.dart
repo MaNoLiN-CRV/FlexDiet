@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
-import 'package:flutter_flexdiet/screens/admin/create_template_screen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
+// Constants
 class UIConstants {
   static const double defaultPadding = 24.0;
   static const double defaultSpacing = 16.0;
@@ -54,7 +54,6 @@ class _TemplateScreenState extends State<TemplateScreen> {
   String? _selectedClientName;
   final TextEditingController _searchController = TextEditingController();
 
-  // Move sample data to a separate file in a real app
   final List<Client> _clients = [
     Client(
       name: 'Snoop Dogg',
@@ -95,16 +94,13 @@ class _TemplateScreenState extends State<TemplateScreen> {
   }
 
   void _filterClients(String query) {
+    final lowercaseQuery = query.toLowerCase();
     setState(() {
-      if (query.isEmpty) {
-        _filteredClients = List.from(_clients);
-      } else {
-        final lowercaseQuery = query.toLowerCase();
-        _filteredClients = _clients.where((client) {
-          return client.name.toLowerCase().contains(lowercaseQuery) ||
-              client.description.toLowerCase().contains(lowercaseQuery);
-        }).toList();
-      }
+      _filteredClients = _clients
+          .where((client) =>
+              client.name.toLowerCase().contains(lowercaseQuery) ||
+              client.description.toLowerCase().contains(lowercaseQuery))
+          .toList();
     });
   }
 
@@ -117,21 +113,22 @@ class _TemplateScreenState extends State<TemplateScreen> {
         selectedIndex: 3,
         onItemTapped: (index) => navigationRouter(context, index),
       ),
-      body: Padding(
-        padding: UIConstants.screenPadding,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHeader(context),
-            if (_selectedClientName != null)
-              _buildSelectedClientBanner(context),
-            _buildAvailableClientsSection(context),
-            _buildSearchField(context),
-            SizedBox(height: UIConstants.defaultSpacing),
-            _buildClientsList(context),
-            _buildActionButtons(context),
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: UIConstants.screenPadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildHeader(context),
+              if (_selectedClientName != null)
+                _buildSelectedClientBanner(context),
+              _buildAvailableClientsSection(context),
+              _buildSearchField(context),
+              SizedBox(height: UIConstants.defaultSpacing),
+              _buildClientsList(context),
+              _buildActionButtons(context),
+            ],
+          ),
         ),
       ),
     );
@@ -188,6 +185,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
         style: theme.textTheme.titleMedium?.copyWith(
           color: theme.colorScheme.onPrimary,
           fontWeight: FontWeight.bold,
+          overflow: TextOverflow.ellipsis,
         ),
         textAlign: TextAlign.center,
       ),
@@ -325,10 +323,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
         title,
         style: theme.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.bold,
-          color: isSecondary
-              ? theme.colorScheme.onSecondary
-              : theme.colorScheme.onPrimary,
         ),
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
