@@ -10,16 +10,15 @@ class DetailsScreen extends StatelessWidget {
   final String proteins;
   final String carbs;
 
-  const DetailsScreen({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.description,
-    required this.image,
-    required this.kcal,
-    required this.proteins,
-    required this.carbs
-  }) : super(key: key);
+  const DetailsScreen(
+      {super.key,
+      required this.title,
+      required this.subtitle,
+      required this.description,
+      required this.image,
+      required this.kcal,
+      required this.proteins,
+      required this.carbs});
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +36,7 @@ class DetailsScreen extends StatelessWidget {
             _buildImageContainer(image),
             // Detalles de la comida
             _buildPrincipalContainer(
-              theme,
-              subtitle,
-              description,
-              kcal,
-              proteins,
-              carbs
-            )
+                theme, subtitle, description, kcal, proteins, carbs)
           ],
         ),
       ),
@@ -135,7 +128,8 @@ Widget _buildImageContainer(String image) {
   );
 }
 
-Widget _buildPrincipalContainer(ThemeData theme, String subtitle, String description, String kcal, String proteins, String carbs) {
+Widget _buildPrincipalContainer(ThemeData theme, String subtitle,
+    String description, String kcal, String proteins, String carbs) {
   return Container(
       margin: EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
@@ -192,4 +186,3 @@ Widget _buildPrincipalContainer(ThemeData theme, String subtitle, String descrip
         ),
       ));
 }
-

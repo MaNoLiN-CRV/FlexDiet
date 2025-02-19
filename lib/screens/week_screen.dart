@@ -114,13 +114,15 @@ class _WeekScreenState extends State<WeekScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => DetailsScreen(
-                                  title: meal.name,
-                                  subtitle: 'Comida del día',
-                                  description: meal.description,
-                                  image:
-                                      'https://s2.abcstatics.com/abc/sevilla/media/gurmesevilla/2012/01/comida-rapida-casera.jpg',
-                                  macros:
-                                      'Información nutricional detallada: \n\n- Calorías: 350 kcal \n- Proteínas: 20g \nCarbohidratos: 40g \nGrasas: 15g \n\nRecuerda que estos valores son aproximados y pueden variar según los ingredientes y las porciones.'),
+                                title: meal.name,
+                                subtitle: 'Comida del día',
+                                description: meal.description,
+                                image:
+                                    'https://s2.abcstatics.com/abc/sevilla/media/gurmesevilla/2012/01/comida-rapida-casera.jpg',
+                                carbs: '40g',
+                                kcal: '350 kcal',
+                                proteins: '20g',
+                              ),
                             ),
                           );
                         },
