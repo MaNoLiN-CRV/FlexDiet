@@ -14,19 +14,15 @@ class CardScroll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        ListView.builder(
-          scrollDirection: scrollDirection,
-          itemCount: cards.length,
-          itemBuilder: (context, index) {
-            return CardItem(
-              cardData: cards[index],
-              onTap: () => onCardTap?.call(index),
-            );
-          },
-        ),
-      ],
+    return ListView.builder(
+      scrollDirection: scrollDirection,
+      itemCount: cards.length,
+      itemBuilder: (context, index) {
+        return CardItem(
+          cardData: cards[index],
+          onTap: () => onCardTap?.call(index),
+        );
+      },
     );
   }
 }
@@ -61,19 +57,22 @@ class CardItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       width: 200,
-      child: ClipRRect(
+      child: Material(
+        elevation: 2,
         borderRadius: borderRadius,
-        child: Material(
-          elevation: 2,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: borderRadius,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: borderRadius,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                child: SizedBox(
                   height: 120,
-                  width: double.infinity,
                   child: Image.network(
                     cardData.imageUrl,
                     fit: BoxFit.cover,
@@ -96,34 +95,34 @@ class CardItem extends StatelessWidget {
                     },
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        cardData.title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ) ??
-                            const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      cardData.title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 4),
-                      if (cardData.description != null)
-                        Text(
-                          cardData.description!,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ) ??
-                              const TextStyle(color: Colors.black),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    if (cardData.description != null)
+                      Text(
+                        cardData.description!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
-                    ],
-                  ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

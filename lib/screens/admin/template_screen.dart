@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
+import 'package:flutter_flexdiet/screens/admin/create_template_screen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
-// Constants
 class UIConstants {
   static const double defaultPadding = 24.0;
   static const double defaultSpacing = 16.0;
@@ -54,6 +54,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
   String? _selectedClientName;
   final TextEditingController _searchController = TextEditingController();
 
+  // Move sample data to a separate file in a real app
   final List<Client> _clients = [
     Client(
       name: 'Snoop Dogg',
@@ -94,13 +95,16 @@ class _TemplateScreenState extends State<TemplateScreen> {
   }
 
   void _filterClients(String query) {
-    final lowercaseQuery = query.toLowerCase();
     setState(() {
-      _filteredClients = _clients
-          .where((client) =>
-              client.name.toLowerCase().contains(lowercaseQuery) ||
-              client.description.toLowerCase().contains(lowercaseQuery))
-          .toList();
+      if (query.isEmpty) {
+        _filteredClients = List.from(_clients);
+      } else {
+        final lowercaseQuery = query.toLowerCase();
+        _filteredClients = _clients.where((client) {
+          return client.name.toLowerCase().contains(lowercaseQuery) ||
+              client.description.toLowerCase().contains(lowercaseQuery);
+        }).toList();
+      }
     });
   }
 
@@ -113,10 +117,11 @@ class _TemplateScreenState extends State<TemplateScreen> {
         selectedIndex: 3,
         onItemTapped: (index) => navigationRouter(context, index),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: Padding(
           padding: UIConstants.screenPadding,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildHeader(context),
@@ -185,7 +190,6 @@ class _TemplateScreenState extends State<TemplateScreen> {
         style: theme.textTheme.titleMedium?.copyWith(
           color: theme.colorScheme.onPrimary,
           fontWeight: FontWeight.bold,
-          overflow: TextOverflow.ellipsis,
         ),
         textAlign: TextAlign.center,
       ),
@@ -236,17 +240,14 @@ class _TemplateScreenState extends State<TemplateScreen> {
   }
 
   Widget _buildClientsList(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * UIConstants.cardHeight,
-      child: CardScroll(
-        scrollDirection: Axis.horizontal,
-        cards: _filteredClients.map((client) => client.toCardData()).toList(),
-        onCardTap: (index) {
-          if (index >= 0 && index < _filteredClients.length) {
-            _selectClient(_filteredClients[index].name);
-          }
-        },
-      ),
+    return CardScroll(
+      scrollDirection: Axis.horizontal,
+      cards: _filteredClients.map((client) => client.toCardData()).toList(),
+      onCardTap: (index) {
+        if (index >= 0 && index < _filteredClients.length) {
+          _selectClient(_filteredClients[index].name);
+        }
+      },
     );
   }
 
@@ -323,8 +324,10 @@ class _TemplateScreenState extends State<TemplateScreen> {
         title,
         style: theme.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.bold,
+          color: isSecondary
+              ? theme.colorScheme.onSecondary
+              : theme.colorScheme.onPrimary,
         ),
-        overflow: TextOverflow.ellipsis,
       ),
     );
   }
