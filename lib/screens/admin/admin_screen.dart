@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/models.dart';
-import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
-import 'package:flutter_flexdiet/navigation/navigation_router.dart';
+import 'package:flutter_flexdiet/navigation/navigation.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';

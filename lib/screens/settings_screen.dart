@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
-import 'package:flutter_flexdiet/navigation/navigation_router.dart';
+import 'package:flutter_flexdiet/navigation/navigation.dart';
+
 import 'package:flutter_flexdiet/screens/login/login_screen.dart';
 import 'package:flutter_flexdiet/services/image_service/image_service.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';

@@ -14,3 +14,4 @@ export 'package:flutter_flexdiet/widgets/goal_selection_card.dart';
 export 'package:flutter_flexdiet/widgets/gender_selection_card.dart';
 export 'package:flutter_flexdiet/widgets/weight_selection_card.dart';
 export 'package:flutter_flexdiet/widgets/height_selection_card.dart';
+export 'package:flutter_flexdiet/widgets/weight_chart.dart';
