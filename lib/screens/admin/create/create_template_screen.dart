@@ -203,6 +203,18 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
         ),
         child: FilledButton(
           onPressed: () {
+            if (selectedDays.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Por favor, selecciona al menos un día.',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              return;
+            }
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => SelectFoodsScreen(
