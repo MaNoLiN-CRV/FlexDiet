@@ -21,13 +21,12 @@ class WeightSelectionCard extends StatefulWidget {
 }
 
 class _WeightSelectionCardState extends State<WeightSelectionCard> {
-  double _sliderValue = 50.0;
+  double _sliderValue = 0;
 
   @override
   void initState() {
     super.initState();
-    _sliderValue = widget.selectedValue ??
-        50.0; // Initialize with selectedValue or default 50.0
+    _sliderValue = widget.selectedValue ?? 0;
   }
 
   @override
@@ -35,7 +34,7 @@ class _WeightSelectionCardState extends State<WeightSelectionCard> {
     super.didUpdateWidget(oldWidget);
     if (widget.selectedValue != oldWidget.selectedValue) {
       setState(() {
-        _sliderValue = widget.selectedValue ?? 50.0;
+        _sliderValue = widget.selectedValue ?? 0;
       });
     }
   }
@@ -43,10 +42,11 @@ class _WeightSelectionCardState extends State<WeightSelectionCard> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
+    final theme = Theme.of(context);
     final Color backgroundColor =
-        isDarkMode ? Colors.grey.shade800 : Colors.white;
-    final Color selectedColor = isDarkMode ? textLightBlue : Colors.black;
+        isDarkMode ? theme.colorScheme.onPrimary : Colors.white;
+    final Color selectedColor =
+        isDarkMode ? textLightBlue : theme.colorScheme.secondary;
     final Color textColor = isDarkMode ? Colors.white : Colors.black;
 
     return Container(
@@ -97,7 +97,7 @@ class _WeightSelectionCardState extends State<WeightSelectionCard> {
           ),
           Slider(
             value: _sliderValue,
-            min: 30.0,
+            min: 0,
             max: 200.0,
             divisions: 170,
             label: '${_sliderValue.round()} kg',

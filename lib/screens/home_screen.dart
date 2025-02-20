@@ -4,6 +4,7 @@ import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/weight_chart.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class HomeScreen extends StatelessWidget {
   static const double _cardHeight = 250.0;
@@ -88,11 +89,20 @@ class _HomeScreenContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildNutritionCard(theme),
+            _buildNutritionCard(theme)
+                .animate() // Apply animation to Nutrition Card
+                .fadeIn(duration: 300.ms, delay: 0.ms)
+                .slideX(begin: 0.2, end: 0),
             const SizedBox(height: HomeScreen._mediumSpacing),
             const SizedBox(height: HomeScreen._mediumSpacing),
-            _buildMealsSection(theme, context),
-            WeightChart(),
+            _buildMealsSection(theme, context)
+                .animate() // Apply animation to Meals Section
+                .fadeIn(duration: 300.ms, delay: 100.ms)
+                .slideX(begin: 0.2, end: 0),
+            WeightChart()
+                .animate() // Apply animation to Weight Chart
+                .fadeIn(duration: 300.ms, delay: 200.ms)
+                .slideX(begin: 0.2, end: 0),
           ],
         ),
       ),

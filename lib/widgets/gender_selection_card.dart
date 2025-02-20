@@ -44,10 +44,12 @@ class _GenderSelectionCardState extends State<GenderSelectionCard> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     final Color backgroundColor =
         isDarkMode ? Colors.grey.shade800 : Colors.white;
-    final Color selectedColor = isDarkMode ? textLightBlue : Colors.black;
+    final Color selectedColor =
+        isDarkMode ? textLightBlue : theme.colorScheme.secondary;
     final Color textColor = isDarkMode ? Colors.white : Colors.black;
 
     return GestureDetector(

@@ -27,18 +27,13 @@ class WeightChart extends StatelessWidget {
     final theme = Theme.of(context);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    final chartAreaColor = isDarkMode
-        ? theme.colorScheme.inversePrimary.withValues(alpha: 0.2)
-        : theme.colorScheme.inversePrimary.withValues(alpha: 0.2);
-    final textColor = isDarkMode ? Colors.white : theme.colorScheme.onSurface;
+    final textColor =
+        isDarkMode ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface;
     final secondaryTextColor =
         isDarkMode ? Colors.grey[400] : theme.colorScheme.inversePrimary;
     final gridLineColor = isDarkMode
         ? Colors.grey[800]!
         : theme.colorScheme.outline.withValues(alpha: 0.1);
-    final dotColor = isDarkMode
-        ? theme.colorScheme.inversePrimary
-        : theme.colorScheme.inversePrimary;
     final backgroundColor =
         isDarkMode ? Colors.grey[900] : theme.colorScheme.surface;
 
