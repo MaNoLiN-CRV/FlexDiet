@@ -77,13 +77,23 @@ class _LoadingScreenState extends State<LoadingScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final loadingTextColor =
+        isDarkMode ? theme.colorScheme.onSurface : theme.colorScheme.primary;
+    final subtitleTextColor = isDarkMode
+        ? theme.colorScheme.onSurface.withValues(alpha: 70)
+        : theme.colorScheme.onSurfaceVariant;
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            LoadingWheel(theme: theme, seconds: widget.loadingSeconds),
+            LoadingWheel(
+              theme: theme,
+              seconds: widget.loadingSeconds,
+            ),
             const SizedBox(height: 24),
             FadeTransition(
               opacity: _fadeAnimation,
@@ -91,7 +101,7 @@ class _LoadingScreenState extends State<LoadingScreen>
                 widget.loadingText,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: theme.colorScheme.primary,
+                  color: loadingTextColor,
                   letterSpacing: 1.1,
                 ),
               ),
@@ -100,13 +110,13 @@ class _LoadingScreenState extends State<LoadingScreen>
             Text(
               "Ajustando tu dieta...",
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+                color: subtitleTextColor,
               ),
             )
                 .animate()
                 .fadeIn(duration: 1000.ms)
                 .then()
-                .slide(begin: Offset(0, 0.25), curve: Curves.easeOut),
+                .slide(begin: const Offset(0, 0.25), curve: Curves.easeOut),
           ],
         ),
       ),

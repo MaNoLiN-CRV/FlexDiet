@@ -48,7 +48,7 @@ class _LoadingWheelState extends State<LoadingWheel>
         theme: widget.theme,
         progress: _animation.value,
       ),
-      child: SizedBox(
+      child: const SizedBox(
         width: 75.0,
         height: 75.0,
       ),
@@ -65,22 +65,11 @@ class _FruitLoadingPainter extends CustomPainter {
     required this.progress,
   });
 
-  final List<Map<String, dynamic>> fruits = [
-    {'icon': '🍎', 'color': Colors.green}, // Apple - Green
-    {'icon': '🍌', 'color': Colors.yellow}, // Banana - Yellow
-    {'icon': '🍓', 'color': Colors.red}, // Strawberry - Red
-    {'icon': '🍇', 'color': Colors.purple}, // Grapes - Purple
-    {'icon': '🍊', 'color': Colors.orange}, // Orange - Orange
-    {'icon': '🥝', 'color': Colors.brown}, // Kiwi - Brown
-    {'icon': '🍋', 'color': Colors.amber}, // Lemon - Amber
-    {'icon': '🍉', 'color': Colors.pink}, // Watermelon - Pink/Red
-    {'icon': '🍐', 'color': Colors.lime}, // Pear - Lime
-  ];
-
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
     final radius = size.width / 2;
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     final backgroundPaint = Paint()
       ..color = theme.colorScheme.surface.withAlpha(50)
@@ -89,7 +78,7 @@ class _FruitLoadingPainter extends CustomPainter {
     canvas.drawCircle(center, radius, backgroundPaint);
 
     final foregroundPaint = Paint()
-      ..color = theme.colorScheme.primary
+      ..color = theme.colorScheme.onSurface
       ..strokeWidth = 6.0
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -110,7 +99,10 @@ class _FruitLoadingPainter extends CustomPainter {
         text: currentFruit['icon'],
         style: TextStyle(
           fontSize: radius * 0.8,
-          color: currentFruit['color'],
+          color: isDarkMode
+              ? Colors.white
+              : theme.colorScheme
+                  .primary, // Use theme color or white based on dark mode
         ),
       ),
       textAlign: TextAlign.center,
@@ -119,6 +111,18 @@ class _FruitLoadingPainter extends CustomPainter {
     fruitPainter.layout();
     fruitPainter.paint(canvas, center - fruitPainter.size.center(Offset.zero));
   }
+
+  final List<Map<String, dynamic>> fruits = [
+    {'icon': '🍎'}, // Apple
+    {'icon': '🍌'}, // Banana
+    {'icon': '🍓'}, // Strawberry
+    {'icon': '🍇'}, // Grapes
+    {'icon': '🍊'}, // Orange
+    {'icon': '🥝'}, // Kiwi
+    {'icon': '🍋'}, // Lemon
+    {'icon': '🍉'}, // Watermelon
+    {'icon': '🍐'}, // Pear
+  ];
 
   @override
   bool shouldRepaint(covariant _FruitLoadingPainter oldDelegate) {
