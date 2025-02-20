@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/models/models.dart';
 import 'package:flutter_flexdiet/screens/admin/admin_screen.dart';
 
 class SelectFoodsScreen extends StatefulWidget {
@@ -38,8 +39,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode =
-        Theme.of(context).brightness == Brightness.dark; // Add this line
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -47,30 +47,27 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         title: Text(
           'Planificar Comidas',
           style: theme.textTheme.titleLarge?.copyWith(
-            color:
-                theme.colorScheme.onPrimary, // Use onPrimary for AppBar title
+            color: theme.colorScheme.onPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: theme.colorScheme.primary, // Set background color
+        backgroundColor: theme.colorScheme.primary,
         centerTitle: true,
-        elevation: 0, // Remove AppBar elevation
+        elevation: 0,
       ),
       body: Column(
         children: [
-          _buildDaySelector(theme, isDarkMode), // Pass isDarkMode
-          _buildNutritionSummary(theme, isDarkMode), // Pass isDarkMode
-          Expanded(
-              child: _buildMealsList(theme, isDarkMode)), // Pass isDarkMode
-          _buildFinishButton(theme, isDarkMode), // Pass isDarkMode
+          _buildDaySelector(theme, isDarkMode),
+          _buildNutritionSummary(theme, isDarkMode),
+          Expanded(child: _buildMealsList(theme, isDarkMode)),
+          _buildFinishButton(theme, isDarkMode),
           const SizedBox(height: 16),
         ],
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(right: 16.0, bottom: 65),
         child: FloatingActionButton.extended(
-          onPressed: () =>
-              _showAddMealDialog(context, isDarkMode), // Pass isDarkMode
+          onPressed: () => _showAddMealDialog(context, isDarkMode),
           label: const Text('Añadir Comida'),
           icon: const Icon(Icons.add),
           backgroundColor: theme.colorScheme.secondary,
@@ -138,12 +135,12 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   ? theme.colorScheme.primary
                   : isDarkMode
                       ? theme.colorScheme.surfaceContainer
-                          .withOpacity(0.8) // Dark mode color
+                          .withValues(alpha: 0.8)
                       : theme.colorScheme.surfaceContainerHighest;
               final textColor = isSelected
                   ? theme.colorScheme.onPrimary
                   : isDarkMode
-                      ? Colors.white // Dark mode text color
+                      ? Colors.white
                       : theme.colorScheme.onSurfaceVariant;
 
               return AnimatedContainer(
@@ -319,9 +316,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 meal.name,
                 style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color:
-                        isDarkMode ? Colors.white : null // White in Dark mode
-                    ),
+                    color: isDarkMode ? Colors.white : null),
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 8),
@@ -383,6 +378,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     final theme = Theme.of(context);
 
     String name = '';
+    String description = '';
     double calories = 0;
     double protein = 0;
     double carbs = 0;
@@ -426,10 +422,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
           'Añadir Comida',
           style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              color: isDarkMode
-                  ? Colors.white
-                  : null // Use white text in dark mode
-              ),
+              color: isDarkMode ? Colors.white : null),
         ),
         content: SingleChildScrollView(
           child: Form(
@@ -438,8 +431,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
-                  style: TextStyle(
-                      color: isDarkMode ? Colors.white : null), // Text color
+                  style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
                     labelText: 'Nombre del plato',
                     prefixIcon: const Icon(Icons.restaurant_menu),
@@ -450,8 +442,18 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  style: TextStyle(
-                      color: isDarkMode ? Colors.white : null), // Text color
+                  style: TextStyle(color: isDarkMode ? Colors.white : null),
+                  decoration: inputDecoration.copyWith(
+                    labelText: 'Descripción (opcional)',
+                    prefixIcon: const Icon(Icons.description),
+                  ),
+                  onSaved: (value) => description = value ?? '',
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Campo requerido' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
                     labelText: 'Calorías (kcal)',
                     prefixIcon: const Icon(Icons.local_fire_department),
@@ -466,8 +468,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  style: TextStyle(
-                      color: isDarkMode ? Colors.white : null), // Text color
+                  style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
                     labelText: 'Proteínas (g)',
                     prefixIcon: const Icon(Icons.fitness_center),
@@ -482,8 +483,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  style: TextStyle(
-                      color: isDarkMode ? Colors.white : null), // Text color
+                  style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
                     labelText: 'Carbohidratos (g)',
                     prefixIcon: const Icon(Icons.grain),
@@ -519,6 +519,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   daysData[selectedDayIndex].meals.add(
                         Meal(
                           name: name,
+                          description: description,
                           calories: calories,
                           protein: protein,
                           carbs: carbs,
@@ -534,31 +535,4 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
       ),
     );
   }
-}
-
-class DayMeals {
-  final String day;
-  final List<Meal> meals;
-
-  DayMeals({required this.day, required this.meals});
-
-  double getTotalCalories() =>
-      meals.fold(0, (sum, meal) => sum + meal.calories);
-
-  double getTotalProtein() => meals.fold(0, (sum, meal) => sum + meal.protein);
-  double getTotalCarbs() => meals.fold(0, (sum, meal) => sum + meal.carbs);
-}
-
-class Meal {
-  final String name;
-  final double calories;
-  final double protein;
-  final double carbs;
-
-  Meal({
-    required this.name,
-    required this.calories,
-    required this.protein,
-    required this.carbs,
-  });
 }

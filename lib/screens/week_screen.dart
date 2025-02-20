@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/models/Meal.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
-
-class Meal {
-  final String name;
-  final String description;
-
-  Meal({required this.name, required this.description});
-}
 
 class WeekScreen extends StatefulWidget {
   const WeekScreen({super.key});
@@ -23,14 +17,44 @@ class _WeekScreenState extends State<WeekScreen> {
 
   final Map<DateTime, List<Meal>> _mealData = {
     DateTime(2025, 2, 18): [
-      Meal(name: 'Desayuno', description: 'Cereales con leche de almendras'),
-      Meal(name: 'Almuerzo', description: 'Crema de calabaza'),
-      Meal(name: 'Cena', description: 'Ensalada de garbanzos'),
+      Meal(
+          name: 'Desayuno',
+          description: 'Cereales con leche de almendras',
+          calories: 2,
+          protein: 2,
+          carbs: 2),
+      Meal(
+          name: 'Almuerzo',
+          description: 'Crema de calabaza',
+          calories: 2,
+          protein: 2,
+          carbs: 2),
+      Meal(
+          name: 'Cena',
+          description: 'Ensalada de garbanzos',
+          calories: 2,
+          protein: 2,
+          carbs: 2),
     ],
     DateTime(2025, 2, 19): [
-      Meal(name: 'Desayuno', description: 'Tortilla con espinacas'),
-      Meal(name: 'Almuerzo', description: 'Pasta con tomate y atún'),
-      Meal(name: 'Cena', description: 'Pizza con verduras'),
+      Meal(
+          name: 'Desayuno',
+          description: 'Tortilla con espinacas',
+          calories: 2,
+          protein: 2,
+          carbs: 2),
+      Meal(
+          name: 'Almuerzo',
+          description: 'Pasta con tomate y atún',
+          calories: 2,
+          protein: 2,
+          carbs: 2),
+      Meal(
+          name: 'Cena',
+          description: 'Pizza con verduras',
+          calories: 2,
+          protein: 2,
+          carbs: 2),
     ],
   };
 

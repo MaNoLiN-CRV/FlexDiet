@@ -25,8 +25,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDarkMode =
-        Theme.of(context).brightness == Brightness.dark; // Determine dark mode
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Crear Plantilla de Dieta'),
@@ -56,15 +55,13 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _buildSectionTitle(
-                    'Calorías Diarias', theme, isDarkMode), // Pass isDarkMode
+                _buildSectionTitle('Calorías Diarias', theme, isDarkMode),
                 const SizedBox(height: 16),
-                _buildCaloriesInput(theme, isDarkMode), // Pass isDarkMode
+                _buildCaloriesInput(theme, isDarkMode),
                 const SizedBox(height: 40),
-                _buildSectionTitle(
-                    'Días de la Semana', theme, isDarkMode), // Pass isDarkMode
+                _buildSectionTitle('Días de la Semana', theme, isDarkMode),
                 const SizedBox(height: 20),
-                _buildDaysSelection(theme, isDarkMode), // Pass isDarkMode
+                _buildDaysSelection(theme, isDarkMode),
                 const SizedBox(height: 48),
                 _buildSaveButton(theme),
               ],
@@ -165,12 +162,11 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
       children: daysOfWeek.map((day) {
         final isSelected = selectedDays.contains(day);
 
-        // Conditional colors based on dark mode
         final labelTextColor = isSelected
             ? theme.colorScheme.onPrimary
             : isDarkMode
-                ? Colors.white // White text in dark mode
-                : theme.colorScheme.onSurfaceVariant; // Default text color
+                ? Colors.white
+                : theme.colorScheme.onSurfaceVariant;
 
         final chipBackgroundColor = theme.colorScheme.surface;
         final selectedChipColor = theme.colorScheme.primary;

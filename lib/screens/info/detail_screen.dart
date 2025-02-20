@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-//* The function of this screen is to display the macros
 class DetailsScreen extends StatelessWidget {
   final String title;
   final String subtitle;

@@ -8,11 +8,11 @@ class LoadingScreen extends StatefulWidget {
   final int loadingSeconds;
 
   const LoadingScreen({
-    Key? key,
+    super.key,
     required this.targetScreen,
     this.loadingFuture,
-    this.loadingSeconds = 2, 
-  }) : super(key: key);
+    this.loadingSeconds = 2,
+  });
 
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
@@ -35,11 +35,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
     });
 
     if (widget.loadingFuture != null) {
-      await widget.loadingFuture!; 
+      await widget.loadingFuture!;
       _futureCompleted = true;
       _navigateToTargetScreenIfReady();
     } else {
-      _futureCompleted = true; 
+      _futureCompleted = true;
     }
   }
 
@@ -58,7 +58,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: Center(
-        child: LoadingWheel(theme: theme, seconds: widget.loadingSeconds), 
+        child: LoadingWheel(theme: theme, seconds: widget.loadingSeconds),
       ),
     );
   }

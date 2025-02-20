@@ -1,44 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/models/models.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
-class UIConstants {
-  static const double defaultPadding = 24.0;
-  static const double defaultSpacing = 16.0;
-  static const double cardHeight = 0.33;
-  static const double buttonHeight = 14.0;
-  static const double borderRadius = 12.0;
-
-  static const EdgeInsets screenPadding = EdgeInsets.symmetric(
-    horizontal: defaultPadding,
-    vertical: defaultPadding,
-  );
-
-  static const EdgeInsets buttonPadding = EdgeInsets.symmetric(
-    vertical: buttonHeight,
-  );
-}
-
-class Client {
-  final String name;
-  final String description;
-  final String imageUrl;
-
-  const Client({
-    required this.name,
-    required this.description,
-    required this.imageUrl,
-  });
-
-  CardData toCardData() => CardData(
-        title: name,
-        description: description,
-        imageUrl: imageUrl,
-      );
-}
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});

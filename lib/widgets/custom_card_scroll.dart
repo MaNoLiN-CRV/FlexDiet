@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/models/models.dart';
 
 class CardScroll extends StatelessWidget {
   final List<CardData> cards;
@@ -28,18 +29,6 @@ class CardScroll extends StatelessWidget {
       },
     );
   }
-}
-
-class CardData {
-  String title;
-  String? description;
-  String imageUrl;
-
-  CardData({
-    required this.title,
-    this.description,
-    required this.imageUrl,
-  });
 }
 
 class CardItem extends StatelessWidget {
