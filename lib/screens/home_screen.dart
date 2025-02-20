@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/models.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
-
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:msh_checkbox/msh_checkbox.dart'; // Import msh_checkbox
 
 class HomeScreen extends StatelessWidget {
   static const double _cardHeight = 250.0;
@@ -329,13 +329,23 @@ class _CardScrollState extends State<CardScroll> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Checkbox(
-                      value: card.isSelected,
-                      onChanged: (value) {
-                        setState(() {
-                          card.isSelected = value!;
-                        });
-                      },
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: MSHCheckbox(
+                        size: 30,
+                        value: card.isSelected,
+                        colorConfig:
+                            MSHColorConfig.fromCheckedUncheckedDisabled(
+                          checkedColor: Colors.white,
+                          uncheckedColor: theme.colorScheme.primary,
+                        ),
+                        style: MSHCheckboxStyle.stroke,
+                        onChanged: (selected) {
+                          setState(() {
+                            card.isSelected = selected;
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
