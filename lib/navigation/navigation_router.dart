@@ -28,7 +28,7 @@ void navigationRouter(BuildContext context, int index) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const TemplateScreen(),
+        builder: (context) => const AdminScreen(),
       ),
     );
   }

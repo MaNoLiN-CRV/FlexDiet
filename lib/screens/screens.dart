@@ -3,7 +3,7 @@ export 'package:flutter_flexdiet/screens/login/login_screen.dart';
 export 'package:flutter_flexdiet/screens/home_screen.dart';
 export 'package:flutter_flexdiet/screens/week_screen.dart';
 export 'package:flutter_flexdiet/screens/settings_screen.dart';
-export 'package:flutter_flexdiet/screens/admin/template_screen.dart';
+export 'package:flutter_flexdiet/screens/admin/admin_screen.dart';
 export 'package:flutter_flexdiet/screens/admin/use_template_screen.dart';
 export 'package:flutter_flexdiet/screens/login/forgot_password_screen.dart';
 export 'package:flutter_flexdiet/screens/user_info_screen.dart';

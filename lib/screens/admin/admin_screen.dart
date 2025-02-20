@@ -40,14 +40,14 @@ class Client {
       );
 }
 
-class TemplateScreen extends StatefulWidget {
-  const TemplateScreen({super.key});
+class AdminScreen extends StatefulWidget {
+  const AdminScreen({super.key});
 
   @override
-  State<TemplateScreen> createState() => _TemplateScreenState();
+  State<AdminScreen> createState() => _AdminScreenState();
 }
 
-class _TemplateScreenState extends State<TemplateScreen> {
+class _AdminScreenState extends State<AdminScreen> {
   String? _selectedClientName;
   final TextEditingController _searchController = TextEditingController();
   final List<Client> _clients = [
@@ -216,128 +216,134 @@ class _TemplateScreenState extends State<TemplateScreen> {
       );
     }
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * UIConstants.cardHeight + 16,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _filteredClients.length,
-        itemBuilder: (context, index) {
-          final client = _filteredClients[index];
-          final isSelected = client.name == _selectedClientName;
+    return Expanded(
+      child: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * UIConstants.cardHeight,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _filteredClients.length,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemBuilder: (context, index) {
+              final client = _filteredClients[index];
+              final isSelected = client.name == _selectedClientName;
 
-          return AnimatedContainer(
-            padding: const EdgeInsets.all(8),
-            duration: const Duration(milliseconds: 200),
-            width: 280,
-            margin: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 4,
-            ),
-            transform: isSelected
-                ? (Matrix4.identity()..scale(1.05))
-                : Matrix4.identity(),
-            child: Card(
-              elevation: isSelected ? 8 : 4,
-              color: isSelected ? Theme.of(context).colorScheme.primary : null,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: InkWell(
-                onTap: () => _selectClient(client.name),
-                borderRadius: BorderRadius.circular(12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(12),
-                      ),
-                      child: Image.network(
-                        client.imageUrl,
-                        height: 160,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return SizedBox(
-                            height: 160,
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 160,
-                            color: Theme.of(context).colorScheme.primary,
-                            child: Icon(
-                              Icons.person,
-                              size: 64,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              client.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: isSelected
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 280,
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                transform: isSelected
+                    ? (Matrix4.identity()..scale(1.05))
+                    : Matrix4.identity(),
+                child: Card(
+                  elevation: isSelected ? 8 : 4,
+                  color:
+                      isSelected ? Theme.of(context).colorScheme.primary : null,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: InkWell(
+                    onTap: () => _selectClient(client.name),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Column(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(12),
+                          ),
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: Image.network(
+                              client.imageUrl,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
                                         : null,
                                   ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 64,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                );
+                              },
                             ),
-                            const SizedBox(height: 8),
-                            Expanded(
-                              child: Text(
-                                client.description,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      color: isSelected
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onPrimaryContainer
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .onSurfaceVariant,
-                                    ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  client.name,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: isSelected
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary
+                                            : null,
+                                      ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 8),
+                                Expanded(
+                                  child: Text(
+                                    client.description,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: isSelected
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .onPrimaryContainer
+                                              : Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
+                                        ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          )
-              .animate()
-              .fadeIn(duration: 300.ms, delay: (100 * index).ms)
-              .slideX(begin: 0.2, end: 0);
-        },
+              )
+                  .animate()
+                  .fadeIn(duration: 300.ms, delay: (100 * index).ms)
+                  .slideX(begin: 0.2, end: 0);
+            },
+          ),
+        ),
       ),
     );
   }

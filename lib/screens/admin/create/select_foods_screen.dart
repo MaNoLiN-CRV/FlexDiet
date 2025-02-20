@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/screens/admin/template_screen.dart';
+import 'package:flutter_flexdiet/screens/admin/admin_screen.dart';
 
 class SelectFoodsScreen extends StatefulWidget {
   final List<String> selectedDays;
@@ -87,7 +87,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const TemplateScreen(),
+                  builder: (context) => const AdminScreen(),
                 ),
               );
             },
