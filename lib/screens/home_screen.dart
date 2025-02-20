@@ -91,17 +91,17 @@ class _HomeScreenContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildNutritionCard(theme)
-                .animate() // Apply animation to Nutrition Card
+                .animate()
                 .fadeIn(duration: 300.ms, delay: 0.ms)
                 .slideX(begin: 0.2, end: 0),
-            const SizedBox(height: HomeScreen._mediumSpacing),
-            const SizedBox(height: HomeScreen._mediumSpacing),
+            const SizedBox(height: 15),
             _buildMealsSection(theme, context)
-                .animate() // Apply animation to Meals Section
+                .animate()
                 .fadeIn(duration: 300.ms, delay: 100.ms)
                 .slideX(begin: 0.2, end: 0),
+            const SizedBox(height: 15),
             WeightChart()
-                .animate() // Apply animation to Weight Chart
+                .animate()
                 .fadeIn(duration: 300.ms, delay: 200.ms)
                 .slideX(begin: 0.2, end: 0),
           ],
@@ -170,19 +170,19 @@ class _HomeScreenContent extends StatelessWidget {
                   ));
             },
             cards: [
-              CardData(
+              MealCardData(
                 title: 'Desayuno',
                 description: 'Huevos y tostadas',
                 imageUrl:
                     'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
               ),
-              CardData(
+              MealCardData(
                 title: 'Almuerzo',
                 description: 'Ensalada con pollo',
                 imageUrl:
                     'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
               ),
-              CardData(
+              MealCardData(
                 title: 'Cena',
                 description: 'Bistec y verduras',
                 imageUrl:
@@ -228,6 +228,123 @@ class _CaloryInfo extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       ],
+    );
+  }
+}
+
+class MealCardData extends CardData {
+  bool isSelected;
+
+  MealCardData({
+    required super.title,
+    required super.description,
+    required super.imageUrl,
+    this.isSelected = false,
+  });
+}
+
+class CardScroll extends StatefulWidget {
+  final List<MealCardData> cards;
+  final Function(int) onCardTap;
+
+  const CardScroll({
+    super.key,
+    required this.cards,
+    required this.onCardTap,
+  });
+
+  @override
+  State<CardScroll> createState() => _CardScrollState();
+}
+
+class _CardScrollState extends State<CardScroll> {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: widget.cards.length,
+      itemBuilder: (context, index) {
+        final card = widget.cards[index];
+        final textColor =
+            card.isSelected ? Colors.white : theme.textTheme.bodyMedium?.color;
+
+        return GestureDetector(
+          onTap: () {
+            widget.onCardTap(index);
+            // Keep the card selected but don't change its color
+          },
+          child: Container(
+            width: 200,
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: card.isSelected ? Colors.green : theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: Image.network(
+                    card.imageUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: theme.colorScheme.primary,
+                        child: const Icon(Icons.error),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        card.title,
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(color: textColor),
+                      ),
+                      Text(
+                        card.description ?? '',
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: textColor),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Checkbox(
+                      value: card.isSelected,
+                      onChanged: (value) {
+                        setState(() {
+                          card.isSelected = value!;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
