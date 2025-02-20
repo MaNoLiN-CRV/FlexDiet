@@ -4,7 +4,7 @@ import 'package:flutter_flexdiet/services/auth/providers/auth_provider.dart'
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AppleAuthProvider implements provider.AuthProvider {
-  FirebaseAuth _auth;
+  final FirebaseAuth _auth;
 
   AppleAuthProvider(FirebaseAuth auth) : _auth = auth;
 

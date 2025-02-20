@@ -9,7 +9,7 @@ class CustomDropdownButton extends StatelessWidget {
   final List<dynamic> list;
 
   const CustomDropdownButton({
-    Key? key,
+    super.key,
     this.value,
     this.icon,
     this.elevation,

@@ -32,13 +32,8 @@ class GoogleAuth implements provider.AuthProvider {
     }
 
     // Contiene accessToken que nos permite acceder a los servicios de google y idToken que sirve para acceder a firebase
-    final GoogleSignInAuthentication? googleAuth =
+    final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
-
-    // Creamos una credencial de Firebase con las credenciales de Google
-    if (googleAuth == null) {
-      return throw Exception('Error al crear los credenciales de google');
-    }
     return GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,

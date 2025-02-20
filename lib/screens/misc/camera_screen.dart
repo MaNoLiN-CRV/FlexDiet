@@ -50,13 +50,13 @@ class _CamereraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    controller?.dispose();
+    controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (controller == null || !controller.value.isInitialized) {
+    if (!controller.value.isInitialized) {
       return Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
@@ -78,9 +78,12 @@ class _CamereraScreenState extends State<CameraScreen> {
                 final image = await controller.takePicture();
                 print('Imagen capturada en: ${image.path}');
                 // TODO : SEND THE IMAGE TO THE DB
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Imagen guardada en: ${image.path}')),
-                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text('Imagen guardada en: ${image.path}')),
+                  );
+                }
               } catch (e) {
                 print('Error al tomar la foto: $e');
               }
