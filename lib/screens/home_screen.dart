@@ -271,7 +271,6 @@ class _CardScrollState extends State<CardScroll> {
         return GestureDetector(
           onTap: () {
             widget.onCardTap(index);
-            // Keep the card selected but don't change its color
           },
           child: Container(
             width: 200,
@@ -337,7 +336,7 @@ class _CardScrollState extends State<CardScroll> {
                         colorConfig:
                             MSHColorConfig.fromCheckedUncheckedDisabled(
                           checkedColor: Colors.white,
-                          uncheckedColor: theme.colorScheme.primary,
+                          uncheckedColor: theme.colorScheme.onSurface,
                         ),
                         style: MSHCheckboxStyle.stroke,
                         onChanged: (selected) {
