@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
+import 'package:flutter_flexdiet/widgets/weight_chart.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -81,15 +82,19 @@ class _HomeScreenContent extends StatelessWidget {
   }
 
   Widget _buildMainContent(ThemeData theme, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(HomeScreen._standardPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildNutritionCard(theme),
-          const SizedBox(height: HomeScreen._mediumSpacing),
-          _buildMealsSection(theme, context),
-        ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(HomeScreen._standardPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildNutritionCard(theme),
+            const SizedBox(height: HomeScreen._mediumSpacing),
+            const SizedBox(height: HomeScreen._mediumSpacing),
+            _buildMealsSection(theme, context),
+            WeightChart(),
+          ],
+        ),
       ),
     );
   }
@@ -128,7 +133,6 @@ class _HomeScreenContent extends StatelessWidget {
   }
 
   Widget _buildMealsSection(ThemeData theme, BuildContext context) {
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -139,16 +143,20 @@ class _HomeScreenContent extends StatelessWidget {
           width: double.infinity,
           child: CardScroll(
             onCardTap: (index) {
-              Navigator.push(context,  MaterialPageRoute(builder: (BuildContext context) =>
-                DetailsScreen(
-                  title: 'Desayuno',
-                  subtitle: 'Empieza el día con energía',
-                  description: 'Huevos y tostadas',
-                  image: 'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
-                  kcal: '460 kcal',
-                  proteins: '20 g',
-                  carbs: '101 g',
-                  ),));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => DetailsScreen(
+                      title: 'Desayuno',
+                      subtitle: 'Empieza el día con energía',
+                      description: 'Huevos y tostadas',
+                      image:
+                          'https://familiakitchen.com/wp-content/uploads/2022/12/Beans-and-Rice-4-Fudio-istock-D-1198428606.jpg',
+                      kcal: '460 kcal',
+                      proteins: '20 g',
+                      carbs: '101 g',
+                    ),
+                  ));
             },
             cards: [
               CardData(
