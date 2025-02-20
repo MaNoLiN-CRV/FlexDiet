@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/screens/admin/create/select_foods_screen.dart';
+import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 class CreateTemplateScreen extends StatefulWidget {
   const CreateTemplateScreen({super.key});
@@ -204,15 +205,8 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
         child: FilledButton(
           onPressed: () {
             if (selectedDays.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Por favor, selecciona al menos un día.',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              showToast(context, "Por favor, selecciona al menos un día.",
+                  toastType: ToastType.warning);
               return;
             }
             Navigator.of(context).pushReplacement(

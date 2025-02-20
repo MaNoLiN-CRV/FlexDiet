@@ -8,7 +8,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 class UIConstants {
   static const double defaultPadding = 24.0;
   static const double defaultSpacing = 16.0;
-  static const double cardHeight = 0.27;
+  static const double cardHeight = 0.33;
   static const double buttonHeight = 14.0;
   static const double borderRadius = 12.0;
 
@@ -106,9 +106,11 @@ class _AdminScreenState extends State<AdminScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      appBar: _buildAppBar(context),
+      appBar: _buildAppBar(context, isDarkMode),
       bottomNavigationBar: BottomNav(
         selectedIndex: 3,
         onItemTapped: (index) => navigationRouter(context, index),
@@ -122,21 +124,21 @@ class _AdminScreenState extends State<AdminScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildHeader(context)
+                _buildHeader(context, isDarkMode)
                     .animate()
                     .fadeIn(duration: 600.ms)
                     .slideY(begin: -0.2, end: 0),
                 SizedBox(height: UIConstants.defaultSpacing),
-                _buildSearchField(context)
+                _buildSearchField(context, isDarkMode)
                     .animate()
                     .fadeIn(delay: 200.ms, duration: 600.ms)
                     .slideY(begin: 0.2, end: 0),
                 SizedBox(height: UIConstants.defaultSpacing),
-                _buildClientsList(context)
+                _buildClientsList(context, isDarkMode)
                     .animate()
                     .fadeIn(delay: 400.ms, duration: 800.ms)
                     .slideX(begin: 0.2, end: 0),
-                _buildActionButtons(context)
+                _buildActionButtons(context, isDarkMode)
                     .animate()
                     .fadeIn(delay: 600.ms, duration: 600.ms)
                     .scale(
@@ -149,7 +151,7 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar(BuildContext context, bool isDarkMode) {
     final theme = Theme.of(context);
     return AppBar(
       backgroundColor: theme.colorScheme.primary,
@@ -165,19 +167,25 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, bool isDarkMode) {
+    final textColor = isDarkMode
+        ? Colors.white
+        : Theme.of(context).colorScheme.onSurfaceVariant;
     return Text(
       'Selecciona un cliente',
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            color: textColor,
             fontWeight: FontWeight.w500,
           ),
       textAlign: TextAlign.center,
     );
   }
 
-  Widget _buildSearchField(BuildContext context) {
+  Widget _buildSearchField(BuildContext context, bool isDarkMode) {
     final theme = Theme.of(context);
+    final iconColor = isDarkMode
+        ? Colors.white70
+        : theme.colorScheme.onSurfaceVariant.withAlpha(153);
     return TextField(
       controller: _searchController,
       onChanged: _filterClients,
@@ -185,7 +193,7 @@ class _AdminScreenState extends State<AdminScreen> {
         hintText: 'Buscar cliente...',
         prefixIcon: Icon(
           Icons.search,
-          color: theme.colorScheme.primary.withAlpha(153),
+          color: iconColor,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(UIConstants.borderRadius),
@@ -204,7 +212,7 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  Widget _buildClientsList(BuildContext context) {
+  Widget _buildClientsList(BuildContext context, bool isDarkMode) {
     if (_filteredClients.isEmpty) {
       return Center(
         child: Text(
@@ -320,10 +328,12 @@ class _AdminScreenState extends State<AdminScreen> {
                                           color: isSelected
                                               ? Theme.of(context)
                                                   .colorScheme
-                                                  .onPrimaryContainer
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurfaceVariant,
+                                                  .onPrimary
+                                              : isDarkMode // Apply dark mode color to description
+                                                  ? Colors.white
+                                                  : Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant, // Default color
                                         ),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
@@ -348,7 +358,7 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.only(top: UIConstants.defaultSpacing * 2),
       child: Column(
@@ -365,6 +375,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     )
                 : null,
             isSecondary: true,
+            isDarkMode: isDarkMode,
           ),
           const SizedBox(height: UIConstants.defaultSpacing),
           _buildActionButton(
@@ -375,6 +386,7 @@ class _AdminScreenState extends State<AdminScreen> {
               MaterialPageRoute(
                   builder: (context) => const UseTemplateScreen()),
             ),
+            isDarkMode: isDarkMode,
           ),
           const SizedBox(height: UIConstants.defaultSpacing),
           _buildActionButton(
@@ -389,6 +401,7 @@ class _AdminScreenState extends State<AdminScreen> {
                       ),
                     )
                 : null,
+            isDarkMode: isDarkMode,
           ),
         ],
       ),
@@ -400,17 +413,21 @@ class _AdminScreenState extends State<AdminScreen> {
     required String title,
     required VoidCallback? onPressed,
     bool isSecondary = false,
+    required bool isDarkMode,
   }) {
     final theme = Theme.of(context);
+    final buttonColor = isSecondary
+        ? (isDarkMode ? Colors.grey.shade800 : theme.colorScheme.secondary)
+        : theme.colorScheme.primary;
+    final textColor = isSecondary
+        ? (isDarkMode ? Colors.white : theme.colorScheme.onSecondary)
+        : theme.colorScheme.onPrimary;
+
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSecondary
-            ? theme.colorScheme.secondary
-            : theme.colorScheme.primary,
-        foregroundColor: isSecondary
-            ? theme.colorScheme.onSecondary
-            : theme.colorScheme.onPrimary,
+        backgroundColor: buttonColor,
+        foregroundColor: textColor,
         padding: UIConstants.buttonPadding,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(UIConstants.borderRadius),
@@ -421,9 +438,7 @@ class _AdminScreenState extends State<AdminScreen> {
         title,
         style: theme.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.bold,
-          color: isSecondary
-              ? theme.colorScheme.onSecondary
-              : theme.colorScheme.onPrimary,
+          color: textColor,
         ),
       ),
     )
