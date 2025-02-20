@@ -1,11 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/screens/admin/edit_person_screen.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
-class UseTemplateScreen extends StatelessWidget {
+class UseTemplateScreen extends StatefulWidget {
   static const double _standardPadding = 16.0;
   static const double _cardSpacing = 20.0;
 
   const UseTemplateScreen({super.key});
+
+  @override
+  State<UseTemplateScreen> createState() => _UseTemplateScreenState();
+}
+
+class _UseTemplateScreenState extends State<UseTemplateScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _fabController;
+  late Animation<double> _fabAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _fabController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _fabAnimation = CurvedAnimation(
+      parent: _fabController,
+      curve: Curves.easeInOut,
+    );
+    _fabController.forward();
+  }
+
+  @override
+  void dispose() {
+    _fabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +49,7 @@ class UseTemplateScreen extends StatelessWidget {
         children: [
           _buildWaveBackgrounds(theme),
           _buildMainContent(context, theme, height),
+          _buildProfileButton(context),
         ],
       ),
     );
@@ -67,12 +98,17 @@ class UseTemplateScreen extends StatelessWidget {
       BuildContext context, ThemeData theme, double height) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(_standardPadding),
+        padding: const EdgeInsets.fromLTRB(
+          UseTemplateScreen._standardPadding,
+          UseTemplateScreen._standardPadding,
+          UseTemplateScreen._standardPadding,
+          80,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(theme),
-            const SizedBox(height: _cardSpacing),
+            const SizedBox(height: UseTemplateScreen._cardSpacing),
             _buildTemplateCards(context, theme, height),
           ],
         ),
@@ -85,7 +121,7 @@ class UseTemplateScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Escoge tu Plan',
+          'Escoge el Plan',
           style: theme.textTheme.headlineMedium?.copyWith(
             color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.bold,
@@ -93,7 +129,7 @@ class UseTemplateScreen extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Selecciona la plantilla que mejor se adapte a tus objetivos',
+          'Selecciona la plantilla que mejor se adapte a tu cliente',
           style: theme.textTheme.bodyLarge?.copyWith(
             color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           ),
@@ -131,6 +167,114 @@ class UseTemplateScreen extends StatelessWidget {
           ),
         ],
         scrollDirection: Axis.vertical,
+      ),
+    );
+  }
+
+  Widget _buildProfileButton(BuildContext context) {
+    return Positioned(
+      right: 16,
+      bottom: 32,
+      child: ScaleTransition(
+        scale: _fabAnimation,
+        child: Hero(
+          tag: 'profile-hero',
+          child: Material(
+            elevation: 8,
+            shadowColor:
+                Theme.of(context).colorScheme.shadow.withValues(alpha: 0.2),
+            shape: const CircleBorder(),
+            child: InkWell(
+              onTap: () => _showProfileDialog(context),
+              customBorder: const CircleBorder(),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.secondary,
+                    ],
+                  ),
+                ),
+                child: Icon(
+                  Icons.person,
+                  size: 32,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showProfileDialog(BuildContext context) async {
+    final theme = Theme.of(context);
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    theme.colorScheme.primary,
+                    theme.colorScheme.secondary,
+                  ],
+                ),
+              ),
+              child: Icon(
+                Icons.person,
+                size: 48,
+                color: theme.colorScheme.onPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'John Doe',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Objetivo: Pérdida de peso',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => EditPerson(name: 'John Doe'))),
+              icon: const Icon(Icons.edit),
+              label: const Text('Editar Perfil'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(200, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
