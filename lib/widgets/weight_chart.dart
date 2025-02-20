@@ -25,16 +25,32 @@ class WeightChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    final chartAreaColor = isDarkMode
+        ? theme.colorScheme.inversePrimary.withValues(alpha: 0.2)
+        : theme.colorScheme.inversePrimary.withValues(alpha: 0.2);
+    final textColor = isDarkMode ? Colors.white : theme.colorScheme.onSurface;
+    final secondaryTextColor =
+        isDarkMode ? Colors.grey[400] : theme.colorScheme.inversePrimary;
+    final gridLineColor = isDarkMode
+        ? Colors.grey[800]!
+        : theme.colorScheme.outline.withValues(alpha: 0.1);
+    final dotColor = isDarkMode
+        ? theme.colorScheme.inversePrimary
+        : theme.colorScheme.inversePrimary;
+    final backgroundColor =
+        isDarkMode ? Colors.grey[900] : theme.colorScheme.surface;
 
     return Container(
       height: 300,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.1),
+            color: theme.shadowColor.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -47,14 +63,14 @@ class WeightChart extends StatelessWidget {
             'Progreso de Peso',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface,
+              color: textColor,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Últimas 7 semanas',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
+              color: secondaryTextColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -67,7 +83,7 @@ class WeightChart extends StatelessWidget {
                   horizontalInterval: 1,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: theme.colorScheme.outline.withOpacity(0.1),
+                      color: gridLineColor,
                       strokeWidth: 1,
                     );
                   },
@@ -85,7 +101,8 @@ class WeightChart extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               DateFormat('dd/MM').format(data[index].date),
-                              style: theme.textTheme.bodySmall,
+                              style: theme.textTheme.bodySmall
+                                  ?.copyWith(color: textColor), // Use textColor
                             ),
                           );
                         }
@@ -101,7 +118,8 @@ class WeightChart extends StatelessWidget {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           '${value.toInt()}kg',
-                          style: theme.textTheme.bodySmall,
+                          style: theme.textTheme.bodySmall
+                              ?.copyWith(color: textColor),
                         );
                       },
                     ),
@@ -120,7 +138,7 @@ class WeightChart extends StatelessWidget {
                       return FlSpot(entry.key.toDouble(), entry.value.weight);
                     }).toList(),
                     isCurved: true,
-                    color: theme.colorScheme.primary,
+                    color: theme.colorScheme.inversePrimary,
                     barWidth: 3,
                     isStrokeCapRound: true,
                     dotData: FlDotData(
@@ -128,14 +146,15 @@ class WeightChart extends StatelessWidget {
                       getDotPainter: (spot, percent, barData, index) =>
                           FlDotCirclePainter(
                         radius: 4,
-                        color: theme.colorScheme.primary,
+                        color: theme.colorScheme.inversePrimary,
                         strokeWidth: 2,
-                        strokeColor: theme.colorScheme.surface,
+                        strokeColor: theme.colorScheme.onInverseSurface,
                       ),
                     ),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      color: theme.colorScheme.inversePrimary
+                          .withValues(alpha: 0.2),
                     ),
                   ),
                 ],
