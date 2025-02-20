@@ -244,7 +244,7 @@ class _AdminScreenState extends State<AdminScreen> {
                   vertical: 4,
                 ),
                 transform: isSelected
-                    ? (Matrix4.identity()..scale(1.05))
+                    ? (Matrix4.identity()..scale(1.04))
                     : Matrix4.identity(),
                 child: Card(
                   elevation: isSelected ? 8 : 4,
@@ -329,11 +329,11 @@ class _AdminScreenState extends State<AdminScreen> {
                                               ? Theme.of(context)
                                                   .colorScheme
                                                   .onPrimary
-                                              : isDarkMode // Apply dark mode color to description
+                                              : isDarkMode
                                                   ? Colors.white
                                                   : Theme.of(context)
                                                       .colorScheme
-                                                      .onSurfaceVariant, // Default color
+                                                      .onSurfaceVariant,
                                         ),
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 2,

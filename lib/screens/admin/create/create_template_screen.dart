@@ -25,6 +25,8 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode =
+        Theme.of(context).brightness == Brightness.dark; // Determine dark mode
     return Scaffold(
       appBar: AppBar(
         title: const Text('Crear Plantilla de Dieta'),
@@ -54,13 +56,15 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _buildSectionTitle('Calorías Diarias', theme),
+                _buildSectionTitle(
+                    'Calorías Diarias', theme, isDarkMode), // Pass isDarkMode
                 const SizedBox(height: 16),
-                _buildCaloriesInput(theme),
+                _buildCaloriesInput(theme, isDarkMode), // Pass isDarkMode
                 const SizedBox(height: 40),
-                _buildSectionTitle('Días de la Semana', theme),
+                _buildSectionTitle(
+                    'Días de la Semana', theme, isDarkMode), // Pass isDarkMode
                 const SizedBox(height: 20),
-                _buildDaysSelection(theme),
+                _buildDaysSelection(theme, isDarkMode), // Pass isDarkMode
                 const SizedBox(height: 48),
                 _buildSaveButton(theme),
               ],
@@ -71,15 +75,19 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
     );
   }
 
-  Widget _buildSectionTitle(String title, ThemeData theme) {
+  Widget _buildSectionTitle(String title, ThemeData theme, bool isDarkMode) {
+    // Use isDarkMode to determine colors
+    final titleColor = isDarkMode ? Colors.white : theme.colorScheme.primary;
+    final borderColor = isDarkMode
+        ? Colors.grey.shade700
+        : theme.colorScheme.primary.withValues(alpha: 0.2);
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.primary.withValues(
-              alpha: 0.2,
-            ),
+            color: borderColor,
             width: 2,
           ),
         ),
@@ -88,21 +96,29 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
         title,
         style: theme.textTheme.headlineSmall?.copyWith(
           fontWeight: FontWeight.bold,
-          color: theme.colorScheme.primary,
+          color: titleColor,
         ),
       ),
     );
   }
 
-  Widget _buildCaloriesInput(ThemeData theme) {
+  Widget _buildCaloriesInput(ThemeData theme, bool isDarkMode) {
+    final shadowColor = isDarkMode
+        ? Colors.grey.shade900
+        : theme.colorScheme.shadow.withValues(alpha: 0.1);
+    final fillColor =
+        isDarkMode ? Colors.grey.shade800 : theme.colorScheme.surface;
+    final textColor =
+        isDarkMode ? Colors.white : theme.textTheme.bodyLarge?.color;
+    final hintColor = isDarkMode ? Colors.grey.shade500 : theme.hintColor;
+    final iconColor = isDarkMode ? Colors.white70 : theme.colorScheme.primary;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.shadow.withValues(
-              alpha: 0.1,
-            ),
+            color: shadowColor,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -110,24 +126,23 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
       ),
       child: TextField(
         keyboardType: TextInputType.number,
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.w500,
-        ),
+        style: theme.textTheme.bodyLarge
+            ?.copyWith(fontWeight: FontWeight.w500, color: textColor),
         decoration: InputDecoration(
           hintText: 'Ej. 2000',
           hintStyle: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.hintColor,
+            color: hintColor,
           ),
           prefixIcon: Icon(
             Icons.local_fire_department_rounded,
-            color: theme.colorScheme.primary,
+            color: iconColor,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: theme.colorScheme.surface,
+          fillColor: fillColor,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 16.0,
             horizontal: 16.0,
@@ -143,19 +158,28 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
     );
   }
 
-  Widget _buildDaysSelection(ThemeData theme) {
+  Widget _buildDaysSelection(ThemeData theme, bool isDarkMode) {
     return Wrap(
       spacing: 12.0,
       runSpacing: 12.0,
       children: daysOfWeek.map((day) {
         final isSelected = selectedDays.contains(day);
+
+        // Conditional colors based on dark mode
+        final labelTextColor = isSelected
+            ? theme.colorScheme.onPrimary
+            : isDarkMode
+                ? Colors.white // White text in dark mode
+                : theme.colorScheme.onSurfaceVariant; // Default text color
+
+        final chipBackgroundColor = theme.colorScheme.surface;
+        final selectedChipColor = theme.colorScheme.primary;
+
         return FilterChip(
           label: Text(
             day,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: isSelected
-                  ? theme.colorScheme.onPrimary
-                  : theme.colorScheme.onSurfaceVariant,
+              color: labelTextColor,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             ),
           ),
@@ -169,8 +193,8 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
               }
             });
           },
-          backgroundColor: theme.colorScheme.surface,
-          selectedColor: theme.colorScheme.primary,
+          backgroundColor: chipBackgroundColor,
+          selectedColor: selectedChipColor,
           checkmarkColor: theme.colorScheme.onPrimary,
           padding: const EdgeInsets.symmetric(
             horizontal: 16.0,

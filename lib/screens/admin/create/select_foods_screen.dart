@@ -38,32 +38,39 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkMode =
+        Theme.of(context).brightness == Brightness.dark; // Add this line
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
           'Planificar Comidas',
           style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colorScheme.surface,
+            color:
+                theme.colorScheme.onPrimary, // Use onPrimary for AppBar title
             fontWeight: FontWeight.bold,
           ),
         ),
+        backgroundColor: theme.colorScheme.primary, // Set background color
         centerTitle: true,
-        elevation: 0,
+        elevation: 0, // Remove AppBar elevation
       ),
       body: Column(
         children: [
-          _buildDaySelector(theme),
-          _buildNutritionSummary(theme),
-          Expanded(child: _buildMealsList(theme)),
-          _buildFinishButton(theme),
+          _buildDaySelector(theme, isDarkMode), // Pass isDarkMode
+          _buildNutritionSummary(theme, isDarkMode), // Pass isDarkMode
+          Expanded(
+              child: _buildMealsList(theme, isDarkMode)), // Pass isDarkMode
+          _buildFinishButton(theme, isDarkMode), // Pass isDarkMode
           const SizedBox(height: 16),
         ],
       ),
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(right: 16.0, bottom: 65),
         child: FloatingActionButton.extended(
-          onPressed: () => _showAddMealDialog(context),
+          onPressed: () =>
+              _showAddMealDialog(context, isDarkMode), // Pass isDarkMode
           label: const Text('Añadir Comida'),
           icon: const Icon(Icons.add),
           backgroundColor: theme.colorScheme.secondary,
@@ -76,7 +83,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     );
   }
 
-  Widget _buildFinishButton(ThemeData theme) {
+  Widget _buildFinishButton(ThemeData theme, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Center(
@@ -93,6 +100,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -113,7 +121,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     );
   }
 
-  Widget _buildDaySelector(ThemeData theme) {
+  Widget _buildDaySelector(ThemeData theme, bool isDarkMode) {
     return SizedBox(
       height: 60,
       child: Stack(
@@ -125,6 +133,19 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             itemCount: daysData.length,
             itemBuilder: (context, index) {
               final isSelected = selectedDayIndex == index;
+
+              final containerColor = isSelected
+                  ? theme.colorScheme.primary
+                  : isDarkMode
+                      ? theme.colorScheme.surfaceContainer
+                          .withOpacity(0.8) // Dark mode color
+                      : theme.colorScheme.surfaceContainerHighest;
+              final textColor = isSelected
+                  ? theme.colorScheme.onPrimary
+                  : isDarkMode
+                      ? Colors.white // Dark mode text color
+                      : theme.colorScheme.onSurfaceVariant;
+
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 margin: const EdgeInsets.symmetric(
@@ -132,9 +153,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.surfaceContainerHighest,
+                  color: containerColor,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: isSelected
                       ? [
@@ -151,9 +170,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   child: Text(
                     daysData[index].day,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: isSelected
-                          ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.onSurfaceVariant,
+                      color: textColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -174,76 +191,77 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     );
   }
 
-  Widget _buildNutritionSummary(ThemeData theme) {
+  Widget _buildNutritionSummary(ThemeData theme, bool isDarkMode) {
     final currentDay = daysData[selectedDayIndex];
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNutritionCard(
-            theme,
-            'Calorías',
-            '${currentDay.getTotalCalories().toStringAsFixed(0)} kcal',
-            Icons.local_fire_department,
-          ),
+              theme,
+              'Calorías',
+              '${currentDay.getTotalCalories().toStringAsFixed(0)} kcal',
+              Icons.local_fire_department,
+              isDarkMode),
           SizedBox(width: 10),
           _buildNutritionCard(
-            theme,
-            'Proteínas',
-            '${currentDay.getTotalProtein().toStringAsFixed(1)} g',
-            Icons.fitness_center,
-          ),
+              theme,
+              'Proteínas',
+              '${currentDay.getTotalProtein().toStringAsFixed(1)} g',
+              Icons.fitness_center,
+              isDarkMode),
           SizedBox(width: 10),
           _buildNutritionCard(
-            theme,
-            'Carbohidratos',
-            '${currentDay.getTotalCarbs().toStringAsFixed(1)} g',
-            Icons.grain,
-          ),
+              theme,
+              'Carbohidratos',
+              '${currentDay.getTotalCarbs().toStringAsFixed(1)} g',
+              Icons.grain,
+              isDarkMode),
         ],
       ),
     );
   }
 
-  Widget _buildNutritionCard(
-    ThemeData theme,
-    String title,
-    String value,
-    IconData icon,
-  ) {
+  Widget _buildNutritionCard(ThemeData theme, String title, String value,
+      IconData icon, bool isDarkMode) {
+    final textColor =
+        isDarkMode ? Colors.white : theme.colorScheme.onPrimaryContainer;
+    final captionColor = isDarkMode
+        ? Colors.white70
+        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3);
+    final noMealsTextColor =
+        isDarkMode ? Colors.white70 : theme.colorScheme.primary;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           icon,
-          color: theme.colorScheme.primary,
+          color: noMealsTextColor,
         ),
         const SizedBox(height: 4),
         Text(
           value,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onPrimaryContainer,
-          ),
+          style: theme.textTheme.titleMedium
+              ?.copyWith(fontWeight: FontWeight.bold, color: textColor),
         ),
         Text(
           title,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-          ),
+          style: theme.textTheme.bodySmall?.copyWith(color: captionColor),
         ),
       ],
     );
   }
 
-  Widget _buildMealsList(ThemeData theme) {
+  Widget _buildMealsList(ThemeData theme, bool isDarkMode) {
     final currentDay = daysData[selectedDayIndex];
+    final noMealsTextColor =
+        isDarkMode ? Colors.white70 : theme.colorScheme.outline;
 
     if (currentDay.meals.isEmpty) {
       return Center(
@@ -253,13 +271,13 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             Icon(
               Icons.restaurant_menu,
               size: 64,
-              color: theme.colorScheme.outline,
+              color: noMealsTextColor,
             ),
             const SizedBox(height: 16),
             Text(
               'No hay comidas añadidas',
               style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.outline,
+                color: noMealsTextColor,
               ),
             ),
           ],
@@ -300,33 +318,35 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
               title: Text(
                 meal.name,
                 style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                    fontWeight: FontWeight.bold,
+                    color:
+                        isDarkMode ? Colors.white : null // White in Dark mode
+                    ),
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Row(
                   children: [
                     _buildMealNutrient(
-                      theme,
-                      'Calorías',
-                      '${meal.calories.toStringAsFixed(0)} kcal',
-                      Icons.local_fire_department,
-                    ),
+                        theme,
+                        'Calorías',
+                        '${meal.calories.toStringAsFixed(0)} kcal',
+                        Icons.local_fire_department,
+                        isDarkMode),
                     const SizedBox(width: 16),
                     _buildMealNutrient(
-                      theme,
-                      'Proteínas',
-                      '${meal.protein.toStringAsFixed(1)} g',
-                      Icons.fitness_center,
-                    ),
+                        theme,
+                        'Proteínas',
+                        '${meal.protein.toStringAsFixed(1)} g',
+                        Icons.fitness_center,
+                        isDarkMode),
                     const SizedBox(width: 16),
                     _buildMealNutrient(
-                      theme,
-                      'Carbohidratos',
-                      '${meal.carbs.toStringAsFixed(1)} g',
-                      Icons.grain,
-                    ),
+                        theme,
+                        'Carbohidratos',
+                        '${meal.carbs.toStringAsFixed(1)} g',
+                        Icons.grain,
+                        isDarkMode),
                   ],
                 ),
               ),
@@ -337,12 +357,10 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     );
   }
 
-  Widget _buildMealNutrient(
-    ThemeData theme,
-    String label,
-    String value,
-    IconData icon,
-  ) {
+  Widget _buildMealNutrient(ThemeData theme, String label, String value,
+      IconData icon, bool isDarkMode) {
+    final onSurfaceVariantColor =
+        isDarkMode ? Colors.white70 : theme.colorScheme.onSurfaceVariant;
     return Row(
       children: [
         Icon(
@@ -353,17 +371,17 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         const SizedBox(width: 4),
         Text(
           value,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+          style: theme.textTheme.bodyMedium
+              ?.copyWith(color: onSurfaceVariantColor),
         ),
       ],
     );
   }
 
-  Future<void> _showAddMealDialog(BuildContext context) async {
+  Future<void> _showAddMealDialog(BuildContext context, bool isDarkMode) async {
     final formKey = GlobalKey<FormState>();
     final theme = Theme.of(context);
+
     String name = '';
     double calories = 0;
     double protein = 0;
@@ -371,8 +389,6 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
 
     final inputDecoration = InputDecoration(
       filled: true,
-      fillColor:
-          theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
@@ -380,7 +396,9 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(
-          color: theme.colorScheme.outline.withValues(alpha: 0.3),
+          color: isDarkMode
+              ? Colors.grey.shade600
+              : theme.colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       focusedBorder: OutlineInputBorder(
@@ -391,6 +409,9 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         ),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      labelStyle: TextStyle(color: isDarkMode ? Colors.white70 : null),
+      hintStyle: TextStyle(color: isDarkMode ? Colors.grey.shade500 : null),
+      prefixIconColor: isDarkMode ? Colors.white70 : null,
     );
 
     await showDialog(
@@ -404,8 +425,11 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         title: Text(
           'Añadir Comida',
           style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+              fontWeight: FontWeight.bold,
+              color: isDarkMode
+                  ? Colors.white
+                  : null // Use white text in dark mode
+              ),
         ),
         content: SingleChildScrollView(
           child: Form(
@@ -414,6 +438,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
+                  style: TextStyle(
+                      color: isDarkMode ? Colors.white : null), // Text color
                   decoration: inputDecoration.copyWith(
                     labelText: 'Nombre del plato',
                     prefixIcon: const Icon(Icons.restaurant_menu),
@@ -424,6 +450,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  style: TextStyle(
+                      color: isDarkMode ? Colors.white : null), // Text color
                   decoration: inputDecoration.copyWith(
                     labelText: 'Calorías (kcal)',
                     prefixIcon: const Icon(Icons.local_fire_department),
@@ -438,6 +466,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  style: TextStyle(
+                      color: isDarkMode ? Colors.white : null), // Text color
                   decoration: inputDecoration.copyWith(
                     labelText: 'Proteínas (g)',
                     prefixIcon: const Icon(Icons.fitness_center),
@@ -452,6 +482,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  style: TextStyle(
+                      color: isDarkMode ? Colors.white : null), // Text color
                   decoration: inputDecoration.copyWith(
                     labelText: 'Carbohidratos (g)',
                     prefixIcon: const Icon(Icons.grain),

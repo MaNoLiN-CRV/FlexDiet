@@ -124,7 +124,7 @@ class _EditPersonState extends State<EditPerson> {
                   border: OutlineInputBorder(),
                 ),
                 value: sex,
-                items: <String>['Masculino', 'Femenino', 'Otro']
+                items: <String>['Masculino', 'Femenino']
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,

@@ -85,7 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 24),
                 ],
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -123,17 +123,16 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   @override
   Widget build(BuildContext context) {
     void _seleccionarImagenDeGaleria() async {
-      final XFile? imagen =
-          await _imagePickerService.seleccionarImagen(ImageSource.gallery);
+      final XFile? imagen = await _imagePickerService.seleccionarImagen(
+          context, ImageSource.gallery);
       if (imagen != null) {
         setState(() {
           _imagenSeleccionada = imagen;
         });
       } else {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No se seleccionó ninguna imagen')),
-          );
+          showToast(context, "No se seleccionó ninguna imagen",
+              toastType: ToastType.warning);
         }
       }
     }
