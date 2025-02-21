@@ -2,8 +2,6 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
-
-import 'package:flutter_flexdiet/screens/login/login_screen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/image_service/image_service.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
@@ -33,75 +31,93 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         centerTitle: true,
         elevation: 0,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: const Text(
-              'Mi Perfil',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
       bottomNavigationBar: BottomNav(
         selectedIndex: 2,
         onItemTapped: (index) => navigationRouter(context, index),
       ),
-      floatingActionButton: IconButton(
-        style: theme.iconButtonTheme.style,
-        onPressed: () =>
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (BuildContext context) => EditPerson())
-        ),
-        icon: Icon(
-          Icons.person,
-          size: 32,
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            _UsernameInfoSettings(theme: theme),
-            const SizedBox(height: 40),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  _CardLogic(
-                    text: 'Selecciona un tema:',
-                    list: ['Claro', 'Oscuro'],
-                    value: themeProvider.currentThemeName,
-                    onChange: (value) {
-                      themeProvider.setTheme(value!);
-                    },
-                    themeProvider: themeProvider,
-                    theme: theme,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                _UsernameInfoSettings(theme: theme),
+                const SizedBox(height: 40),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    children: [
+                      _CardLogic(
+                        text: 'Selecciona un tema:',
+                        list: ['Claro', 'Oscuro'],
+                        value: themeProvider.currentThemeName,
+                        onChange: (value) {
+                          themeProvider.setTheme(value!);
+                        },
+                        themeProvider: themeProvider,
+                        theme: theme,
+                      ),
+                      const SizedBox(height: 24),
+                      _CardLogic(
+                        text: 'Tamaño de la fuente:',
+                        list: ['Pequeña', 'Mediana', 'Grande'],
+                        value: themeProvider.currentFontSize,
+                        onChange: (value) {
+                          themeProvider.setFontSize(value);
+                        },
+                        themeProvider: themeProvider,
+                        theme: theme,
+                      ),
+                      const SizedBox(height: 24),
+                      _ElevatedButtonSettings(),
+                      const SizedBox(height: 24),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  _CardLogic(
-                    text: 'Tamaño de la fuente:',
-                    list: ['Pequeña', 'Mediana', 'Grande'],
-                    value: themeProvider.currentFontSize,
-                    onChange: (value) {
-                      themeProvider.setFontSize(value);
-                    },
-                    themeProvider: themeProvider,
-                    theme: theme,
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            right: 16,
+            bottom: 20,
+            child: Hero(
+              tag: 'profile-hero',
+              child: Material(
+                elevation: 8,
+                shadowColor:
+                    Theme.of(context).colorScheme.shadow.withValues(alpha: 0.2),
+                shape: const CircleBorder(),
+                child: InkWell(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const EditPerson())),
+                  customBorder: const CircleBorder(),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.secondary,
+                        ],
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.person,
+                      size: 32,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                   ),
-                  const SizedBox(height: 24),
-                  _ElevatedButtonSettings(),
-                  const SizedBox(height: 24),
-                ],
+                ),
               ),
-            )
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
