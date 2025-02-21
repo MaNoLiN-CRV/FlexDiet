@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
 
 import 'package:flutter_flexdiet/screens/login/login_screen.dart';
+import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/image_service/image_service.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
@@ -48,6 +49,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       bottomNavigationBar: BottomNav(
         selectedIndex: 2,
         onItemTapped: (index) => navigationRouter(context, index),
+      ),
+      floatingActionButton: IconButton(
+        style: theme.iconButtonTheme.style,
+        onPressed: () =>
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (BuildContext context) => EditPerson())
+        ),
+        icon: Icon(
+          Icons.person,
+          size: 32,
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
