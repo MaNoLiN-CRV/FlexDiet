@@ -46,7 +46,7 @@ void navigationRouter(BuildContext context, int index) {
           carbs: 2),
     ],
   };
-  final List<Client> _clients = [
+  final List<Client> clients = [
     Client(
       name: 'Snoop Dogg',
       description:
@@ -98,7 +98,7 @@ void navigationRouter(BuildContext context, int index) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => AdminScreen( clients: _clients,),
+        builder: (context) => AdminScreen( clients: clients,),
       ),
     );
   }

@@ -6,12 +6,12 @@ import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class AdminScreen extends StatefulWidget {
-  final List<Client> _clients = [];
-  AdminScreen({
+  final List<Client> clients ;
+  const AdminScreen({
     super.key,
-    required List<Client> clients,
+    required this.clients,
     });
-
+    
   @override
   State<AdminScreen> createState() => _AdminScreenState();
 }
@@ -26,7 +26,7 @@ class _AdminScreenState extends State<AdminScreen> {
   @override
   void initState() {
     super.initState();
-    _filteredClients = List.from(widget._clients);
+    _filteredClients = List.from(widget.clients);
   }
 
   void _selectClient(String clientName) {
@@ -36,10 +36,10 @@ class _AdminScreenState extends State<AdminScreen> {
   void _filterClients(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredClients = List.from(widget._clients);
+        _filteredClients = List.from(widget.clients);
       } else {
         final lowercaseQuery = query.toLowerCase();
-        _filteredClients = widget._clients.where((client) {
+        _filteredClients = widget.clients.where((client) {
           return client.name.toLowerCase().contains(lowercaseQuery) ||
               client.description.toLowerCase().contains(lowercaseQuery);
         }).toList();
