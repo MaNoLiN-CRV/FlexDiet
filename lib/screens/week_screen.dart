@@ -6,7 +6,9 @@ import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 
 class WeekScreen extends StatefulWidget {
-  const WeekScreen({super.key});
+  final Map<DateTime, List<Meal>> mealData;
+
+  const WeekScreen({required this.mealData, super.key});
 
   @override
   _WeekScreenState createState() => _WeekScreenState();
@@ -15,49 +17,7 @@ class WeekScreen extends StatefulWidget {
 class _WeekScreenState extends State<WeekScreen> {
   DateTime _selectedDate = DateTime.now();
 
-  final Map<DateTime, List<Meal>> _mealData = {
-    DateTime(2025, 2, 18): [
-      Meal(
-          name: 'Desayuno',
-          description: 'Cereales con leche de almendras',
-          calories: 2,
-          protein: 2,
-          carbs: 2),
-      Meal(
-          name: 'Almuerzo',
-          description: 'Crema de calabaza',
-          calories: 2,
-          protein: 2,
-          carbs: 2),
-      Meal(
-          name: 'Cena',
-          description: 'Ensalada de garbanzos',
-          calories: 2,
-          protein: 2,
-          carbs: 2),
-    ],
-    DateTime(2025, 2, 19): [
-      Meal(
-          name: 'Desayuno',
-          description: 'Tortilla con espinacas',
-          calories: 2,
-          protein: 2,
-          carbs: 2),
-      Meal(
-          name: 'Almuerzo',
-          description: 'Pasta con tomate y atún',
-          calories: 2,
-          protein: 2,
-          carbs: 2),
-      Meal(
-          name: 'Cena',
-          description: 'Pizza con verduras',
-          calories: 2,
-          protein: 2,
-          carbs: 2),
-    ],
-  };
-
+  
   @override
   void initState() {
     super.initState();
@@ -75,7 +35,7 @@ class _WeekScreenState extends State<WeekScreen> {
     final DateFormat formatter = DateFormat('EEEE, d MMMM yyyy', 'es_ES');
     final String formattedDate = formatter.format(_selectedDate);
 
-    final mealsForSelectedDate = _mealData[_selectedDate] ?? [];
+    final mealsForSelectedDate = widget.mealData[_selectedDate] ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -191,3 +151,4 @@ class _WeekScreenState extends State<WeekScreen> {
     );
   }
 }
+
