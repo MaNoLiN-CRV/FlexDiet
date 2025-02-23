@@ -4,7 +4,7 @@ import 'package:flutter_flexdiet/navigation/navigation.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:msh_checkbox/msh_checkbox.dart'; // Import msh_checkbox
+import 'package:msh_checkbox/msh_checkbox.dart';
 
 class HomeScreen extends StatelessWidget {
   static const double _cardHeight = 250.0;

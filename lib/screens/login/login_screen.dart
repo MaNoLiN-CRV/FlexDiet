@@ -8,7 +8,9 @@ import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_flexdiet/exceptions/invalid_credentials_exception.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -50,56 +52,94 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _setupAuthServices() {
-    emailAuthService = authService.emailAuth() as provider.EmailAuth;
-    googleAuthService = authService.googleAuth() as provider.GoogleAuth;
+    emailAuthService = authService.emailAuth();
+    googleAuthService = authService.googleAuth();
   }
 
-  Future<bool> _hasCompletedUserInfo() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getBool('userInfoCompleted') ?? false;
-    } catch (e) {
-      return false;
-    }
-  }
+  Future<void> _navigateToNextScreen(BuildContext context) async {
+    // Check if user info is completed
+    bool userInfoCompleted = await _isUserInfoCompleted();
 
-  Future<void> _handleNavigation(BuildContext context) async {
-    final hasCompleted = await _hasCompletedUserInfo();
-
-    if (hasCompleted) {
-      if (context.mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const LoadingScreen(
-              targetScreen: HomeScreen(),
-              loadingSeconds: 2,
-            ),
+    // Navigate to the appropriate screen
+    if (context.mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoadingScreen(
+            targetScreen:
+                userInfoCompleted ? const HomeScreen() : const UserInfoScreen(),
+            loadingSeconds: 2,
           ),
-        );
-      }
-    } else {
-      if (context.mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const UserInfoScreen()),
-        );
-      }
+        ),
+      );
     }
+  }
+
+  Future<bool> _isUserInfoCompleted() async {
+    // Use SharedPreferences to check if user info is completed
+    // Adjust the key based on your implementation
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('userInfoCompleted') ?? false;
   }
 
   Future<void> _handleGoogleSignIn(BuildContext context) async {
     try {
       await googleAuthService.signIn();
+      if (FirebaseAuth.instance.currentUser != null) {
+        // Successful sign-in, navigate to the next screen
+        await _navigateToNextScreen(context);
+      }
       if (!context.mounted) return;
 
       showToast(context, 'Inicio de sesión correcto',
           toastType: ToastType.success);
-      await _handleNavigation(context);
     } catch (e) {
       if (!context.mounted) return;
       showToast(context, 'Error al iniciar sesión con Google',
           toastType: ToastType.error);
+    }
+  }
+
+  Future<void> _handleEmailSignIn(BuildContext context) async {
+    try {
+      final email = _usernameController.text.trim();
+      final password = _passwordController.text.trim();
+
+      if (email.isEmpty || password.isEmpty) {
+        showToast(context, 'Por favor, introduce email y contraseña',
+            toastType: ToastType.error);
+        return;
+      }
+
+      await emailAuthService.signIn(email: email, password: password);
+
+      if (FirebaseAuth.instance.currentUser != null) {
+        // Successful sign-in, navigate to the next screen
+        await _navigateToNextScreen(context);
+      }
+
+      if (!context.mounted) return;
+      showToast(context, 'Inicio de sesión correcto',
+          toastType: ToastType.success);
+    } on FirebaseAuthException catch (e) {
+      if (e is InvalidCredentialsException) {
+        if (mounted) {
+          // Check if the widget is still mounted
+          showToast(context, 'Credenciales inválidas',
+              toastType: ToastType.error);
+        }
+      } else {
+        if (mounted) {
+          // Check if the widget is still mounted
+          showToast(context, 'Error al iniciar sesión: ${e.message}',
+              toastType: ToastType.error);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        // Check if the widget is still mounted
+        showToast(context, 'Error inesperado: $e', toastType: ToastType.error);
+      }
     }
   }
 
@@ -323,7 +363,7 @@ class _LoginScreenState extends State<LoginScreen>
                           SizedBox(height: screenSize.height * 0.02),
                           ElevatedButton(
                             onPressed: () =>
-                                _handleNavigation(context), // LOGIN BYPASS
+                                _handleEmailSignIn(context), // Email Sign In
                             style: theme.elevatedButtonTheme.style,
                             child: Text(
                               'Comenzar mi viaje saludable',
