@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/Meal.dart';
+import 'package:flutter_flexdiet/models/meal.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
