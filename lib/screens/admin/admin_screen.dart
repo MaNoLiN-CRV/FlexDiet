@@ -6,7 +6,11 @@ import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class AdminScreen extends StatefulWidget {
-  const AdminScreen({super.key});
+  final List<Client> _clients = [];
+  AdminScreen({
+    super.key,
+    required List<Client> clients,
+    });
 
   @override
   State<AdminScreen> createState() => _AdminScreenState();
@@ -15,39 +19,14 @@ class AdminScreen extends StatefulWidget {
 class _AdminScreenState extends State<AdminScreen> {
   String? _selectedClientName;
   final TextEditingController _searchController = TextEditingController();
-  final List<Client> _clients = [
-    Client(
-      name: 'Snoop Dogg',
-      description:
-          'Cliente con rutina de ganar peso, entrena dos dias a la semana.',
-      imageUrl:
-          'https://allhiphop.com/wp-content/uploads/2022/11/Snoop-Dogg.jpg',
-    ),
-    Client(
-      name: 'Eminem',
-      description: 'Atleta, y fisicoculturista',
-      imageUrl: 'https://cdn.britannica.com/63/136263-050-7FBFFBD1/Eminem.jpg',
-    ),
-    Client(
-      name: 'Ice Cube',
-      description: 'Rutina para perder peso',
-      imageUrl:
-          'https://heavy.com/wp-content/uploads/2017/02/gettyimages-615695594.jpg?quality=65&strip=all',
-    ),
-    Client(
-      name: 'Juice WRLD',
-      description: 'Rutina de ciclismo',
-      imageUrl:
-          'https://www.thefamouspeople.com/profiles/images/juice-wrld-1.jpg',
-    ),
-  ];
+  
 
   late List<Client> _filteredClients;
 
   @override
   void initState() {
     super.initState();
-    _filteredClients = List.from(_clients);
+    _filteredClients = List.from(widget._clients);
   }
 
   void _selectClient(String clientName) {
@@ -57,10 +36,10 @@ class _AdminScreenState extends State<AdminScreen> {
   void _filterClients(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredClients = List.from(_clients);
+        _filteredClients = List.from(widget._clients);
       } else {
         final lowercaseQuery = query.toLowerCase();
-        _filteredClients = _clients.where((client) {
+        _filteredClients = widget._clients.where((client) {
           return client.name.toLowerCase().contains(lowercaseQuery) ||
               client.description.toLowerCase().contains(lowercaseQuery);
         }).toList();
@@ -434,3 +413,5 @@ class _AdminScreenState extends State<AdminScreen> {
     super.dispose();
   }
 }
+
+
