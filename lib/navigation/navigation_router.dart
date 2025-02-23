@@ -1,4 +1,5 @@
 import 'package:flutter_flexdiet/models/meal.dart';
+import 'package:flutter_flexdiet/models/models.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter/material.dart';
 
@@ -45,6 +46,32 @@ void navigationRouter(BuildContext context, int index) {
           carbs: 2),
     ],
   };
+  final List<Client> _clients = [
+    Client(
+      name: 'Snoop Dogg',
+      description:
+          'Cliente con rutina de ganar peso, entrena dos dias a la semana.',
+      imageUrl:
+          'https://allhiphop.com/wp-content/uploads/2022/11/Snoop-Dogg.jpg',
+    ),
+    Client(
+      name: 'Eminem',
+      description: 'Atleta, y fisicoculturista',
+      imageUrl: 'https://cdn.britannica.com/63/136263-050-7FBFFBD1/Eminem.jpg',
+    ),
+    Client(
+      name: 'Ice Cube',
+      description: 'Rutina para perder peso',
+      imageUrl:
+          'https://heavy.com/wp-content/uploads/2017/02/gettyimages-615695594.jpg?quality=65&strip=all',
+    ),
+    Client(
+      name: 'Juice WRLD',
+      description: 'Rutina de ciclismo',
+      imageUrl:
+          'https://www.thefamouspeople.com/profiles/images/juice-wrld-1.jpg',
+    ),
+  ];
   if (index == 0) {
     Navigator.pushReplacement(
       context,
@@ -71,7 +98,7 @@ void navigationRouter(BuildContext context, int index) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const AdminScreen(),
+        builder: (context) => AdminScreen( clients: _clients,),
       ),
     );
   }

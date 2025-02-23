@@ -88,13 +88,9 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AdminScreen(),
-                ),
-              );
+              Navigator.pop(context);
             },
+
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
               foregroundColor: theme.colorScheme.onPrimary,
