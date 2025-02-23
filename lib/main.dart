@@ -80,7 +80,7 @@ class _MyAppState extends State<MyApp> {
               future: _getInitialScreen(),
               builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SplashScreen(); // Or a loading indicator
+                  return const SplashScreen();
                 } else if (snapshot.hasError) {
                   return Scaffold(
                     body: Center(child: Text('Error: ${snapshot.error}')),

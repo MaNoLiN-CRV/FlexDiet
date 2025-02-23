@@ -1,25 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
-import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
-    as provider;
+import 'package:flutter_flexdiet/services/auth/auth_handler.dart';
 
 class LoginForm extends StatefulWidget {
-  final provider.EmailAuth emailAuthService;
-  final AuthService authService;
+  final AuthHandler authHandler;
   final TextEditingController usernameController;
   final TextEditingController passwordController;
-  final Future<void> Function(BuildContext) handleGoogleSignIn;
-  final Future<void> Function(BuildContext) handleEmailSignIn;
+
   const LoginForm({
-    Key? key,
-    required this.emailAuthService,
-    required this.authService,
+    super.key,
+    required this.authHandler,
     required this.usernameController,
     required this.passwordController,
-    required this.handleGoogleSignIn,
-    required this.handleEmailSignIn,
-  }) : super(key: key);
+  });
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -27,6 +20,7 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   bool _isPasswordVisible = false;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -46,15 +40,23 @@ class _LoginFormState extends State<LoginForm> {
           isPassword: true,
         ),
         SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-        ElevatedButton(
-          onPressed: () => widget.handleEmailSignIn(context),
-          style: Theme.of(context).elevatedButtonTheme.style,
-          child: Text(
-            'Comenzar mi viaje saludable',
-            style: Theme.of(context)
-                .textTheme
-                .labelLarge
-                ?.copyWith(color: Colors.white),
+        SizedBox(
+          // Wrap the ElevatedButton with SizedBox
+          width: double.infinity, // Set width to maximum available
+          child: ElevatedButton(
+            onPressed: () {
+              final email = widget.usernameController.text.trim();
+              final password = widget.passwordController.text.trim();
+              widget.authHandler.handleEmailSignIn(email, password);
+            },
+            style: Theme.of(context).elevatedButtonTheme.style,
+            child: Text(
+              'Comenzar mi viaje saludable',
+              style: Theme.of(context)
+                  .textTheme
+                  .labelLarge
+                  ?.copyWith(color: Colors.white),
+            ),
           ),
         ),
       ],

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
-import 'dart:async'; // Import for StreamController
+import 'dart:async';
 
 //* This is a service that manages client authentication.
 class AuthService {
@@ -16,7 +16,7 @@ class AuthService {
   final _signOutController = StreamController<void>.broadcast();
   Stream<void> get signOutStream => _signOutController.stream;
 
-  //We obtain the auth instance. Once obtained we initialize _user
+  //We obtain the auth instance.  This is now PRIVATE
   AuthService._privateConstructor() : _auth = FirebaseAuth.instance {
     userStream = _auth.authStateChanges();
   }
@@ -32,6 +32,11 @@ class AuthService {
 
   provider.GoogleAuth googleAuth() {
     return provider.GoogleAuth(auth: _auth);
+  }
+
+  provider.AppleAuthProvider appleAuth() {
+    return provider.AppleAuthProvider(
+        _auth); // <---- Pass the _auth instance (POSITIONAL ARGUMENT)
   }
 
   // Sign-out method to invalidate the Firebase Auth state

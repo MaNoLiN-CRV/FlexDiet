@@ -6,7 +6,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 class AppleAuthProvider implements provider.AuthProvider {
   final FirebaseAuth _auth;
 
-  AppleAuthProvider(FirebaseAuth auth) : _auth = auth;
+  AppleAuthProvider(this._auth);
 
   @override
   Future<UserCredential?> signIn({String? email, String? password}) async {

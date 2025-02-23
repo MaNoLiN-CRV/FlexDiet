@@ -11,6 +11,7 @@ import 'package:flutter_flexdiet/widgets/auth/social_buttons.dart';
 import 'package:flutter_flexdiet/widgets/auth/action_buttons.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_flexdiet/services/auth/auth_handler.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,6 +25,8 @@ class _LoginScreenState extends State<LoginScreen>
   final AuthService authService = AuthService();
   late final provider.EmailAuth emailAuthService;
   late final provider.GoogleAuth googleAuthService;
+  late final provider.AppleAuthProvider
+      appleAuthService; // Add Apple Auth service
   late final AnimationController _animationController;
   late final Animation<Color?> _backgroundColorAnimation;
   final LocalAuthentication _localAuth = LocalAuthentication();
@@ -36,6 +39,7 @@ class _LoginScreenState extends State<LoginScreen>
     super.initState();
     _setupAnimation();
     _setupAuthServices();
+    _checkBiometricLogin();
   }
 
   @override
@@ -61,23 +65,7 @@ class _LoginScreenState extends State<LoginScreen>
   void _setupAuthServices() {
     emailAuthService = authService.emailAuth();
     googleAuthService = authService.googleAuth();
-  }
-
-  Future<void> _navigateToNextScreen(BuildContext context) async {
-    bool userInfoCompleted = await isUserInfoCompleted();
-
-    if (context.mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LoadingScreen(
-            targetScreen:
-                userInfoCompleted ? const HomeScreen() : const UserInfoScreen(),
-            loadingSeconds: 2,
-          ),
-        ),
-      );
-    }
+    appleAuthService = authService.appleAuth();
   }
 
   Future<bool> isUserInfoCompleted() async {
@@ -85,11 +73,29 @@ class _LoginScreenState extends State<LoginScreen>
     return prefs.getBool('userInfoCompleted') ?? false;
   }
 
+  // Check for stored biometric ID and attempt login
+  Future<void> _checkBiometricLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final biometricUserId = prefs.getString('biometricUserId');
+
+    if (biometricUserId != null) {
+      if (context.mounted) {
+        _handleBiometricAuth(context);
+      }
+    }
+  }
+
   Future<void> _handleBiometricAuth(BuildContext context) async {
     final canAuthenticate = await _localAuth.canCheckBiometrics ||
         await _localAuth.isDeviceSupported();
 
-    if (!canAuthenticate) return;
+    if (!canAuthenticate) {
+      if (context.mounted) {
+        showToast(context, "Biometric authentication is not available",
+            toastType: ToastType.info);
+        return;
+      }
+    }
 
     try {
       final authenticated = await _localAuth.authenticate(
@@ -98,63 +104,56 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (authenticated && context.mounted) {
-        showToast(context, 'Inicio de sesión correcto',
-            toastType: ToastType.success);
-        await _navigateToNextScreen(context);
+        // Get the biometricUserId from SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        final biometricUserId = prefs.getString('biometricUserId');
+
+        if (biometricUserId != null) {
+          // Check if the user still exists in Firebase
+          try {
+            final user = authService.currentUser;
+            if (user != null && user.uid == biometricUserId) {
+              if (context.mounted) {
+                showToast(context, 'Inicio de sesión correcto',
+                    toastType: ToastType.success);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const UserInfoScreen()),
+                );
+              }
+              return;
+            } else {
+              // User is not logged in with those credentials. Clear the stored biometric ID.
+              await prefs.remove('biometricUserId');
+              if (context.mounted) {
+                showToast(context,
+                    'El usuario ha cambiado. Por favor, inicie sesión nuevamente.',
+                    toastType: ToastType.warning);
+              }
+              return;
+            }
+          } catch (e) {
+            // The user may no longer exist in Firebase.
+            await prefs.remove('biometricUserId');
+            if (context.mounted) {
+              showToast(context,
+                  'Error al verificar el usuario. Por favor, inicie sesión nuevamente.',
+                  toastType: ToastType.error);
+            }
+            return;
+          }
+        } else {
+          if (context.mounted) {
+            showToast(context, 'No se ha encontrado ID biométrico guardado.',
+                toastType: ToastType.warning);
+          }
+          return;
+        }
       }
     } on PlatformException {
       if (!context.mounted) return;
       showToast(context, 'Error en la autenticación biométrica',
-          toastType: ToastType.error);
-    }
-  }
-
-  Future<void> _handleEmailSignIn(BuildContext context) async {
-    try {
-      final email = _usernameController.text.trim();
-      final password = _passwordController.text.trim();
-
-      if (email.isEmpty || password.isEmpty) {
-        showToast(context, 'Por favor, introduce email y contraseña',
-            toastType: ToastType.error);
-        return;
-      }
-
-      final userCredential =
-          await emailAuthService.signIn(email: email, password: password);
-
-      if (userCredential?.user != null) {
-        if (context.mounted) {
-          await _navigateToNextScreen(context);
-        }
-      }
-
-      if (!context.mounted) return;
-      showToast(context, 'Inicio de sesión correcto',
-          toastType: ToastType.success);
-    } catch (e) {
-      if (mounted) {
-        showToast(context, 'Error inesperado: $e', toastType: ToastType.error);
-      }
-    }
-  }
-
-  Future<void> _handleGoogleSignIn(BuildContext context) async {
-    try {
-      final userCredential = await googleAuthService.signIn();
-      final user = userCredential?.user;
-      if (user != null) {
-        if (context.mounted) {
-          await _navigateToNextScreen(context);
-        }
-      }
-      if (!context.mounted) return;
-
-      showToast(context, 'Inicio de sesión correcto',
-          toastType: ToastType.success);
-    } catch (e) {
-      if (!context.mounted) return;
-      showToast(context, 'Error al iniciar sesión con Google',
           toastType: ToastType.error);
     }
   }
@@ -164,6 +163,13 @@ class _LoginScreenState extends State<LoginScreen>
     final theme = Theme.of(context);
     final screenSize = MediaQuery.of(context).size;
     final horizontalPadding = screenSize.width * 0.05;
+    final authHandler = AuthHandler(
+      emailAuthService: emailAuthService,
+      googleAuthService: googleAuthService,
+      appleAuthService: appleAuthService,
+      authService: authService,
+      context: context,
+    );
 
     return Scaffold(
       body: AnimatedBuilder(
@@ -212,12 +218,9 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                           SizedBox(height: screenSize.height * 0.04),
                           LoginForm(
-                            emailAuthService: emailAuthService,
-                            authService: authService,
+                            authHandler: authHandler,
                             usernameController: _usernameController,
                             passwordController: _passwordController,
-                            handleGoogleSignIn: _handleGoogleSignIn,
-                            handleEmailSignIn: _handleEmailSignIn,
                           ),
                           ActionButtons(),
                           Padding(
@@ -238,8 +241,8 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                           ),
                           SocialLoginButtons(
+                            authHandler: authHandler,
                             googleAuthService: googleAuthService,
-                            handleGoogleSignIn: _handleGoogleSignIn,
                           ),
                           IconButton(
                             icon: Icon(Icons.fingerprint,
