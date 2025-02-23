@@ -45,6 +45,8 @@ class AuthService {
     }
   }
 
+  User? get currentUser => _auth.currentUser; // Add the currentUser getter.
+
   void dispose() {
     _signOutController.close();
   }

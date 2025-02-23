@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
@@ -7,10 +6,11 @@ import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
+import 'package:flutter_flexdiet/widgets/auth/login_form.dart';
+import 'package:flutter_flexdiet/widgets/auth/social_buttons.dart';
+import 'package:flutter_flexdiet/widgets/auth/action_buttons.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_flexdiet/exceptions/invalid_credentials_exception.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,22 +21,29 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with TickerProviderStateMixin {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
-  final LocalAuthentication _localAuth = LocalAuthentication();
   final AuthService authService = AuthService();
-
-  late final AnimationController _animationController;
-  late final Animation<Color?> _backgroundColorAnimation;
   late final provider.EmailAuth emailAuthService;
   late final provider.GoogleAuth googleAuthService;
+  late final AnimationController _animationController;
+  late final Animation<Color?> _backgroundColorAnimation;
+  final LocalAuthentication _localAuth = LocalAuthentication();
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _setupAnimation();
     _setupAuthServices();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   void _setupAnimation() {
@@ -57,10 +64,8 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> _navigateToNextScreen(BuildContext context) async {
-    // Check if user info is completed
-    bool userInfoCompleted = await _isUserInfoCompleted();
+    bool userInfoCompleted = await isUserInfoCompleted();
 
-    // Navigate to the appropriate screen
     if (context.mounted) {
       Navigator.pushReplacement(
         context,
@@ -75,72 +80,9 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  Future<bool> _isUserInfoCompleted() async {
-    // Use SharedPreferences to check if user info is completed
-    // Adjust the key based on your implementation
+  Future<bool> isUserInfoCompleted() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('userInfoCompleted') ?? false;
-  }
-
-  Future<void> _handleGoogleSignIn(BuildContext context) async {
-    try {
-      await googleAuthService.signIn();
-      if (FirebaseAuth.instance.currentUser != null) {
-        // Successful sign-in, navigate to the next screen
-        await _navigateToNextScreen(context);
-      }
-      if (!context.mounted) return;
-
-      showToast(context, 'Inicio de sesión correcto',
-          toastType: ToastType.success);
-    } catch (e) {
-      if (!context.mounted) return;
-      showToast(context, 'Error al iniciar sesión con Google',
-          toastType: ToastType.error);
-    }
-  }
-
-  Future<void> _handleEmailSignIn(BuildContext context) async {
-    try {
-      final email = _usernameController.text.trim();
-      final password = _passwordController.text.trim();
-
-      if (email.isEmpty || password.isEmpty) {
-        showToast(context, 'Por favor, introduce email y contraseña',
-            toastType: ToastType.error);
-        return;
-      }
-
-      await emailAuthService.signIn(email: email, password: password);
-
-      if (FirebaseAuth.instance.currentUser != null) {
-        // Successful sign-in, navigate to the next screen
-        await _navigateToNextScreen(context);
-      }
-
-      if (!context.mounted) return;
-      showToast(context, 'Inicio de sesión correcto',
-          toastType: ToastType.success);
-    } on FirebaseAuthException catch (e) {
-      if (e is InvalidCredentialsException) {
-        if (mounted) {
-          // Check if the widget is still mounted
-          showToast(context, 'Credenciales inválidas',
-              toastType: ToastType.error);
-        }
-      } else {
-        if (mounted) {
-          // Check if the widget is still mounted
-          showToast(context, 'Error al iniciar sesión: ${e.message}',
-              toastType: ToastType.error);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        // Check if the widget is still mounted
-        showToast(context, 'Error inesperado: $e', toastType: ToastType.error);
-      }
-    }
   }
 
   Future<void> _handleBiometricAuth(BuildContext context) async {
@@ -158,10 +100,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (authenticated && context.mounted) {
         showToast(context, 'Inicio de sesión correcto',
             toastType: ToastType.success);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const UserInfoScreen()),
-        );
+        await _navigateToNextScreen(context);
       }
     } on PlatformException {
       if (!context.mounted) return;
@@ -170,126 +109,54 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  Widget _buildInputField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    bool isPassword = false,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black,
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: CustomInputText(
-        controller: controller,
-        obscureText: isPassword ? !_isPasswordVisible : false,
-        keyboardType: !isPassword ? TextInputType.emailAddress : null,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
-          border: InputBorder.none,
-          prefixIcon: Icon(icon),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(_isPasswordVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off),
-                  onPressed: () =>
-                      setState(() => _isPasswordVisible = !_isPasswordVisible),
-                )
-              : null,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        ),
-      ),
-    );
+  Future<void> _handleEmailSignIn(BuildContext context) async {
+    try {
+      final email = _usernameController.text.trim();
+      final password = _passwordController.text.trim();
+
+      if (email.isEmpty || password.isEmpty) {
+        showToast(context, 'Por favor, introduce email y contraseña',
+            toastType: ToastType.error);
+        return;
+      }
+
+      final userCredential =
+          await emailAuthService.signIn(email: email, password: password);
+
+      if (userCredential?.user != null) {
+        if (context.mounted) {
+          await _navigateToNextScreen(context);
+        }
+      }
+
+      if (!context.mounted) return;
+      showToast(context, 'Inicio de sesión correcto',
+          toastType: ToastType.success);
+    } catch (e) {
+      if (mounted) {
+        showToast(context, 'Error inesperado: $e', toastType: ToastType.error);
+      }
+    }
   }
 
-  Widget _buildActionButtons(ThemeData theme) {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 8,
-      children: [
-        TextButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const ForgotPasswordScreen()),
-          ),
-          child: Text(
-            '¿Olvidaste tu contraseña?',
-            style: theme.textTheme.bodyLarge?.copyWith(color: textDarkBlue),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        TextButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const RegisterScreen()),
-          ),
-          child: Text(
-            'Únete ahora',
-            style: theme.textTheme.bodyLarge?.copyWith(color: textDarkBlue),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
-    );
-  }
+  Future<void> _handleGoogleSignIn(BuildContext context) async {
+    try {
+      final userCredential = await googleAuthService.signIn();
+      final user = userCredential?.user;
+      if (user != null) {
+        if (context.mounted) {
+          await _navigateToNextScreen(context);
+        }
+      }
+      if (!context.mounted) return;
 
-  Widget _buildSocialButtons(ThemeData theme, double screenWidth) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final googleButtonColor =
-        isDarkMode ? backgroundColorDarkBlue : backgroundColorWhite;
-    final appleButtonColor =
-        isDarkMode ? backgroundColorDarkBlue : backgroundColorWhite;
-    final appleIconColor = isDarkMode ? Colors.white : Colors.black;
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: GoogleAuthButton(
-              onPressed: () => _handleGoogleSignIn(context),
-              text: "Iniciar con Google",
-              style: AuthButtonStyle(
-                buttonColor: googleButtonColor,
-                textStyle: theme.textTheme.bodyLarge,
-                iconSize: 20,
-                width: double.infinity,
-                height: 45,
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: AppleAuthButton(
-              text: "Iniciar con Apple",
-              onPressed: () {},
-              style: AuthButtonStyle(
-                buttonColor: appleButtonColor,
-                iconColor: appleIconColor,
-                textStyle: theme.textTheme.bodyLarge,
-                iconSize: 20,
-                width: double.infinity,
-                height: 45,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+      showToast(context, 'Inicio de sesión correcto',
+          toastType: ToastType.success);
+    } catch (e) {
+      if (!context.mounted) return;
+      showToast(context, 'Error al iniciar sesión con Google',
+          toastType: ToastType.error);
+    }
   }
 
   @override
@@ -315,13 +182,11 @@ class _LoginScreenState extends State<LoginScreen>
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: horizontalPadding,
-                    ),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: horizontalPadding),
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -335,43 +200,26 @@ class _LoginScreenState extends State<LoginScreen>
                             child: Text(
                               'FlexDiet',
                               textAlign: TextAlign.center,
-                              style: theme.textTheme.displaySmall?.copyWith(
-                                color: textDarkBlue,
-                              ),
+                              style: theme.textTheme.displaySmall
+                                  ?.copyWith(color: textDarkBlue),
                             ),
                           ),
                           Text(
                             'Tu camino hacia una vida saludable',
                             textAlign: TextAlign.center,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: textDarkBlue,
-                            ),
+                            style: theme.textTheme.titleMedium
+                                ?.copyWith(color: textDarkBlue),
                           ),
                           SizedBox(height: screenSize.height * 0.04),
-                          _buildInputField(
-                            controller: _usernameController,
-                            label: 'Correo electrónico',
-                            icon: Icons.email_rounded,
+                          LoginForm(
+                            emailAuthService: emailAuthService,
+                            authService: authService,
+                            usernameController: _usernameController,
+                            passwordController: _passwordController,
+                            handleGoogleSignIn: _handleGoogleSignIn,
+                            handleEmailSignIn: _handleEmailSignIn,
                           ),
-                          SizedBox(height: screenSize.height * 0.02),
-                          _buildInputField(
-                            controller: _passwordController,
-                            label: 'Contraseña',
-                            icon: Icons.lock_outline,
-                            isPassword: true,
-                          ),
-                          SizedBox(height: screenSize.height * 0.02),
-                          ElevatedButton(
-                            onPressed: () =>
-                                _handleEmailSignIn(context), // Email Sign In
-                            style: theme.elevatedButtonTheme.style,
-                            child: Text(
-                              'Comenzar mi viaje saludable',
-                              style: theme.textTheme.labelLarge
-                                  ?.copyWith(color: Colors.white),
-                            ),
-                          ),
-                          _buildActionButtons(theme),
+                          ActionButtons(),
                           Padding(
                             padding: EdgeInsets.symmetric(
                                 vertical: screenSize.height * 0.02),
@@ -389,7 +237,10 @@ class _LoginScreenState extends State<LoginScreen>
                               ],
                             ),
                           ),
-                          _buildSocialButtons(theme, screenSize.width),
+                          SocialLoginButtons(
+                            googleAuthService: googleAuthService,
+                            handleGoogleSignIn: _handleGoogleSignIn,
+                          ),
                           IconButton(
                             icon: Icon(Icons.fingerprint,
                                 size: 40, color: textDarkBlue),
@@ -406,13 +257,5 @@ class _LoginScreenState extends State<LoginScreen>
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }

@@ -28,8 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen>
   final GlobalKey<FormState> myFormKey = GlobalKey<FormState>();
 
   final AuthService authService = AuthService();
-  late provider.EmailAuth emailAuthService =
-      authService.emailAuth() as provider.EmailAuth;
+  late provider.EmailAuth emailAuthService = authService.emailAuth();
 
   @override
   void initState() {
