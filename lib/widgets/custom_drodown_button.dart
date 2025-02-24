@@ -22,8 +22,9 @@ class CustomDropdownButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final initialValue = list.isNotEmpty ? list[0] : null;
+    final selectedValue = list.contains(value) ? value : initialValue;
     return DropdownButton<dynamic>(
-      value: value ?? initialValue,
+      value: selectedValue,
       icon: icon ?? const Icon(Icons.arrow_downward),
       elevation: elevation ?? 16,
       style: textStyle ?? theme.textTheme.labelLarge,

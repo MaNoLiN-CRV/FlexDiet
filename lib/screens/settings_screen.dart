@@ -62,9 +62,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _CardLogic(
                         text: 'Tamaño de la fuente:',
                         list: ['Pequeña', 'Mediana', 'Grande'],
-                        value: themeProvider.currentFontSize,
+                        value: themeProvider.currentThemeName,
                         onChange: (value) {
-                          themeProvider.setFontSize(value);
+                          themeProvider.setTheme(value);
                         },
                         themeProvider: themeProvider,
                         theme: theme,
