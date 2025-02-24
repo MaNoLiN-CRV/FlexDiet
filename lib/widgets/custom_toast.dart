@@ -9,21 +9,6 @@ enum ToastType {
 }
 
 /// Displays a custom toast message.
-///
-/// This function creates and displays a toast with a customizable appearance,
-/// including an icon, message, background color, and duration. It leverages
-/// `FToast` for more control over toast presentation.  Uses theme colors.
-///
-/// Example 1:
-///
-/// ```dart
-/// ShowToast(context, "Operation successful!", toastType: ToastType.success);
-/// ```
-/// Example 2:
-///
-/// ```dart
-/// ShowToast(context, "An error occurred.", toastType: ToastType.error);
-/// ```
 void showToast(BuildContext context, String mensaje,
     {ToastType toastType = ToastType.info}) {
   FToast fToast = FToast();
@@ -53,6 +38,22 @@ void showToast(BuildContext context, String mensaje,
       break;
   }
 
+  /// Displays a custom toast message.
+  ///
+  /// This function creates and displays a toast with a customizable appearance,
+  /// including an icon, message, background color, and duration. It leverages
+  /// `FToast` for more control over toast presentation.  Uses theme colors.
+  ///
+  /// Example 1:
+  ///
+  /// ```dart
+  /// ShowToast(context, "Operation successful!", toastType: ToastType.success);
+  /// ```
+  /// Example 2:
+  ///
+  /// ```dart
+  /// ShowToast(context, "An error occurred.", toastType: ToastType.error);
+  /// ```
   fToast.showToast(
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -72,10 +73,12 @@ void showToast(BuildContext context, String mensaje,
         children: [
           Icon(icon, color: theme.colorScheme.onPrimary, size: 20),
           const SizedBox(width: 8),
-          Text(
-            mensaje,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(color: theme.colorScheme.onPrimary),
+          Flexible(
+            child: Text(
+              mensaje,
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: theme.colorScheme.onPrimary),
+            ),
           ),
         ],
       ),
