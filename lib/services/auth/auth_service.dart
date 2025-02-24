@@ -16,7 +16,6 @@ class AuthService {
   final _signOutController = StreamController<void>.broadcast();
   Stream<void> get signOutStream => _signOutController.stream;
 
-  //We obtain the auth instance.  This is now PRIVATE
   AuthService._privateConstructor() : _auth = FirebaseAuth.instance {
     userStream = _auth.authStateChanges();
   }
@@ -25,7 +24,6 @@ class AuthService {
     return instance;
   }
 
-  // It takes part of Strategy Pattern
   provider.EmailAuth emailAuth() {
     return provider.EmailAuth(auth: _auth);
   }
@@ -35,22 +33,19 @@ class AuthService {
   }
 
   provider.AppleAuthProvider appleAuth() {
-    return provider.AppleAuthProvider(
-        _auth); // <---- Pass the _auth instance (POSITIONAL ARGUMENT)
+    return provider.AppleAuthProvider(_auth);
   }
 
-  // Sign-out method to invalidate the Firebase Auth state
   Future<void> signOut() async {
     try {
       await _auth.signOut();
-      _signOutController.add(null); // Notify listeners of sign-out
+      _signOutController.add(null);
     } catch (e) {
-      print("Error signing out: $e");
-      rethrow; // Re-throw the exception for the UI to handle
+      rethrow;
     }
   }
 
-  User? get currentUser => _auth.currentUser; // Add the currentUser getter.
+  User? get currentUser => _auth.currentUser;
 
   void dispose() {
     _signOutController.close();

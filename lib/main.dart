@@ -9,12 +9,28 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
+import 'package:flutter/foundation.dart';
+
+// Declare shared preferences globally
+late SharedPreferences prefs;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  try {
+    // Initialize Firebase and SharedPreferences
+
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+    prefs = await SharedPreferences.getInstance();
+    if (kDebugMode) {
+      print('SharedPreferences initialized in main()');
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error during initialization: $e');
+    }
+  }
 
   Intl.defaultLocale = 'es';
 
@@ -29,11 +45,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  AuthService authService = AuthService(); // Get the AuthService instance
+  AuthService authService = AuthService();
 
   Future<bool> _hasCompletedUserInfo() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
       return prefs.getBool('userInfoCompleted') ?? false;
     } catch (e) {
       return false;
@@ -43,6 +58,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
     // Listen for sign-out events
     authService.signOutStream.listen((_) {
       // Navigate to the LoginScreen when a sign-out occurs
@@ -82,9 +98,14 @@ class _MyAppState extends State<MyApp> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const SplashScreen();
                 } else if (snapshot.hasError) {
+                  // Provide a friendly error message or fallback UI
                   return Scaffold(
-                    body: Center(child: Text('Error: ${snapshot.error}')),
+                    body: Center(
+                      child: Text('Error: ${snapshot.error}'),
+                    ),
                   );
+                } else if (!snapshot.hasData) {
+                  return const SplashScreen(); // Handle the case of no data
                 } else {
                   return snapshot.data!;
                 }
@@ -100,12 +121,16 @@ class _MyAppState extends State<MyApp> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // Add a delay before navigating when user is already logged in
+      // Add a delay before navigating when the user is already logged in
       await Future.delayed(const Duration(seconds: 2));
+
+      // Check if user information is completed
       final hasCompletedInfo = await _hasCompletedUserInfo();
-      return hasCompletedInfo ? const HomeScreen() : const UserInfoScreen();
+      return hasCompletedInfo
+          ? const HomeScreen()
+          : const UserInfoScreen(); // Navigate to the appropriate screen
     } else {
-      return const LoginScreen();
+      return const LoginScreen(); // Show login screen if user is not logged in
     }
   }
 }

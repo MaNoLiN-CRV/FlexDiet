@@ -3,14 +3,15 @@ import 'package:auth_buttons/auth_buttons.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
 import 'package:flutter_flexdiet/theme/theme.dart';
-import 'package:flutter_flexdiet/services/auth/auth_handler.dart';
 
 class SocialLoginButtons extends StatelessWidget {
   final provider.GoogleAuth googleAuthService;
-  final AuthHandler authHandler;
+  final Future<void> Function(BuildContext) handleGoogleSignIn;
 
   const SocialLoginButtons(
-      {super.key, required this.googleAuthService, required this.authHandler});
+      {super.key,
+      required this.googleAuthService,
+      required this.handleGoogleSignIn});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class SocialLoginButtons extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: GoogleAuthButton(
-              onPressed: () => authHandler.handleGoogleSignIn(),
+              onPressed: () => handleGoogleSignIn(context),
               text: "Iniciar con Google",
               style: AuthButtonStyle(
                 buttonColor: googleButtonColor,
@@ -47,8 +48,9 @@ class SocialLoginButtons extends StatelessWidget {
             width: double.infinity,
             child: AppleAuthButton(
               text: "Iniciar con Apple",
-              onPressed: () => authHandler
-                  .handleAppleSignIn(), // Call the Apple Sign-In method
+              onPressed: () {
+                print("Apple Sign-in pressed");
+              },
               style: AuthButtonStyle(
                 buttonColor: appleButtonColor,
                 iconColor: appleIconColor,

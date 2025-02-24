@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
@@ -10,7 +9,6 @@ import 'package:flutter_flexdiet/widgets/auth/login_form.dart';
 import 'package:flutter_flexdiet/widgets/auth/social_buttons.dart';
 import 'package:flutter_flexdiet/widgets/auth/action_buttons.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flexdiet/services/auth/auth_handler.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,8 +23,7 @@ class _LoginScreenState extends State<LoginScreen>
   final AuthService authService = AuthService();
   late final provider.EmailAuth emailAuthService;
   late final provider.GoogleAuth googleAuthService;
-  late final provider.AppleAuthProvider
-      appleAuthService; // Add Apple Auth service
+  late final provider.AppleAuthProvider appleAuthService;
   late final AnimationController _animationController;
   late final Animation<Color?> _backgroundColorAnimation;
   final LocalAuthentication _localAuth = LocalAuthentication();
@@ -34,12 +31,21 @@ class _LoginScreenState extends State<LoginScreen>
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  late final AuthHandler authHandler; // Declare AuthHandler
+
   @override
   void initState() {
     super.initState();
     _setupAnimation();
     _setupAuthServices();
-    _checkBiometricLogin();
+    authHandler = AuthHandler(
+      // Initialize AuthHandler
+      emailAuthService: emailAuthService,
+      googleAuthService: googleAuthService,
+      appleAuthService: appleAuthService,
+      authService: authService,
+      context: context,
+    );
   }
 
   @override
@@ -68,34 +74,21 @@ class _LoginScreenState extends State<LoginScreen>
     appleAuthService = authService.appleAuth();
   }
 
-  Future<bool> isUserInfoCompleted() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('userInfoCompleted') ?? false;
+  Future<void> _handleGoogleSignIn(BuildContext context) async {
+    await authHandler.handleGoogleSignIn();
   }
 
-  // Check for stored biometric ID and attempt login
-  Future<void> _checkBiometricLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final biometricUserId = prefs.getString('biometricUserId');
-
-    if (biometricUserId != null) {
-      if (context.mounted) {
-        _handleBiometricAuth(context);
-      }
-    }
+  Future<void> _handleEmailSignIn(BuildContext context) async {
+    final email = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+    await authHandler.handleEmailSignIn(email, password);
   }
 
   Future<void> _handleBiometricAuth(BuildContext context) async {
     final canAuthenticate = await _localAuth.canCheckBiometrics ||
         await _localAuth.isDeviceSupported();
 
-    if (!canAuthenticate) {
-      if (context.mounted) {
-        showToast(context, "Biometric authentication is not available",
-            toastType: ToastType.info);
-        return;
-      }
-    }
+    if (!canAuthenticate) return;
 
     try {
       final authenticated = await _localAuth.authenticate(
@@ -104,52 +97,9 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (authenticated && context.mounted) {
-        // Get the biometricUserId from SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        final biometricUserId = prefs.getString('biometricUserId');
-
-        if (biometricUserId != null) {
-          // Check if the user still exists in Firebase
-          try {
-            final user = authService.currentUser;
-            if (user != null && user.uid == biometricUserId) {
-              if (context.mounted) {
-                showToast(context, 'Inicio de sesión correcto',
-                    toastType: ToastType.success);
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const UserInfoScreen()),
-                );
-              }
-              return;
-            } else {
-              // User is not logged in with those credentials. Clear the stored biometric ID.
-              await prefs.remove('biometricUserId');
-              if (context.mounted) {
-                showToast(context,
-                    'El usuario ha cambiado. Por favor, inicie sesión nuevamente.',
-                    toastType: ToastType.warning);
-              }
-              return;
-            }
-          } catch (e) {
-            // The user may no longer exist in Firebase.
-            await prefs.remove('biometricUserId');
-            if (context.mounted) {
-              showToast(context,
-                  'Error al verificar el usuario. Por favor, inicie sesión nuevamente.',
-                  toastType: ToastType.error);
-            }
-            return;
-          }
-        } else {
-          if (context.mounted) {
-            showToast(context, 'No se ha encontrado ID biométrico guardado.',
-                toastType: ToastType.warning);
-          }
-          return;
-        }
+        showToast(context, 'Inicio de sesión correcto',
+            toastType: ToastType.success);
+        await authHandler.navigateToNextScreen();
       }
     } on PlatformException {
       if (!context.mounted) return;
@@ -163,13 +113,6 @@ class _LoginScreenState extends State<LoginScreen>
     final theme = Theme.of(context);
     final screenSize = MediaQuery.of(context).size;
     final horizontalPadding = screenSize.width * 0.05;
-    final authHandler = AuthHandler(
-      emailAuthService: emailAuthService,
-      googleAuthService: googleAuthService,
-      appleAuthService: appleAuthService,
-      authService: authService,
-      context: context,
-    );
 
     return Scaffold(
       body: AnimatedBuilder(
@@ -218,9 +161,12 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                           SizedBox(height: screenSize.height * 0.04),
                           LoginForm(
-                            authHandler: authHandler,
                             usernameController: _usernameController,
                             passwordController: _passwordController,
+                            emailAuthService: emailAuthService,
+                            authService: authService,
+                            handleGoogleSignIn: _handleGoogleSignIn,
+                            handleEmailSignIn: _handleEmailSignIn,
                           ),
                           ActionButtons(),
                           Padding(
@@ -241,8 +187,8 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                           ),
                           SocialLoginButtons(
-                            authHandler: authHandler,
                             googleAuthService: googleAuthService,
+                            handleGoogleSignIn: _handleGoogleSignIn,
                           ),
                           IconButton(
                             icon: Icon(Icons.fingerprint,

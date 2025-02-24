@@ -18,7 +18,6 @@ class EmailAuth implements provider.AuthProvider {
 
   @override
   Future<void> singOut() {
-    // TODO: implement singOut
     throw UnimplementedError();
   }
 

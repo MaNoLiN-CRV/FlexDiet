@@ -1,23 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/main.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
-// Top-level function for compute
-Future<bool> storeBiometricId(String uid) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('biometricUserId', uid);
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
+// Constants
+const String biometricUserIdKey = 'biometricUserId';
+const String biometricAuthenticationReason = 'Autentícate para iniciar sesión';
+const String userInfoCompletedKey = 'userInfoCompleted';
 
 class AuthHandler {
   final provider.EmailAuth emailAuthService;
@@ -25,6 +20,8 @@ class AuthHandler {
   final provider.AppleAuthProvider appleAuthService;
   final AuthService authService;
   final BuildContext context;
+  final encrypt.Key key = encrypt.Key.fromLength(32);
+  final encrypt.IV iv = encrypt.IV.fromLength(16);
 
   AuthHandler({
     required this.emailAuthService,
@@ -52,32 +49,35 @@ class AuthHandler {
   }
 
   Future<bool> isUserInfoCompleted() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('userInfoCompleted') ?? false;
+    return prefs.getBool(userInfoCompletedKey) ?? false;
   }
 
   Future<void> handleEmailSignIn(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
-      showToast(context, 'Por favor, introduce email y contraseña',
+      _showToast(context, 'Por favor, introduce email y contraseña',
           toastType: ToastType.error);
       return;
     }
 
-    final userCredential =
-        await emailAuthService.signIn(email: email, password: password);
+    try {
+      final userCredential =
+          await emailAuthService.signIn(email: email, password: password);
 
-    if (userCredential?.user != null) {
-      if (context.mounted) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          promptForBiometricAssociation(
-              userCredential!.user!.uid, userCredential.user!.email ?? "user");
-        });
-        navigateToNextScreen();
-      }
-      if (context.mounted) {
-        showToast(context, 'Inicio de sesión correcto',
+      if (userCredential?.user != null) {
+        if (context.mounted) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            promptForBiometricAssociation(userCredential!.user!.uid,
+                userCredential.user!.email ?? "user");
+          });
+          navigateToNextScreen();
+        }
+
+        _showToast(context, 'Inicio de sesión correcto',
             toastType: ToastType.success);
       }
+    } catch (e) {
+      _showToast(context, 'Error al iniciar sesión: $e',
+          toastType: ToastType.error);
     }
   }
 
@@ -90,16 +90,14 @@ class AuthHandler {
         if (context.mounted) {
           promptForBiometricAssociation(user.uid, user.email ?? "user");
           navigateToNextScreen();
-
-          showToast(context, 'Inicio de sesión correcto',
-              toastType: ToastType.success);
         }
+
+        _showToast(context, 'Inicio de sesión correcto',
+            toastType: ToastType.success);
       }
     } catch (e) {
-      if (context.mounted) {
-        showToast(context, 'Error al iniciar sesión con Google',
-            toastType: ToastType.error);
-      }
+      _showToast(context, 'Error al iniciar sesión con Google: $e',
+          toastType: ToastType.error);
     }
   }
 
@@ -113,16 +111,13 @@ class AuthHandler {
           promptForBiometricAssociation(user.uid, user.email ?? "user");
           navigateToNextScreen();
         }
-        if (context.mounted) {
-          showToast(context, 'Inicio de sesión correcto con Apple',
-              toastType: ToastType.success);
-        }
+
+        _showToast(context, 'Inicio de sesión correcto con Apple',
+            toastType: ToastType.success);
       }
     } catch (e) {
-      if (context.mounted) {
-        showToast(context, 'Error al iniciar sesión con Apple',
-            toastType: ToastType.error);
-      }
+      _showToast(context, 'Error al iniciar sesión con Apple: $e',
+          toastType: ToastType.error);
     }
   }
 
@@ -131,8 +126,19 @@ class AuthHandler {
   Future<void> promptForBiometricAssociation(String uid, String user) async {
     if (!context.mounted) return;
 
+    // Capture a valid parent context
+    final parentContext = context;
+
+    final LocalAuthentication auth = LocalAuthentication();
+    final isAvailable = await auth.canCheckBiometrics;
+    if (!isAvailable) {
+      _showToast(context, 'Biometrics not available on this device',
+          toastType: ToastType.warning);
+      return;
+    }
+
     showDialog(
-      context: context,
+      context: parentContext, // Use the captured parentContext
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         return PopScope(
@@ -157,20 +163,20 @@ class AuthHandler {
                     Navigator.of(dialogContext).pop();
                   }
 
-                  // 🔹 Autenticación biométrica antes de almacenar el ID
                   bool didAuthenticate = await auth.authenticate(
                     localizedReason:
                         'Por favor, autentícate con tu huella digital',
                     options: const AuthenticationOptions(
-                      biometricOnly: true, // Solo huella digital o Face ID
+                      biometricOnly: true,
                     ),
                   );
 
                   if (didAuthenticate) {
-                    // 🔹 Mostrar carga mientras se almacena la huella
-                    if (context.mounted) {
+                    // Show loading indicator
+                    if (parentContext.mounted) {
                       showDialog(
-                        context: context,
+                        context:
+                            parentContext, // Use the captured parentContext
                         barrierDismissible: false,
                         builder: (BuildContext loadingContext) {
                           return PopScope(
@@ -184,27 +190,56 @@ class AuthHandler {
                     }
 
                     try {
-                      final success = await compute(storeBiometricId, uid);
+                      // Call the static method using compute
+                      final encryptedId = await compute(
+                        AuthHandler._encryptBiometricIdInIsolate,
+                        {
+                          'uid': uid,
+                          'keyBase64': key.base64, // Pass key as base64
+                          'ivBase64': iv.base64, // Pass IV as base64
+                        },
+                      );
 
-                      if (context.mounted && Navigator.of(context).canPop()) {
-                        Navigator.of(context).pop();
-                        showToast(
-                          context,
-                          success
+                      if (parentContext.mounted) {
+                        // Dismiss loading dialog
+                        Navigator.of(parentContext).pop();
+                      }
+
+                      // Store the encrypted ID in Shared Preferences (on the main isolate)
+                      if (encryptedId != null) {
+                        await prefs.setString(biometricUserIdKey, encryptedId);
+                        await prefs.setString(
+                            '${uid}_email', user); // Add this line
+                        if (kDebugMode) {
+                          print(
+                              'Biometric ID stored successfully in shared preferences with key: $biometricUserIdKey');
+                          print(
+                              'Email stored with key: ${'${uid}_email'} and value: $user'); // Log the stored email
+                        }
+                      } else {
+                        print("Encryption failed, not storing biometric ID");
+                      }
+
+                      // Show success or error message
+                      if (parentContext.mounted) {
+                        _showToast(
+                          parentContext,
+                          encryptedId != null
                               ? 'Huella digital asociada a la cuenta $user'
                               : 'Error al asociar la huella digital',
-                          toastType:
-                              success ? ToastType.success : ToastType.error,
+                          toastType: encryptedId != null
+                              ? ToastType.success
+                              : ToastType.error,
                         );
                       }
                     } catch (e) {
-                      if (context.mounted && Navigator.of(context).canPop()) {
-                        Navigator.of(context).pop();
+                      // Dismiss loading dialog
+                      if (parentContext.mounted) {
+                        Navigator.of(parentContext).pop();
                       }
-
                       if (context.mounted) {
-                        showToast(
-                          context,
+                        _showToast(
+                          parentContext,
                           'Error al asociar la huella digital: $e',
                           toastType: ToastType.error,
                         );
@@ -212,8 +247,8 @@ class AuthHandler {
                     }
                   } else {
                     if (context.mounted) {
-                      showToast(
-                        context,
+                      _showToast(
+                        parentContext,
                         'Autenticación biométrica cancelada',
                         toastType: ToastType.warning,
                       );
@@ -226,5 +261,71 @@ class AuthHandler {
         );
       },
     );
+  }
+
+  // Static method to encrypt the biometric ID within the isolate
+  static Future<String?> _encryptBiometricIdInIsolate(
+      Map<String, dynamic> params) async {
+    try {
+      // Retrieve parameters
+      final String uid = params['uid'] as String;
+      final String keyBase64 = params['keyBase64'] as String;
+      final String ivBase64 = params['ivBase64'] as String;
+
+      // Recreate key and IV from base64
+      final encrypt.Key key = encrypt.Key.fromBase64(keyBase64);
+      final encrypt.IV iv = encrypt.IV.fromBase64(ivBase64);
+
+      // Encryption
+      final encrypter =
+          encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
+      final encrypted = encrypter.encrypt(uid, iv: iv);
+      final encryptedBase64 = encrypted.base64;
+
+      if (kDebugMode) {
+        print('Encrypted biometric ID: $encryptedBase64');
+      }
+
+      return encryptedBase64;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Failed to encrypt biometric ID: $e');
+      }
+      return null;
+    }
+  }
+
+  Future<String?> getAssociatedUserId() async {
+    // 1. Retrieve the encrypted user ID from SharedPreferences
+    final encryptedUserId = prefs.getString(biometricUserIdKey);
+
+    if (encryptedUserId == null) {
+      return null; // No biometric ID stored
+    }
+
+    try {
+      // 2. Decrypt the user ID
+      final decryptedUid = decryptUserId(encryptedUserId);
+      return decryptedUid;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Failed to decrypt biometric ID: $e');
+      }
+      return null; // Decryption failed
+    }
+  }
+
+  String decryptUserId(String encryptedUserId) {
+    final encrypter =
+        encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
+    final encrypted = encrypt.Encrypted.fromBase64(encryptedUserId);
+    return encrypter.decrypt(encrypted, iv: iv);
+  }
+
+  void _showToast(BuildContext context, String message,
+      {ToastType toastType = ToastType.info}) {
+    if (context.mounted) {
+      showToast(context, message, toastType: toastType);
+    }
   }
 }
