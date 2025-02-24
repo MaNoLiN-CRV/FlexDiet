@@ -6,7 +6,7 @@ import 'package:flutter_flexdiet/theme/theme.dart';
 
 class SocialLoginButtons extends StatelessWidget {
   final provider.GoogleAuth googleAuthService;
-  final Future<void> Function(BuildContext) handleGoogleSignIn;
+  final Function(BuildContext) handleGoogleSignIn;
 
   const SocialLoginButtons(
       {super.key,
@@ -48,9 +48,7 @@ class SocialLoginButtons extends StatelessWidget {
             width: double.infinity,
             child: AppleAuthButton(
               text: "Iniciar con Apple",
-              onPressed: () {
-                print("Apple Sign-in pressed");
-              },
+              onPressed: () {},
               style: AuthButtonStyle(
                 buttonColor: appleButtonColor,
                 iconColor: appleIconColor,
