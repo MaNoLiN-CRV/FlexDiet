@@ -348,11 +348,10 @@ BoxDecoration _buildDecorationContainer(ThemeData theme) {
   );
 }
 
-InputDecoration _buildDecoration(
-    ThemeData theme, String labelText, IconData icon,
+InputDecoration _buildDecoration(ThemeData theme, String label, IconData icon,
     [IconButton? suffix]) {
   return InputDecoration(
-    labelText: labelText,
+    hintText: label,
     labelStyle: theme.inputDecorationTheme.labelStyle,
     border: InputBorder.none,
     prefixIcon: Icon(

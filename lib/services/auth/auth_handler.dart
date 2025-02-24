@@ -54,7 +54,8 @@ class AuthHandler {
   }
 
   Future<bool> isUserInfoCompleted() async {
-    return prefs.getBool(userInfoCompletedKey) ?? false;
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('userInfoCompleted') ?? false;
   }
 
   Future<void> handleEmailSignIn(String email, String password) async {
@@ -74,7 +75,7 @@ class AuthHandler {
             promptForBiometricAssociation(userCredential!.user!.uid,
                 userCredential.user!.email ?? "user");
           });
-          navigateToNextScreen();
+          await navigateToNextScreen();
         }
 
         _showToast(context, 'Inicio de sesión correcto',
@@ -94,7 +95,7 @@ class AuthHandler {
       if (user != null) {
         if (context.mounted) {
           promptForBiometricAssociation(user.uid, user.email ?? "user");
-          navigateToNextScreen();
+          await navigateToNextScreen();
         }
 
         _showToast(context, 'Inicio de sesión correcto',
@@ -114,7 +115,7 @@ class AuthHandler {
       if (user != null) {
         if (context.mounted) {
           promptForBiometricAssociation(user.uid, user.email ?? "user");
-          navigateToNextScreen();
+          await navigateToNextScreen();
         }
 
         _showToast(context, 'Inicio de sesión correcto con Apple',
@@ -340,6 +341,7 @@ class AuthHandler {
 
   // New Method: Sign in with decrypted user ID
   Future<void> signInWithBiometrics(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
     final userEmailKey = '${userId}_email';
     final userEmail = prefs.getString(userEmailKey);
 

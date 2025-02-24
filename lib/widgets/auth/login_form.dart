@@ -12,14 +12,14 @@ class LoginForm extends StatefulWidget {
   final Future<void> Function(BuildContext) handleGoogleSignIn;
   final Future<void> Function(BuildContext) handleEmailSignIn;
   const LoginForm({
-    Key? key,
+    super.key,
     required this.emailAuthService,
     required this.authService,
     required this.usernameController,
     required this.passwordController,
     required this.handleGoogleSignIn,
     required this.handleEmailSignIn,
-  }) : super(key: key);
+  });
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -29,6 +29,8 @@ class _LoginFormState extends State<LoginForm> {
   bool _isPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size; // Get screen size
+
     return Column(
       children: [
         _buildInputField(
@@ -37,7 +39,8 @@ class _LoginFormState extends State<LoginForm> {
           label: 'Correo electrónico',
           icon: Icons.email_rounded,
         ),
-        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+        SizedBox(
+            height: screenSize.height * 0.02), // Use screen size for spacing
         _buildInputField(
           context: context,
           controller: widget.passwordController,
@@ -45,16 +48,28 @@ class _LoginFormState extends State<LoginForm> {
           icon: Icons.lock_outline,
           isPassword: true,
         ),
-        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-        ElevatedButton(
-          onPressed: () => widget.handleEmailSignIn(context),
-          style: Theme.of(context).elevatedButtonTheme.style,
-          child: Text(
-            'Comenzar mi viaje saludable',
-            style: Theme.of(context)
-                .textTheme
-                .labelLarge
-                ?.copyWith(color: Colors.white),
+        SizedBox(
+            height: screenSize.height * 0.02), // Use screen size for spacing
+
+        SizedBox(
+          // Add a SizedBox to control the button width
+          width: double.infinity, // Make the button take up full width
+          child: ElevatedButton(
+            onPressed: () => widget.handleEmailSignIn(context),
+            style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
+                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                    EdgeInsets.symmetric(
+                        vertical: screenSize.height *
+                            0.02), // Adjust vertical padding as needed
+                  ),
+                ),
+            child: Text(
+              'Comenzar mi viaje saludable',
+              style: Theme.of(context)
+                  .textTheme
+                  .labelLarge
+                  ?.copyWith(color: Colors.white),
+            ),
           ),
         ),
       ],
@@ -84,7 +99,7 @@ class _LoginFormState extends State<LoginForm> {
         obscureText: isPassword ? !_isPasswordVisible : false,
         keyboardType: !isPassword ? TextInputType.emailAddress : null,
         decoration: InputDecoration(
-          labelText: label,
+          hintText: label,
           labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
           border: InputBorder.none,
           prefixIcon: Icon(icon),

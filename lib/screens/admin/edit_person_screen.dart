@@ -62,7 +62,7 @@ class _EditPersonState extends State<EditPerson> {
               TextFormField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  labelText: 'Nombre',
+                  hintText: 'Nombre',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -76,7 +76,7 @@ class _EditPersonState extends State<EditPerson> {
               TextFormField(
                 controller: kgController,
                 decoration: const InputDecoration(
-                  labelText: 'Peso (kg)',
+                  hintText: 'Peso (kg)',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
@@ -94,7 +94,7 @@ class _EditPersonState extends State<EditPerson> {
               TextFormField(
                 controller: descriptionController,
                 decoration: const InputDecoration(
-                  labelText: 'Descripción',
+                  hintText: 'Descripción',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
@@ -103,7 +103,7 @@ class _EditPersonState extends State<EditPerson> {
               TextFormField(
                 controller: heightController,
                 decoration: const InputDecoration(
-                  labelText: 'Altura (cm)',
+                  hintText: 'Altura (cm)',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
@@ -120,7 +120,7 @@ class _EditPersonState extends State<EditPerson> {
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(
-                  labelText: 'Sexo',
+                  hintText: 'Sexo',
                   border: OutlineInputBorder(),
                 ),
                 value: sex,

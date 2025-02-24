@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
-import 'package:flutter_flexdiet/widgets/widgets.dart';
-
-late AnimationController _animationController;
-late Animation<Color?> _backgroundColorAnimation;
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -14,6 +10,10 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<Color?> _backgroundColorAnimation;
+  final TextEditingController _emailController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -31,13 +31,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final TextEditingController _emailController = TextEditingController();
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -72,70 +72,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                     Text(
                         'Ingresa tu correo electrónico para restablecer tu contraseña',
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.titleMedium
+                        style: theme.textTheme.bodyMedium
                             ?.copyWith(color: textDarkBlue)),
-                    const SizedBox(height: 50),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black,
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: CustomInputText(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: 'Correo electrónico',
-                          labelStyle: theme.inputDecorationTheme.labelStyle
-                              ?.copyWith(color: theme.colorScheme.onSurface),
-                          border: InputBorder.none,
-                          prefixIcon: Icon(Icons.email_outlined,
-                              color: theme.colorScheme.onSurface),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 16),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        hintText: 'Correo electrónico',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
+                      keyboardType: TextInputType.emailAddress,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        final email = _emailController.text;
-                        if (email.isNotEmpty) {
-                          showToast(
-                            context,
-                            'Se ha enviado un correo de recuperación a $email',
-                            toastType: ToastType.success,
-                          );
-                        } else {
-                          showToast(
-                            context,
-                            'Por favor, ingresa un correo válido',
-                            toastType: ToastType.error,
-                          );
-                        }
+                        // Handle password reset logic
                       },
-                      style: theme.elevatedButtonTheme.style,
-                      child: Text('Enviar correo de recuperación',
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: theme.colorScheme.onPrimary,
-                          )),
-                    ),
-                    const SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Volver al inicio de sesión',
-                        style: theme.textTheme.bodyLarge
-                            ?.copyWith(color: textDarkBlue),
-                      ),
+                      child: Text('Restablecer contraseña'),
                     ),
                   ],
                 ),

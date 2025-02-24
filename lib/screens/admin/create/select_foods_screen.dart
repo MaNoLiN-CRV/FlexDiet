@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/models.dart';
-import 'package:flutter_flexdiet/screens/admin/admin_screen.dart';
 
 class SelectFoodsScreen extends StatefulWidget {
   final List<String> selectedDays;
@@ -90,7 +89,6 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             onPressed: () {
               Navigator.pop(context);
             },
-
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
               foregroundColor: theme.colorScheme.onPrimary,
@@ -429,7 +427,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 TextFormField(
                   style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
-                    labelText: 'Nombre del plato',
+                    hintText: 'Nombre del plato',
                     prefixIcon: const Icon(Icons.restaurant_menu),
                   ),
                   onSaved: (value) => name = value ?? '',
@@ -440,7 +438,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 TextFormField(
                   style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
-                    labelText: 'Descripción (opcional)',
+                    hintText: 'Descripción (opcional)',
                     prefixIcon: const Icon(Icons.description),
                   ),
                   onSaved: (value) => description = value ?? '',
@@ -451,7 +449,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 TextFormField(
                   style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
-                    labelText: 'Calorías (kcal)',
+                    hintText: 'Calorías (kcal)',
                     prefixIcon: const Icon(Icons.local_fire_department),
                   ),
                   keyboardType:
@@ -466,7 +464,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 TextFormField(
                   style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
-                    labelText: 'Proteínas (g)',
+                    hintText: 'Proteínas (g)',
                     prefixIcon: const Icon(Icons.fitness_center),
                   ),
                   keyboardType:
@@ -481,7 +479,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 TextFormField(
                   style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
-                    labelText: 'Carbohidratos (g)',
+                    hintText: 'Carbohidratos (g)',
                     prefixIcon: const Icon(Icons.grain),
                   ),
                   keyboardType:
