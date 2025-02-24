@@ -46,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen>
       authService: authService,
       context: context,
     );
+    _attemptBiometricLogin(); // Try automatic biometric login on init
   }
 
   @override
@@ -88,7 +89,13 @@ class _LoginScreenState extends State<LoginScreen>
     final canAuthenticate = await _localAuth.canCheckBiometrics ||
         await _localAuth.isDeviceSupported();
 
-    if (!canAuthenticate) return;
+    if (!canAuthenticate) {
+      if (context.mounted) {
+        showToast(context, 'Biometria no disponible en este dispositivo.',
+            toastType: ToastType.warning);
+      }
+      return;
+    }
 
     try {
       final authenticated = await _localAuth.authenticate(
@@ -97,14 +104,50 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (authenticated && context.mounted) {
-        showToast(context, 'Inicio de sesión correcto',
-            toastType: ToastType.success);
-        await authHandler.navigateToNextScreen();
+        // Step 1: Get the associated user ID
+        final userId = await authHandler.getAssociatedUserId();
+
+        if (userId != null) {
+          // Step 2: Sign in the user (logic moved into AuthHandler)
+          await authHandler.signInWithBiometrics(userId);
+
+          //  Navigate on successful sign-in.
+          if (context.mounted) {
+            showToast(context, 'Inicio de sesión correcto',
+                toastType: ToastType.success);
+            await authHandler.navigateToNextScreen();
+          }
+        } else {
+          if (context.mounted) {
+            showToast(context, 'No se encontró cuenta asociada a la huella.',
+                toastType: ToastType.error);
+          }
+        }
+      } else {
+        if (context.mounted) {
+          showToast(context, 'Autenticación biométrica fallida',
+              toastType: ToastType.error);
+        }
       }
-    } on PlatformException {
-      if (!context.mounted) return;
-      showToast(context, 'Error en la autenticación biométrica',
-          toastType: ToastType.error);
+    } on PlatformException catch (e) {
+      if (context.mounted) {
+        showToast(context, 'Error en la autenticación biométrica: $e',
+            toastType: ToastType.error);
+      }
+    }
+  }
+
+  Future<void> _attemptBiometricLogin() async {
+    final canAuthenticate = await _localAuth.canCheckBiometrics ||
+        await _localAuth.isDeviceSupported();
+
+    if (canAuthenticate) {
+      // Delay the biometric prompt slightly after the screen loads
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          _handleBiometricAuth(context);
+        }
+      });
     }
   }
 

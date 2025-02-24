@@ -8,6 +8,11 @@ import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'dart:async'; // Import dart:async
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart'; // Import dart:convert
 
 // Constants
 const String biometricUserIdKey = 'biometricUserId';
@@ -21,7 +26,6 @@ class AuthHandler {
   final AuthService authService;
   final BuildContext context;
   final encrypt.Key key = encrypt.Key.fromLength(32);
-  final encrypt.IV iv = encrypt.IV.fromLength(16);
 
   AuthHandler({
     required this.emailAuthService,
@@ -126,7 +130,7 @@ class AuthHandler {
   Future<void> promptForBiometricAssociation(String uid, String user) async {
     if (!context.mounted) return;
 
-    // Capture a valid parent context
+    // Captura el contexto padre
     final parentContext = context;
 
     final LocalAuthentication auth = LocalAuthentication();
@@ -138,7 +142,7 @@ class AuthHandler {
     }
 
     showDialog(
-      context: parentContext, // Use the captured parentContext
+      context: parentContext,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         return PopScope(
@@ -172,11 +176,10 @@ class AuthHandler {
                   );
 
                   if (didAuthenticate) {
-                    // Show loading indicator
+                    // Muestra el indicador de carga
                     if (parentContext.mounted) {
                       showDialog(
-                        context:
-                            parentContext, // Use the captured parentContext
+                        context: parentContext,
                         barrierDismissible: false,
                         builder: (BuildContext loadingContext) {
                           return PopScope(
@@ -190,46 +193,55 @@ class AuthHandler {
                     }
 
                     try {
-                      // Call the static method using compute
-                      final encryptedId = await compute(
-                        AuthHandler._encryptBiometricIdInIsolate,
-                        {
-                          'uid': uid,
-                          'keyBase64': key.base64, // Pass key as base64
-                          'ivBase64': iv.base64, // Pass IV as base64
-                        },
+                      final biometricIdKey = 'biometricId_$uid';
+
+                      await prefs.setString(
+                          'biometricUserUid_$uid', uid); // Almacena UID
+
+                      // Usar una clave fija (dummy key) en lugar de generar una aleatoria
+                      final String dummyKey =
+                          '12345678901234567890123456789012'; // 32 bytes
+                      final key = encrypt.Key.fromUtf8(
+                          dummyKey); // Convertir a encrypt.Key
+                      final iv =
+                          encrypt.IV.fromLength(16); // IV fijo de 16 bytes
+
+                      final encrypter = encrypt.Encrypter(
+                        encrypt.AES(key,
+                            mode: encrypt.AESMode.cbc, padding: 'PKCS7'),
                       );
 
+                      final encrypted = encrypter.encrypt(uid, iv: iv);
+
+                      // Almacenar el IV y los datos encriptados como un JSON
+                      final dataToStore = {
+                        'iv': base64Encode(iv.bytes),
+                        'encryptedData': encrypted.base64,
+                      };
+
+                      final jsonData = jsonEncode(dataToStore);
+
+                      await prefs.setString(biometricIdKey, jsonData);
+                      await prefs.setString('${uid}_email', user);
+
+                      // Finaliza el proceso de carga
                       if (parentContext.mounted) {
-                        // Dismiss loading dialog
                         Navigator.of(parentContext).pop();
                       }
 
-                      // Store the encrypted ID in Shared Preferences (on the main isolate)
-                      if (encryptedId != null) {
-                        await prefs.setString(biometricUserIdKey, encryptedId);
-                        await prefs.setString(
-                            '${uid}_email', user); // Add this line
-                        if (kDebugMode) {
-                          print(
-                              'Biometric ID stored successfully in shared preferences with key: $biometricUserIdKey');
-                          print(
-                              'Email stored with key: ${'${uid}_email'} and value: $user'); // Log the stored email
-                        }
-                      } else {
-                        print("Encryption failed, not storing biometric ID");
+                      if (kDebugMode) {
+                        print(
+                            'Biometric ID stored successfully in shared preferences with key: $biometricIdKey');
+                        print(
+                            'Email stored with key: ${'${uid}_email'} and value: $user');
                       }
 
-                      // Show success or error message
+                      // Muestra un mensaje de éxito
                       if (parentContext.mounted) {
                         _showToast(
                           parentContext,
-                          encryptedId != null
-                              ? 'Huella digital asociada a la cuenta $user'
-                              : 'Error al asociar la huella digital',
-                          toastType: encryptedId != null
-                              ? ToastType.success
-                              : ToastType.error,
+                          'Huella digital asociada a la cuenta $user',
+                          toastType: ToastType.success,
                         );
                       }
                     } catch (e) {
@@ -263,63 +275,102 @@ class AuthHandler {
     );
   }
 
-  // Static method to encrypt the biometric ID within the isolate
-  static Future<String?> _encryptBiometricIdInIsolate(
-      Map<String, dynamic> params) async {
+  Future<String?> getAssociatedUserId() async {
+    final allPrefs = await SharedPreferences.getInstance();
+    final keys = allPrefs.getKeys();
+    String? userUid;
+
+    for (String key in keys) {
+      if (key.startsWith('biometricUserUid_')) {
+        userUid = allPrefs.getString(key);
+        break; // Exit loop after finding the UID
+      }
+    }
+
+    if (userUid == null) {
+      return null; // No associated user ID found
+    }
+
     try {
-      // Retrieve parameters
-      final String uid = params['uid'] as String;
-      final String keyBase64 = params['keyBase64'] as String;
-      final String ivBase64 = params['ivBase64'] as String;
+      final biometricIdKey = 'biometricId_$userUid';
+      final jsonData = allPrefs.getString(biometricIdKey);
 
-      // Recreate key and IV from base64
-      final encrypt.Key key = encrypt.Key.fromBase64(keyBase64);
-      final encrypt.IV iv = encrypt.IV.fromBase64(ivBase64);
-
-      // Encryption
-      final encrypter =
-          encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
-      final encrypted = encrypter.encrypt(uid, iv: iv);
-      final encryptedBase64 = encrypted.base64;
-
-      if (kDebugMode) {
-        print('Encrypted biometric ID: $encryptedBase64');
+      if (jsonData == null) {
+        return null;
       }
 
-      return encryptedBase64;
+      final data = jsonDecode(jsonData);
+      final ivBytes = base64Decode(data['iv']); // Decode the base64 IV
+      final encryptedData = data['encryptedData'];
+
+      // Debugging logs
+      print("IV bytes: $ivBytes");
+      print("Encrypted Data: $encryptedData");
+
+      // Ensure the IV is 16 bytes long for AES
+      if (ivBytes.length != 16) {
+        print("Error: IV length is not 16 bytes!");
+        return null;
+      }
+
+      // Generate the Encrypter Object
+      final key = encrypt.Key.fromLength(
+          32); // Use the same key length as in encryption
+      final iv = encrypt.IV(ivBytes); // Use the decoded IV
+
+      // Explicitly specify the padding scheme to ensure it's handled correctly
+      final encrypter = encrypt.Encrypter(
+        encrypt.AES(key, mode: encrypt.AESMode.cbc, padding: 'PKCS7'),
+      );
+
+      final encrypted = encrypt.Encrypted.fromBase64(encryptedData);
+
+      // Decrypt the data
+      final decrypted = encrypter.decrypt(encrypted, iv: iv);
+
+      print("Decrypted User ID: $decrypted");
+
+      return decrypted;
     } catch (e) {
-      if (kDebugMode) {
-        print('Failed to encrypt biometric ID: $e');
-      }
+      print('Decryption error: $e');
       return null;
     }
   }
 
-  Future<String?> getAssociatedUserId() async {
-    // 1. Retrieve the encrypted user ID from SharedPreferences
-    final encryptedUserId = prefs.getString(biometricUserIdKey);
+  // New Method: Sign in with decrypted user ID
+  Future<void> signInWithBiometrics(String userId) async {
+    final userEmailKey = '${userId}_email';
+    final userEmail = prefs.getString(userEmailKey);
 
-    if (encryptedUserId == null) {
-      return null; // No biometric ID stored
+    if (userEmail == null) {
+      _showToast(context, 'Email no encontrado para el usuario asociado',
+          toastType: ToastType.error);
+      return;
     }
 
     try {
-      // 2. Decrypt the user ID
-      final decryptedUid = decryptUserId(encryptedUserId);
-      return decryptedUid;
+      // IMPORTANT:  We're only using the email to retrieve the user.
+      // We're *not* using a password at this point because the biometric
+      // authentication *is* the authentication.
+
+      // You might need to fetch the user's provider info if you need
+      // to re-authenticate via Google or Apple.
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: userEmail,
+        password:
+            'biometric_login', // Dummy password as password isn't needed here
+      ); //Use an empty password
+
+      _showToast(context, 'Inicio de sesión con biometría correcto',
+          toastType: ToastType.success);
+      navigateToNextScreen();
     } catch (e) {
       if (kDebugMode) {
-        print('Failed to decrypt biometric ID: $e');
+        print('Error signing in with biometric user: $e');
       }
-      return null; // Decryption failed
+      _showToast(context, 'Error al iniciar sesión con biometría: $e',
+          toastType: ToastType.error);
     }
-  }
-
-  String decryptUserId(String encryptedUserId) {
-    final encrypter =
-        encrypt.Encrypter(encrypt.AES(key, mode: encrypt.AESMode.cbc));
-    final encrypted = encrypt.Encrypted.fromBase64(encryptedUserId);
-    return encrypter.decrypt(encrypted, iv: iv);
   }
 
   void _showToast(BuildContext context, String message,
