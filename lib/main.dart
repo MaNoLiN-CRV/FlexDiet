@@ -81,11 +81,10 @@ class MyApp extends StatelessWidget {
   }
 
   Future<Widget> _getInitialScreen() async {
+    await Future.delayed(const Duration(seconds: 2));
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      await Future.delayed(const Duration(seconds: 2));
-
       final hasCompletedInfo = await _hasCompletedUserInfo();
       return hasCompletedInfo ? const HomeScreen() : const UserInfoScreen();
     } else {

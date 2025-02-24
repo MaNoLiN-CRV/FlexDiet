@@ -92,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const EditPerson())),
+                          builder: (context) => const UserInfoScreen())),
                   customBorder: const CircleBorder(),
                   child: Container(
                     padding: const EdgeInsets.all(12),
