@@ -3,7 +3,6 @@ import 'package:flutter_flexdiet/firebase_firestore.dart';
 
 final firestore = FirestoreService.firestore;
 
-/// Entidad Admin
 class Admin {
   String id; // UUID en el esquema
 
