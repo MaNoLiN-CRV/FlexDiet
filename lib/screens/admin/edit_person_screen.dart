@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class EditPerson extends StatefulWidget {
-  final String name;
-  const EditPerson({super.key, this.name = ''});
+  late Client client;
+  final String clientId;
+  EditPerson({super.key, required this.clientId});
 
   @override
   State<EditPerson> createState() => _EditPersonState();
@@ -10,18 +13,35 @@ class EditPerson extends StatefulWidget {
 
 class _EditPersonState extends State<EditPerson> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController kgController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController heightController = TextEditingController();
+  late final TextEditingController nameController;
+  late final TextEditingController kgController;
+  late final TextEditingController descriptionController;
+  late final TextEditingController heightController;
   String? sex;
 
   @override
   void initState() {
     super.initState();
-    if (widget.name.isNotEmpty) {
-      nameController.text = widget.name;
+    _initializeData();
+    _initializeControllers();
+  }
+
+  void _initializeData() async {
+    final Client? client = await Client.getClient(widget.clientId);
+    if (client != null && mounted) {
+      setState(() => widget.client = client);
     }
+  }
+
+  void _initializeControllers() {
+    nameController = TextEditingController(text: widget.client.username);
+    kgController =
+        TextEditingController(text: widget.client.bodyweight?.toString() ?? '');
+    descriptionController =
+        TextEditingController(text: widget.client.description ?? '');
+    heightController =
+        TextEditingController(text: widget.client.height?.toString() ?? '');
+    sex = widget.client.sex;
   }
 
   @override
@@ -33,193 +53,213 @@ class _EditPersonState extends State<EditPerson> {
     super.dispose();
   }
 
+  Widget _buildFormField({
+    required TextEditingController controller,
+    required String label,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    IconData? prefixIcon,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          filled: true,
+        ),
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        validator: validator,
+      ),
+    );
+  }
+
+  Future<void> _showDeleteDialog() async {
+    final bool? result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Eliminar Cliente'),
+        content: const Text(
+          '¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('CANCELAR'),
+          ),
+          FilledButton.tonal(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red.shade100,
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('ELIMINAR'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && mounted) {
+      // TODO: Implement delete logic
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Cliente eliminado'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editar cliente'),
-        backgroundColor: theme.colorScheme.primary,
+        title: const Text('Editar Cliente'),
         centerTitle: true,
       ),
-      body: Form(
-        key: _formKey,
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: ListView(
-            children: <Widget>[
-              if (widget.name.isNotEmpty)
-                Text('Editar cliente ${widget.name}',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ))
-              else
-                Text('Seleccione un cliente, por favor',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    )),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  hintText: 'Nombre',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, introduzca un nombre';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: kgController,
-                decoration: const InputDecoration(
-                  hintText: 'Peso (kg)',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, introduzca el peso';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Por favor, introduzca un número válido';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  hintText: 'Descripción',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: heightController,
-                decoration: const InputDecoration(
-                  hintText: 'Altura (cm)',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, introduzca la altura';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Por favor, introduzca un número válido';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  hintText: 'Sexo',
-                  border: OutlineInputBorder(),
-                ),
-                value: sex,
-                items: <String>['Masculino', 'Femenino']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                validator: (value) =>
-                    value == null ? 'Por favor, seleccione el sexo' : null,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    sex = newValue;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Procesando datos')),
-                        );
-                      }
-                    },
-                    child: const Text('Guardar'),
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Cancelar'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 40),
-              Divider(),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Text(
-                  'Zona de peligro',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.red.shade700,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  showDialog<bool>(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      title: const Text('Eliminar Cliente'),
-                      content: const Text(
-                          '¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.'),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          style: TextButton.styleFrom(
-                              foregroundColor: Colors.grey),
-                          child: const Text('Cancelar'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context, true);
-                          },
-                          style:
-                              TextButton.styleFrom(foregroundColor: Colors.red),
-                          child: const Text('Eliminar'),
-                        ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Información Personal',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ).animate().fadeIn().slideX(),
+                        const SizedBox(height: 16),
+                        _buildFormField(
+                          controller: nameController,
+                          label: 'Nombre',
+                          prefixIcon: Icons.person,
+                          validator: (value) =>
+                              value?.isEmpty ?? true ? 'Campo requerido' : null,
+                        ).animate().fadeIn().slideX(),
+                        _buildFormField(
+                          controller: kgController,
+                          label: 'Peso (kg)',
+                          prefixIcon: Icons.monitor_weight,
+                          keyboardType: TextInputType.number,
+                          validator: (value) =>
+                              double.tryParse(value ?? '') == null
+                                  ? 'Ingrese un número válido'
+                                  : null,
+                        ).animate().fadeIn().slideX(),
+                        _buildFormField(
+                          controller: heightController,
+                          label: 'Altura (cm)',
+                          prefixIcon: Icons.height,
+                          keyboardType: TextInputType.number,
+                          validator: (value) =>
+                              double.tryParse(value ?? '') == null
+                                  ? 'Ingrese un número válido'
+                                  : null,
+                        ).animate().fadeIn().slideX(),
                       ],
                     ),
-                  ).then((value) {
-                    if (value == true) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              backgroundColor: Colors.redAccent,
-                              content: Text('Cliente eliminado')),
-                        );
-                        Navigator.pop(context);
-                      }
-                    }
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
+                  ),
                 ),
-                child: const Text('Eliminar Cliente'),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Detalles Adicionales',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ).animate().fadeIn().slideX(),
+                        const SizedBox(height: 16),
+                        _buildFormField(
+                          controller: descriptionController,
+                          label: 'Descripción',
+                          prefixIcon: Icons.description,
+                          maxLines: 3,
+                        ).animate().fadeIn().slideX(),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Sexo',
+                            prefixIcon: const Icon(Icons.people),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                          ),
+                          value: sex,
+                          items: ['Masculino', 'Femenino']
+                              .map((String value) => DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  ))
+                              .toList(),
+                          validator: (value) =>
+                              value == null ? 'Campo requerido' : null,
+                          onChanged: (String? newValue) {
+                            setState(() => sex = newValue);
+                          },
+                        ).animate().fadeIn().slideX(),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            // TODO: Implement save logic
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Guardando cambios...'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.save),
+                        label: const Text('GUARDAR'),
+                      ),
+                    ),
+                  ],
+                ).animate().fadeIn().slideY(),
+                const SizedBox(height: 48),
+                OutlinedButton.icon(
+                  onPressed: _showDeleteDialog,
+                  icon: const Icon(Icons.delete_forever),
+                  label: const Text('ELIMINAR CLIENTE'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                    side: BorderSide(color: Colors.red),
+                    padding: const EdgeInsets.all(16),
+                  ),
+                ).animate().fadeIn().slideY(),
+              ],
+            ),
           ),
         ),
       ),

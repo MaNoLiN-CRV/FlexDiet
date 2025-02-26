@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/models.dart';
+import 'package:flutter_flexdiet/models/card_data.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/screens/admin/edit_person_screen.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 class UseTemplateScreen extends StatefulWidget {
+  final String clientId;
   static const double _standardPadding = 16.0;
   static const double _cardSpacing = 20.0;
 
-  const UseTemplateScreen({super.key});
+  const UseTemplateScreen({
+    super.key,
+    required this.clientId,
+  });
 
   @override
   State<UseTemplateScreen> createState() => _UseTemplateScreenState();
@@ -17,10 +22,17 @@ class _UseTemplateScreenState extends State<UseTemplateScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _fabController;
   late Animation<double> _fabAnimation;
+  Client? _client;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _initializeAnimations();
+    _loadClient();
+  }
+
+  void _initializeAnimations() {
     _fabController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -32,39 +44,144 @@ class _UseTemplateScreenState extends State<UseTemplateScreen>
     _fabController.forward();
   }
 
-  @override
-  void dispose() {
-    _fabController.dispose();
-    super.dispose();
+  Future<void> _loadClient() async {
+    try {
+      final client = await Client.getClient(widget.clientId);
+      if (mounted) {
+        setState(() {
+          _client = client;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Error al cargar el cliente'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _showProfileDialog(BuildContext context) async {
+    if (_client == null) return;
+
+    final theme = Theme.of(context);
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    theme.colorScheme.primary,
+                    theme.colorScheme.secondary,
+                  ],
+                ),
+              ),
+              child: Icon(
+                Icons.person,
+                size: 48,
+                color: theme.colorScheme.onPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _client!.username,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (_client!.bodyweight != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Peso actual: ${_client!.bodyweight}kg',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditPerson(clientId: _client!.id),
+                ),
+              ),
+              icon: const Icon(Icons.edit),
+              label: const Text('Editar Perfil'),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(200, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final height = MediaQuery.of(context).size.height;
+
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            color: theme.colorScheme.primary,
+          ),
+        ),
+      );
+    }
+
+    if (_client == null) {
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'Cliente no encontrado',
+            style: theme.textTheme.titleLarge,
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      appBar: _buildAppBar(theme),
+      appBar: AppBar(
+        title: Text(
+          'Plan para ${_client!.username}',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: theme.colorScheme.onPrimary,
+          ),
+        ),
+        backgroundColor: theme.colorScheme.primary,
+        centerTitle: true,
+      ),
       body: Stack(
         children: [
           _buildWaveBackgrounds(theme),
-          _buildMainContent(context, theme, height),
+          _buildMainContent(context, theme, MediaQuery.of(context).size.height),
           _buildProfileButton(context),
         ],
       ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(ThemeData theme) {
-    return AppBar(
-      backgroundColor: theme.colorScheme.primary,
-      elevation: 0,
-      title: Text(
-        'Plantillas de Dieta',
-        style: theme.appBarTheme.titleTextStyle,
-      ),
-      centerTitle: true,
     );
   }
 
@@ -209,72 +326,6 @@ class _UseTemplateScreenState extends State<UseTemplateScreen>
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showProfileDialog(BuildContext context) async {
-    final theme = Theme.of(context);
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: theme.colorScheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    theme.colorScheme.primary,
-                    theme.colorScheme.secondary,
-                  ],
-                ),
-              ),
-              child: Icon(
-                Icons.person,
-                size: 48,
-                color: theme.colorScheme.onPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'John Doe',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Objetivo: Pérdida de peso',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-            FilledButton.icon(
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EditPerson(name: 'John Doe'))),
-              icon: const Icon(Icons.edit),
-              label: const Text('Editar Perfil'),
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(200, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );

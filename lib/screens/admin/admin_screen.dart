@@ -1,47 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/models.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
+import 'package:flutter_flexdiet/models/ui_constants.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class AdminScreen extends StatefulWidget {
-  final List<Client> clients ;
-  const AdminScreen({
-    super.key,
-    required this.clients,
-    });
-    
+  const AdminScreen({super.key});
+
   @override
   State<AdminScreen> createState() => _AdminScreenState();
 }
 
 class _AdminScreenState extends State<AdminScreen> {
-  String? _selectedClientName;
+  String? _selectedClientId;
   final TextEditingController _searchController = TextEditingController();
-  
-
-  late List<Client> _filteredClients;
+  List<Client> _clients = [];
+  List<Client> _filteredClients = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _filteredClients = List.from(widget.clients);
+    _loadClients();
   }
 
-  void _selectClient(String clientName) {
-    setState(() => _selectedClientName = clientName);
+  Future<void> _loadClients() async {
+    setState(() => _isLoading = true);
+    try {
+      final snapshot = await Client.collection.get();
+      setState(() {
+        _clients = snapshot.docs.map((doc) => doc.data()).toList();
+        _filteredClients = List.from(_clients);
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Error al cargar los clientes'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
+  void _selectClient(String clientId) {
+    setState(() => _selectedClientId = clientId);
   }
 
   void _filterClients(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredClients = List.from(widget.clients);
+        _filteredClients = List.from(_clients);
       } else {
         final lowercaseQuery = query.toLowerCase();
-        _filteredClients = widget.clients.where((client) {
-          return client.name.toLowerCase().contains(lowercaseQuery) ||
-              client.description.toLowerCase().contains(lowercaseQuery);
+        _filteredClients = _clients.where((client) {
+          return client.username.toLowerCase().contains(lowercaseQuery) ||
+              (client.description?.toLowerCase().contains(lowercaseQuery) ??
+                  false);
         }).toList();
       }
     });
@@ -78,7 +98,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     .fadeIn(delay: 200.ms, duration: 600.ms)
                     .slideY(begin: 0.2, end: 0),
                 SizedBox(height: UIConstants.defaultSpacing),
-                _buildClientsList(context, isDarkMode)
+                _buildClientsList(context)
                     .animate()
                     .fadeIn(delay: 400.ms, duration: 800.ms)
                     .slideX(begin: 0.2, end: 0),
@@ -156,7 +176,11 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  Widget _buildClientsList(BuildContext context, bool isDarkMode) {
+  Widget _buildClientsList(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     if (_filteredClients.isEmpty) {
       return Center(
         child: Text(
@@ -171,14 +195,14 @@ class _AdminScreenState extends State<AdminScreen> {
     return Expanded(
       child: SingleChildScrollView(
         child: SizedBox(
-          height: MediaQuery.of(context).size.height * UIConstants.cardHeight,
+          height: MediaQuery.of(context).size.height * 0.4,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: _filteredClients.length,
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemBuilder: (context, index) {
               final client = _filteredClients[index];
-              final isSelected = client.name == _selectedClientName;
+              final isSelected = client.id == _selectedClientId;
 
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
@@ -188,54 +212,35 @@ class _AdminScreenState extends State<AdminScreen> {
                   vertical: 4,
                 ),
                 transform: isSelected
-                    ? (Matrix4.identity()..scale(1.04))
+                    ? (Matrix4.identity()..scale(1.05))
                     : Matrix4.identity(),
                 child: Card(
                   elevation: isSelected ? 8 : 4,
                   color:
                       isSelected ? Theme.of(context).colorScheme.primary : null,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                   child: InkWell(
-                    onTap: () => _selectClient(client.name),
+                    onTap: () => _selectClient(client.id),
                     borderRadius: BorderRadius.circular(12),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12),
-                          ),
-                          child: AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child: Image.network(
-                              client.imageUrl,
-                              fit: BoxFit.cover,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                        : null,
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  child: Icon(
-                                    Icons.person,
-                                    size: 64,
-                                    color:
-                                        Theme.of(context).colorScheme.onPrimary,
-                                  ),
-                                );
-                              },
+                        AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.person,
+                              size: 64,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                             ),
                           ),
                         ),
@@ -246,7 +251,7 @@ class _AdminScreenState extends State<AdminScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  client.name,
+                                  client.username,
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleLarge
@@ -261,10 +266,10 @@ class _AdminScreenState extends State<AdminScreen> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                const SizedBox(height: 8),
-                                Expanded(
-                                  child: Text(
-                                    client.description,
+                                if (client.description != null) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    client.description!,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium
@@ -273,15 +278,34 @@ class _AdminScreenState extends State<AdminScreen> {
                                               ? Theme.of(context)
                                                   .colorScheme
                                                   .onPrimary
-                                              : isDarkMode
-                                                  ? Colors.white
-                                                  : Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurfaceVariant,
+                                              : Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
                                         ),
-                                    overflow: TextOverflow.ellipsis,
                                     maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
+                                ],
+                                const Spacer(),
+                                Row(
+                                  children: [
+                                    if (client.bodyweight != null)
+                                      _buildClientInfo(
+                                        context,
+                                        '${client.bodyweight!}kg',
+                                        Icons.monitor_weight,
+                                        isSelected,
+                                      ),
+                                    if (client.height != null) ...[
+                                      const SizedBox(width: 16),
+                                      _buildClientInfo(
+                                        context,
+                                        '${client.height!}cm',
+                                        Icons.height,
+                                        isSelected,
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ],
                             ),
@@ -302,6 +326,34 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
+  Widget _buildClientInfo(
+    BuildContext context,
+    String text,
+    IconData icon,
+    bool isSelected,
+  ) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: isSelected
+              ? Theme.of(context).colorScheme.onPrimary
+              : Theme.of(context).colorScheme.primary,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: isSelected
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildActionButtons(BuildContext context, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.only(top: UIConstants.defaultSpacing * 2),
@@ -311,7 +363,7 @@ class _AdminScreenState extends State<AdminScreen> {
           _buildActionButton(
             context: context,
             title: 'CREAR PLANTILLA',
-            onPressed: _selectedClientName != null
+            onPressed: _selectedClientId != null
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -328,7 +380,9 @@ class _AdminScreenState extends State<AdminScreen> {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const UseTemplateScreen()),
+                  builder: (context) => UseTemplateScreen(
+                        clientId: _selectedClientId!,
+                      )),
             ),
             isDarkMode: isDarkMode,
           ),
@@ -336,12 +390,12 @@ class _AdminScreenState extends State<AdminScreen> {
           _buildActionButton(
             context: context,
             title: 'EDITAR CLIENTE',
-            onPressed: _selectedClientName != null
+            onPressed: _selectedClientId != null
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            EditPerson(name: _selectedClientName!),
+                            EditPerson(clientId: _selectedClientId!),
                       ),
                     )
                 : null,
@@ -413,5 +467,3 @@ class _AdminScreenState extends State<AdminScreen> {
     super.dispose();
   }
 }
-
-

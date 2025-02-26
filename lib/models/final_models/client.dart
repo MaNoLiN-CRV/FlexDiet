@@ -9,6 +9,7 @@ class Client {
   String? dietId; // Diet reference
   String? sex;
   double? bodyweight;
+  double? height;
   String? description;
 
   Client({
@@ -17,6 +18,7 @@ class Client {
     this.dietId,
     this.sex,
     this.bodyweight,
+    this.height,
     this.description,
   });
 
@@ -26,6 +28,7 @@ class Client {
       'dietId': dietId,
       'sex': sex,
       'bodyweight': bodyweight,
+      'height': height,
       'description': description,
     };
   }
@@ -38,6 +41,7 @@ class Client {
       sex: json['sex'],
       bodyweight:
           json['bodyweight'] != null ? json['bodyweight'].toDouble() : null,
+      height: json['height'] != null ? json['height'].toDouble() : null,
       description: json['description'],
     );
   }

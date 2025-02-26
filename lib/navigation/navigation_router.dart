@@ -76,7 +76,9 @@ void navigationRouter(BuildContext context, int index) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => WeekScreen(mealData: _mealData,),
+        builder: (context) => WeekScreen(
+          mealData: _mealData,
+        ),
       ),
     );
   } else if (index == 1) {
@@ -98,7 +100,7 @@ void navigationRouter(BuildContext context, int index) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => AdminScreen( clients: clients,),
+        builder: (context) => AdminScreen(),
       ),
     );
   }
