@@ -29,7 +29,7 @@ class _LoginFormState extends State<LoginForm> {
   bool _isPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size; // Get screen size
+    final screenSize = MediaQuery.of(context).size;
 
     return Column(
       children: [
@@ -39,8 +39,7 @@ class _LoginFormState extends State<LoginForm> {
           label: 'Correo electrónico',
           icon: Icons.email_rounded,
         ),
-        SizedBox(
-            height: screenSize.height * 0.02), // Use screen size for spacing
+        SizedBox(height: screenSize.height * 0.02),
         _buildInputField(
           context: context,
           controller: widget.passwordController,
@@ -48,19 +47,14 @@ class _LoginFormState extends State<LoginForm> {
           icon: Icons.lock_outline,
           isPassword: true,
         ),
+        SizedBox(height: screenSize.height * 0.02),
         SizedBox(
-            height: screenSize.height * 0.02), // Use screen size for spacing
-
-        SizedBox(
-          // Add a SizedBox to control the button width
-          width: double.infinity, // Make the button take up full width
+          width: double.infinity,
           child: ElevatedButton(
             onPressed: () => widget.handleEmailSignIn(context),
             style: Theme.of(context).elevatedButtonTheme.style?.copyWith(
-                  padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                    EdgeInsets.symmetric(
-                        vertical: screenSize.height *
-                            0.02), // Adjust vertical padding as needed
+                  padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                    EdgeInsets.symmetric(vertical: screenSize.height * 0.02),
                   ),
                 ),
             child: Text(

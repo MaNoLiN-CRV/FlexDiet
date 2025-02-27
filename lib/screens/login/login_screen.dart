@@ -91,7 +91,9 @@ class _LoginScreenState extends State<LoginScreen>
     try {
       final authenticated = await _localAuth.authenticate(
         localizedReason: 'Autentícate para iniciar sesión',
-        options: const AuthenticationOptions(biometricOnly: true),
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+        ),
       );
 
       if (authenticated && context.mounted) {
@@ -239,10 +241,12 @@ class _LoginScreenState extends State<LoginScreen>
                             googleAuthService: googleAuthService,
                             handleGoogleSignIn: _handleGoogleSignIn,
                           ),
-                          IconButton(
-                            icon: Icon(Icons.fingerprint,
-                                size: 40, color: textDarkBlue),
-                            onPressed: () => _handleBiometricAuth(context),
+                          Center(
+                            child: IconButton(
+                              icon: Icon(Icons.fingerprint,
+                                  size: 40, color: textDarkBlue),
+                              onPressed: () => _handleBiometricAuth(context),
+                            ),
                           ),
                         ],
                       ),

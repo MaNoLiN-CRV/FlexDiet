@@ -4,8 +4,8 @@ import 'package:flutter_flexdiet/theme/theme.dart';
 
 class ActionButtons extends StatelessWidget {
   const ActionButtons({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
