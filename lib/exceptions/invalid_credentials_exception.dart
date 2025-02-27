@@ -1,5 +1,3 @@
-
-
 class InvalidCredentialsException implements Exception {
   final String _message;
 
