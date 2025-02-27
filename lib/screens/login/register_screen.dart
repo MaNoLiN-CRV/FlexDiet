@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/exceptions/exceptions.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
@@ -27,6 +28,8 @@ class _RegisterScreenState extends State<RegisterScreen>
   late Animation<Color?> _backgroundColorAnimation;
   final GlobalKey<FormState> myFormKey = GlobalKey<FormState>();
 
+  final FirebaseAuthExceptionsHandler _authExceptionsHandler =
+      FirebaseAuthExceptionsHandler();
   final AuthService authService = AuthService();
   late provider.EmailAuth emailAuthService = authService.emailAuth();
 
@@ -80,7 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                 setState(() {
                   _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
                 });
-              }));
+              }, _authExceptionsHandler));
         },
       ),
     );
@@ -99,20 +102,20 @@ Decoration _buildBackground(Animation<Color?> backgroundColorAnimation) {
 }
 
 Widget _buildPrincipalContainer(
-  BuildContext context,
-  GlobalKey<FormState> myFormKey,
-  Size screenSize,
-  ThemeData theme,
-  TextEditingController usernameController,
-  TextEditingController emailController,
-  bool isPasswordVisible,
-  bool isConfirmPasswordVisible,
-  TextEditingController passwordController,
-  TextEditingController confirmPasswordController,
-  provider.EmailAuth emailAuthService,
-  void Function()? onPasswordVisibilityChanged,
-  void Function()? onConfirmPasswordVisibilityChanged,
-) {
+    BuildContext context,
+    GlobalKey<FormState> myFormKey,
+    Size screenSize,
+    ThemeData theme,
+    TextEditingController usernameController,
+    TextEditingController emailController,
+    bool isPasswordVisible,
+    bool isConfirmPasswordVisible,
+    TextEditingController passwordController,
+    TextEditingController confirmPasswordController,
+    provider.EmailAuth emailAuthService,
+    void Function()? onPasswordVisibilityChanged,
+    void Function()? onConfirmPasswordVisibilityChanged,
+    FirebaseAuthExceptionsHandler authExceptionsHandler) {
   return Center(
     child: SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
@@ -139,56 +142,32 @@ Widget _buildPrincipalContainer(
             // Sign Up button
             ElevatedButton(
               onPressed: () async {
-                if (usernameController.text.isEmpty ||
-                    emailController.text.isEmpty ||
-                    passwordController.text.isEmpty ||
-                    confirmPasswordController.text.isEmpty) {
-                  if (context.mounted) {
-                    showToast(context, 'Por favor, rellena todos los campos.',
-                        toastType: ToastType.warning);
-                  }
-                }
+                //if (usernameController.text.isEmpty ||
+                //    emailController.text.isEmpty ||
+                //    passwordController.text.isEmpty ||
+                //    confirmPasswordController.text.isEmpty) {
+                //  if (context.mounted) {
+                //    showToast(context, 'Por favor, rellena todos los campos.',
+                //        toastType: ToastType.warning);
+                //  }
+                //}
 
-                if (passwordController.text != confirmPasswordController.text) {
-                  if (context.mounted) {
-                    showToast(context, 'Las contraseñas no coinciden.',
-                        toastType: ToastType.error);
-                  }
-                }
+                _checkPassword(
+                    passwordController, confirmPasswordController, context);
 
                 try {
                   await emailAuthService.signUp(
                     email: emailController.text,
                     password: passwordController.text,
                   );
-                  if (context.mounted) {
-                    showToast(context, 'Has sido registrado correctamente.',
-                        toastType: ToastType.success);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginScreen()),
-                    );
-                  }
+                  if (context.mounted) _registerSuccesful(context);
                 } on FirebaseAuthException catch (e) {
-                  if (e.code == 'email-already-in-use') {
-                    if (context.mounted) {
-                      showToast(context, 'El correo ya está en uso.',
-                          toastType: ToastType.error);
-                    }
-                  } else {
-                    if (e.code == 'weak-password') {
-                      if (context.mounted) {
-                        showToast(context,
-                            'La contraseña debe de tener al menos 6 caracteres.',
-                            toastType: ToastType.error);
-                      }
-                    } else if (e.code == 'invalid-email') {
-                      if (context.mounted) {
-                        showToast(context, 'El email es inválido',
-                            toastType: ToastType.error);
-                      }
-                    }
+                  if (context.mounted) {
+                    showToast(
+                      context,
+                      authExceptionsHandler.getExceptionMessage(e.code),
+                      toastType: ToastType.error,
+                    );
                   }
                 } catch (e) {
                   if (context.mounted) {
@@ -359,5 +338,24 @@ InputDecoration _buildDecoration(ThemeData theme, String label, IconData icon,
     ),
     suffixIcon: suffix,
     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+  );
+}
+
+// Register if else refactor
+void _checkPassword(TextEditingController passwordController,
+    TextEditingController confirmPasswordController, BuildContext context) {
+  if (passwordController.text != confirmPasswordController.text &&
+      context.mounted) {
+    showToast(context, 'Las contraseñas no coinciden.',
+        toastType: ToastType.error);
+  }
+}
+
+void _registerSuccesful(BuildContext context) {
+  showToast(context, 'Has sido registrado correctamente.',
+      toastType: ToastType.success);
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const LoginScreen()),
   );
 }

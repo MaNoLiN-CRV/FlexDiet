@@ -10,6 +10,7 @@ class Client {
     required this.description,
     required this.imageUrl,
   });
+  
   CardData toCardData() => CardData(
         title: name,
         description: description,
