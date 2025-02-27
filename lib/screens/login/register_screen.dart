@@ -63,27 +63,32 @@ class _RegisterScreenState extends State<RegisterScreen>
         animation: _backgroundColorAnimation,
         builder: (context, child) {
           return Container(
-              decoration: _buildBackground(_backgroundColorAnimation),
-              child: _buildPrincipalContainer(
-                  context,
-                  myFormKey,
-                  screenSize,
-                  theme,
-                  _usernameController,
-                  _emailController,
-                  _isPasswordVisible,
-                  _isConfirmPasswordVisible,
-                  _passwordController,
-                  _confirmPasswordController,
-                  emailAuthService, () {
+            decoration: _buildBackground(_backgroundColorAnimation),
+            child: _buildPrincipalContainer(
+              context,
+              myFormKey,
+              screenSize,
+              theme,
+              _usernameController,
+              _emailController,
+              _isPasswordVisible,
+              _isConfirmPasswordVisible,
+              _passwordController,
+              _confirmPasswordController,
+              emailAuthService,
+              () {
                 setState(() {
                   _isPasswordVisible = !_isPasswordVisible;
                 });
-              }, () {
+              },
+              () {
                 setState(() {
                   _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
                 });
-              }, _authExceptionsHandler));
+              },
+              _authExceptionsHandler,
+            ),
+          );
         },
       ),
     );
@@ -93,7 +98,7 @@ class _RegisterScreenState extends State<RegisterScreen>
 Decoration _buildBackground(Animation<Color?> backgroundColorAnimation) {
   return BoxDecoration(
     color: backgroundColorAnimation.value,
-    image: DecorationImage(
+    image: const DecorationImage(
       image: AssetImage('assets/images/background.jpg'),
       opacity: 0.4,
       fit: BoxFit.cover,
@@ -102,20 +107,21 @@ Decoration _buildBackground(Animation<Color?> backgroundColorAnimation) {
 }
 
 Widget _buildPrincipalContainer(
-    BuildContext context,
-    GlobalKey<FormState> myFormKey,
-    Size screenSize,
-    ThemeData theme,
-    TextEditingController usernameController,
-    TextEditingController emailController,
-    bool isPasswordVisible,
-    bool isConfirmPasswordVisible,
-    TextEditingController passwordController,
-    TextEditingController confirmPasswordController,
-    provider.EmailAuth emailAuthService,
-    void Function()? onPasswordVisibilityChanged,
-    void Function()? onConfirmPasswordVisibilityChanged,
-    FirebaseAuthExceptionsHandler authExceptionsHandler) {
+  BuildContext context,
+  GlobalKey<FormState> myFormKey,
+  Size screenSize,
+  ThemeData theme,
+  TextEditingController usernameController,
+  TextEditingController emailController,
+  bool isPasswordVisible,
+  bool isConfirmPasswordVisible,
+  TextEditingController passwordController,
+  TextEditingController confirmPasswordController,
+  provider.EmailAuth emailAuthService,
+  void Function()? onPasswordVisibilityChanged,
+  void Function()? onConfirmPasswordVisibilityChanged,
+  FirebaseAuthExceptionsHandler authExceptionsHandler,
+) {
   return Center(
     child: SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
@@ -126,32 +132,22 @@ Widget _buildPrincipalContainer(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildUpContainer(screenSize, theme),
-
             const SizedBox(height: 50),
             _buildForm(
-                theme,
-                usernameController,
-                emailController,
-                passwordController,
-                confirmPasswordController,
-                isPasswordVisible,
-                isConfirmPasswordVisible,
-                onPasswordVisibilityChanged,
-                onConfirmPasswordVisibilityChanged),
+              theme,
+              usernameController,
+              emailController,
+              passwordController,
+              confirmPasswordController,
+              isPasswordVisible,
+              isConfirmPasswordVisible,
+              onPasswordVisibilityChanged,
+              onConfirmPasswordVisibilityChanged,
+            ),
             const SizedBox(height: 30),
             // Sign Up button
             ElevatedButton(
               onPressed: () async {
-                //if (usernameController.text.isEmpty ||
-                //    emailController.text.isEmpty ||
-                //    passwordController.text.isEmpty ||
-                //    confirmPasswordController.text.isEmpty) {
-                //  if (context.mounted) {
-                //    showToast(context, 'Por favor, rellena todos los campos.',
-                //        toastType: ToastType.warning);
-                //  }
-                //}
-
                 _checkPassword(
                     passwordController, confirmPasswordController, context);
 
@@ -244,70 +240,74 @@ Widget _buildForm(
       Container(
         decoration: _buildDecorationContainer(theme),
         child: CustomInputText(
-            controller: usernameController,
-            keyboardType: TextInputType.text,
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Por favor, ingresa un nombre de usuario';
-              }
-              return null;
-            },
-            decoration: _buildDecoration(
-                theme, 'Nombre de usuario', Icons.person_outline)),
+          controller: usernameController,
+          keyboardType: TextInputType.text,
+          validator: (value) {
+            if (value!.isEmpty) {
+              return 'Por favor, ingresa un nombre de usuario';
+            }
+            return null;
+          },
+          decoration: _buildDecoration(
+              theme, 'Nombre de usuario', Icons.person_outline),
+        ),
       ),
-
       const SizedBox(height: 20),
       Container(
         decoration: _buildDecorationContainer(theme),
         child: CustomInputText(
-            controller: emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: _buildDecoration(
-                theme, 'Correo electrónico', Icons.email_rounded)),
+          controller: emailController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: _buildDecoration(
+              theme, 'Correo electrónico', Icons.email_rounded),
+        ),
       ),
       const SizedBox(height: 20),
       // Password input
       Container(
         decoration: _buildDecorationContainer(theme),
         child: CustomInputText(
-            controller: passwordController,
-            obscureText: !isPasswordVisible,
-            validator: (value) {
-              if (value!.length < 8) return 'Mínimo 8 caracteres';
-              return null;
-            },
-            decoration: _buildDecoration(
-                theme,
-                'Contraseña',
-                Icons.lock_outline,
-                IconButton(
-                  icon: Icon(
-                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                  ),
-                  onPressed: onPasswordVisibilityChanged,
-                ))),
+          controller: passwordController,
+          obscureText: !isPasswordVisible,
+          validator: (value) {
+            if (value!.length < 8) return 'Mínimo 8 caracteres';
+            return null;
+          },
+          decoration: _buildDecoration(
+            theme,
+            'Contraseña',
+            Icons.lock_outline,
+            IconButton(
+              icon: Icon(
+                  isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+              onPressed: onPasswordVisibilityChanged,
+            ),
+          ),
+        ),
       ),
       const SizedBox(height: 20),
       // Confirm Password input
       Container(
         decoration: _buildDecorationContainer(theme),
         child: CustomInputText(
-            controller: confirmPasswordController,
-            obscureText: !isConfirmPasswordVisible,
-            validator: (value) {
-              if (value!.length < 8) return 'Mínimo 8 caracteres';
-              return null;
-            },
-            decoration: _buildDecoration(
-                theme,
-                'Repita su contraseña',
-                Icons.lock_outline,
-                IconButton(
-                  icon: Icon(
-                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                  ),
-                  onPressed: onPasswordVisibilityChanged,
-                ))),
+          controller: confirmPasswordController,
+          obscureText: !isConfirmPasswordVisible,
+          validator: (value) {
+            if (value!.length < 8) return 'Mínimo 8 caracteres';
+            return null;
+          },
+          decoration: _buildDecoration(
+            theme,
+            'Confirmar contraseña',
+            Icons.lock_outline,
+            IconButton(
+              icon: Icon(isConfirmPasswordVisible
+                  ? Icons.visibility
+                  : Icons.visibility_off),
+              onPressed: onConfirmPasswordVisibilityChanged,
+            ),
+          ),
+        ),
       ),
     ],
   );
@@ -333,9 +333,7 @@ InputDecoration _buildDecoration(ThemeData theme, String label, IconData icon,
     hintText: label,
     labelStyle: theme.inputDecorationTheme.labelStyle,
     border: InputBorder.none,
-    prefixIcon: Icon(
-      icon,
-    ),
+    prefixIcon: Icon(icon),
     suffixIcon: suffix,
     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
   );
