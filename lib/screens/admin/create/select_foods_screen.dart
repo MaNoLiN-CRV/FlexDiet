@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/models.dart';
+import 'package:flutter_flexdiet/models/final_models/meal.dart';
+import 'package:flutter_flexdiet/models/final_models/day.dart';
+import 'package:flutter_flexdiet/models/day_meals.dart';
 
 class SelectFoodsScreen extends StatefulWidget {
   final List<String> selectedDays;
@@ -307,7 +309,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
               title: Text(
-                meal.name,
+                meal.name ?? 'Unnamed Meal',
                 style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: isDarkMode ? Colors.white : null),
@@ -319,21 +321,21 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                     _buildMealNutrient(
                         theme,
                         'Calorías',
-                        '${meal.calories.toStringAsFixed(0)} kcal',
+                        '${meal.calories?.toStringAsFixed(0)} kcal',
                         Icons.local_fire_department,
                         isDarkMode),
                     const SizedBox(width: 16),
                     _buildMealNutrient(
                         theme,
                         'Proteínas',
-                        '${meal.protein.toStringAsFixed(1)} g',
+                        '${meal.protein?.toStringAsFixed(1)} g',
                         Icons.fitness_center,
                         isDarkMode),
                     const SizedBox(width: 16),
                     _buildMealNutrient(
                         theme,
                         'Carbohidratos',
-                        '${meal.carbs.toStringAsFixed(1)} g',
+                        '${meal.carbs?.toStringAsFixed(1)} g',
                         Icons.grain,
                         isDarkMode),
                   ],
@@ -511,14 +513,15 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 formKey.currentState?.save();
                 setState(() {
                   daysData[selectedDayIndex].meals.add(
-                        Meal(
-                          name: name,
-                          description: description,
-                          calories: calories,
-                          protein: protein,
-                          carbs: carbs,
-                        ),
-                      );
+                    Meal(
+                      id: UniqueKey().toString(), // Temporary ID for template
+                      name: name,
+                      description: description,
+                      calories: calories,
+                      protein: protein,
+                      carbs: carbs,
+                    ),
+                  );
                 });
                 Navigator.pop(context);
               }
