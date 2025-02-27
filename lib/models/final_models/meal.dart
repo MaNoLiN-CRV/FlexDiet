@@ -6,14 +6,18 @@ final firestore = FirestoreService.firestore;
 class Meal {
   String id; // UUID
   String? name;
-  String? protein;
-  String? carbs;
+  String? description;
+  num? protein;
+  num? calories;
+  num? carbs;
   String? image;
 
   Meal({
     required this.id,
     this.name,
+    this.description,
     this.protein,
+    this.calories,
     this.carbs,
     this.image,
   });
