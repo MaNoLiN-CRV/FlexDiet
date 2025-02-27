@@ -40,20 +40,36 @@ class Day {
             toFirestore: (day, _) => day.toJson(),
           );
 
-  static Future<Day?> getDay(String dayId) async {
+  static Future<Day> getDay(String dayId) async {
     final docSnap = await collection.doc(dayId).get();
-    return docSnap.data();
+    return docSnap.data()!;
   }
 
-  static Future<void> createDay(Day day) async {
-    await collection.doc(day.id).set(day);
+  static Future<bool> createDay(Day day) async {
+    try {
+      await collection.doc(day.id).set(day);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> updateDay(Day day) async {
-    await collection.doc(day.id).update(day.toJson());
+  static Future<bool> updateDay(Day day) async {
+    try {
+      await collection.doc(day.id).update(day.toJson());
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> deleteDay(String dayId) async {
-    await collection.doc(dayId).delete();
+  static Future<bool> deleteDay(String dayId) async {
+    try {
+      await collection.doc(dayId).delete();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
+

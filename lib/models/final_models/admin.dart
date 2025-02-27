@@ -33,20 +33,36 @@ class Admin {
             toFirestore: (admin, _) => admin.toJson(),
           );
 
-  static Future<Admin?> getAdmin(String adminId) async {
+  static Future<Admin> getAdmin(String adminId) async {
     final docSnap = await collection.doc(adminId).get();
-    return docSnap.data();
+    return docSnap.data()!;
   }
 
-  static Future<void> createAdmin(Admin admin) async {
-    await collection.doc(admin.id).set(admin);
+  static Future<bool> createAdmin(Admin admin) async {
+    try {
+      await collection.doc(admin.id).set(admin);
+      return true;
+    } on FirebaseException catch (_) {
+      return false;
+    }
   }
 
-  static Future<void> updateAdmin(Admin admin) async {
-    await collection.doc(admin.id).update(admin.toJson());
+  static Future<bool> updateAdmin(Admin admin) async {
+    try {
+      await collection.doc(admin.id).update(admin.toJson());
+      return true;
+    } on FirebaseException catch (_) {
+      return false;
+    }
   }
 
-  static Future<void> deleteAdmin(String adminId) async {
-    await collection.doc(adminId).delete();
+  static Future<bool> deleteAdmin(String adminId) async {
+    try {
+      await collection.doc(adminId).delete();
+      return true;
+    } on FirebaseException catch (_) {
+      return false;
+    }
   }
 }
+

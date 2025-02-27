@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_flexdiet/widgets/custom_toast.dart'; // Assuming you have a custom toast widget
 
 class EditPerson extends StatefulWidget {
   late Client client;
@@ -30,6 +31,9 @@ class _EditPersonState extends State<EditPerson> {
     final Client? client = await Client.getClient(widget.clientId);
     if (client != null && mounted) {
       setState(() => widget.client = client);
+    } else {
+      showToast(context, 'Cliente no encontrado', toastType: ToastType.error);
+      Navigator.pop(context);
     }
   }
 
@@ -106,15 +110,19 @@ class _EditPersonState extends State<EditPerson> {
     );
 
     if (result == true && mounted) {
-      // TODO: Implement delete logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('Cliente eliminado'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      Navigator.pop(context);
+      final bool deleteSuccess = await Client.deleteClient(widget.clientId);
+      if (deleteSuccess) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Cliente eliminado'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        showToast(context, 'Error al eliminar el cliente', toastType: ToastType.error);
+      }
     }
   }
 

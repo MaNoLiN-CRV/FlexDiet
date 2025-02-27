@@ -30,7 +30,6 @@ class UserDiet {
     );
   }
 
-  // Métodos Firestore para UserDiet
   static CollectionReference<UserDiet> get collection =>
       firestore.collection('userDiets').withConverter<UserDiet>(
             fromFirestore: (snapshot, _) =>
@@ -38,20 +37,36 @@ class UserDiet {
             toFirestore: (userDiet, _) => userDiet.toJson(),
           );
 
-  static Future<UserDiet?> getUserDiet(String userDietId) async {
-    final docSnap = await collection.doc(userDietId).get();
-    return docSnap.data();
+  static Future<UserDiet> getUserDiet(String userDietId) async {
+      final docSnap = await collection.doc(userDietId).get();
+      return docSnap.data()!;
   }
 
-  static Future<void> createUserDiet(UserDiet userDiet) async {
-    await collection.doc(userDiet.id).set(userDiet);
+  static Future<bool> createUserDiet(UserDiet userDiet) async {
+    try {
+      await collection.doc(userDiet.id).set(userDiet);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> updateUserDiet(UserDiet userDiet) async {
-    await collection.doc(userDiet.id).update(userDiet.toJson());
+  static Future<bool> updateUserDiet(UserDiet userDiet) async {
+    try {
+      await collection.doc(userDiet.id).update(userDiet.toJson());
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> deleteUserDiet(String userDietId) async {
-    await collection.doc(userDietId).delete();
+  static Future<bool> deleteUserDiet(String userDietId) async {
+    try {
+      await collection.doc(userDietId).delete();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
+

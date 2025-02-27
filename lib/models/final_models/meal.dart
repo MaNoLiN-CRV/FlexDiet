@@ -45,20 +45,36 @@ class Meal {
             toFirestore: (meal, _) => meal.toJson(),
           );
 
-  static Future<Meal?> getMeal(String mealId) async {
-    final docSnap = await collection.doc(mealId).get();
-    return docSnap.data();
+  static Future<Meal> getMeal(String mealId) async {
+      final docSnap = await collection.doc(mealId).get();
+      return docSnap.data()!;
   }
 
-  static Future<void> createMeal(Meal meal) async {
-    await collection.doc(meal.id).set(meal);
+  static Future<bool> createMeal(Meal meal) async {
+    try {
+      await collection.doc(meal.id).set(meal);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> updateMeal(Meal meal) async {
-    await collection.doc(meal.id).update(meal.toJson());
+  static Future<bool> updateMeal(Meal meal) async {
+    try {
+      await collection.doc(meal.id).update(meal.toJson());
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> deleteMeal(String mealId) async {
-    await collection.doc(mealId).delete();
+  static Future<bool> deleteMeal(String mealId) async {
+    try {
+      await collection.doc(mealId).delete();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
+
