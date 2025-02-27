@@ -54,20 +54,36 @@ class Client {
             toFirestore: (client, _) => client.toJson(),
           );
 
-  static Future<Client?> getClient(String clientId) async {
+  static Future<Client> getClient(String clientId) async {
     final docSnap = await collection.doc(clientId).get();
-    return docSnap.data();
+    return docSnap.data()!;
   }
 
-  static Future<void> createClient(Client client) async {
-    await collection.doc(client.id).set(client);
+  static Future<bool> createClient(Client client) async {
+    try {
+      await collection.doc(client.id).set(client);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> updateClient(Client client) async {
-    await collection.doc(client.id).update(client.toJson());
+  static Future<bool> updateClient(Client client) async {
+    try {
+      await collection.doc(client.id).update(client.toJson());
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> deleteClient(String clientId) async {
-    await collection.doc(clientId).delete();
+  static Future<bool> deleteClient(String clientId) async {
+    try {
+      await collection.doc(clientId).delete();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
+

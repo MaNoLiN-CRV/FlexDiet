@@ -36,20 +36,36 @@ class Template {
             toFirestore: (template, _) => template.toJson(),
           );
 
-  static Future<Template?> getTemplate(String templateId) async {
-    final docSnap = await collection.doc(templateId).get();
-    return docSnap.data();
+  static Future<Template> getTemplate(String templateId) async {
+      final docSnap = await collection.doc(templateId).get();
+      return docSnap.data()!;
   }
 
-  static Future<void> createTemplate(Template template) async {
-    await collection.doc(template.id).set(template);
+  static Future<bool> createTemplate(Template template) async {
+    try {
+      await collection.doc(template.id).set(template);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> updateTemplate(Template template) async {
-    await collection.doc(template.id).update(template.toJson());
+  static Future<bool> updateTemplate(Template template) async {
+    try {
+      await collection.doc(template.id).update(template.toJson());
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  static Future<void> deleteTemplate(String templateId) async {
-    await collection.doc(templateId).delete();
+  static Future<bool> deleteTemplate(String templateId) async {
+    try {
+      await collection.doc(templateId).delete();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
+
