@@ -131,7 +131,8 @@ class _LoginScreenState extends State<LoginScreen>
           toastType: ToastType.success);
     } catch (e) {
       if (mounted) {
-        showToast(context, 'Error inesperado: $e', toastType: ToastType.error);
+        showToast(context, 'El correo o la contraseña son incorrectos',
+            toastType: ToastType.error);
       }
     }
   }

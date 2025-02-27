@@ -377,13 +377,16 @@ class _AdminScreenState extends State<AdminScreen> {
           _buildActionButton(
             context: context,
             title: 'USAR PLANTILLA EXISTENTE',
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => UseTemplateScreen(
-                        clientId: _selectedClientId!,
-                      )),
-            ),
+            onPressed: _selectedClientId != null
+                ? () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UseTemplateScreen(
+                          clientId: _selectedClientId!,
+                        ),
+                      ),
+                    )
+                : null,
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: UIConstants.defaultSpacing),
@@ -394,8 +397,9 @@ class _AdminScreenState extends State<AdminScreen> {
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            EditPerson(clientId: _selectedClientId!),
+                        builder: (context) => EditPerson(
+                          clientId: _selectedClientId!,
+                        ),
                       ),
                     )
                 : null,
