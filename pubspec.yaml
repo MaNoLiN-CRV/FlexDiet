@@ -56,7 +56,9 @@ dependencies:
   msh_checkbox: ^2.0.1
   encrypt: ^5.0.1
   flutter_isolate: ^2.1.0
-  
+  uni_links: ^0.5.1
+  firebase_dynamic_links: ^0.8.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
