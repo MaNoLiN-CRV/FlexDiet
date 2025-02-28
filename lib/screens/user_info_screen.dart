@@ -45,11 +45,12 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       id: userId,
       username: widget.client.username,
       email: widget.client.email,
-      dietId: _selectedGoal,
+      dietId: widget.client.dietId,
       sex: _selectedGender,
       bodyweight: _selectedWeight,
       height: _selectedHeight,
-      description: widget.client.description,
+      description:
+          'Objetivo para el cliente: $_selectedGoal \nPeso deseado: $_targetWeightController \n${widget.client.description} ',
     );
 
     bool isClientUpdated = await Client.updateClient(newClient);
