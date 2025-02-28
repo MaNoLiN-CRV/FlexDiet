@@ -150,6 +150,16 @@ Widget _buildPrincipalContainer(
             // Sign Up button
             ElevatedButton(
               onPressed: () async {
+                // Check if any field is empty
+                if (usernameController.text.isEmpty ||
+                    emailController.text.isEmpty ||
+                    passwordController.text.isEmpty ||
+                    confirmPasswordController.text.isEmpty) {
+                  showToast(context, 'Por favor, rellena todos los campos.',
+                      toastType: ToastType.error);
+                  return; // Exit the function if any field is empty
+                }
+
                 _checkPassword(
                     passwordController, confirmPasswordController, context);
 
@@ -243,123 +253,82 @@ Widget _buildUpContainer(Size screenSize, ThemeData theme) {
   );
 }
 
-  Widget _buildForm(
-    BuildContext context,
-    ThemeData theme,
-    TextEditingController usernameController,
-    TextEditingController emailController,
-    TextEditingController passwordController,
-    TextEditingController confirmPasswordController,
-    bool isPasswordVisible,
-    bool isConfirmPasswordVisible,
-    void Function()? onPasswordVisibilityChanged,
-    void Function()? onConfirmPasswordVisibilityChanged,
-  ) {
-    return Column(
-      children: [
-        // Username input
-        Container(
-          decoration: _buildDecorationContainer(theme),
-          child: CustomInputText(
-            controller: usernameController,
-            keyboardType: TextInputType.text,
-            validator: (value) {
-              if (value!.isEmpty) {
-                showToast(context, 'Por favor, rellene el campo nombre de usuario', toastType: ToastType.error);
-                return;
-              }
-              return null;
-            },
-            decoration: _buildDecoration(
-                theme, 'Nombre de usuario', Icons.person_outline),
-          ),
+Widget _buildForm(
+  BuildContext context,
+  ThemeData theme,
+  TextEditingController usernameController,
+  TextEditingController emailController,
+  TextEditingController passwordController,
+  TextEditingController confirmPasswordController,
+  bool isPasswordVisible,
+  bool isConfirmPasswordVisible,
+  void Function()? onPasswordVisibilityChanged,
+  void Function()? onConfirmPasswordVisibilityChanged,
+) {
+  return Column(
+    children: [
+      // Username input
+      Container(
+        decoration: _buildDecorationContainer(theme),
+        child: CustomInputText(
+          controller: usernameController,
+          keyboardType: TextInputType.text,
+          decoration: _buildDecoration(
+              theme, 'Nombre de usuario', Icons.person_outline),
         ),
-        const SizedBox(height: 20),
-        Container(
-          decoration: _buildDecorationContainer(theme),
-          child: CustomInputText(
-            controller: emailController,
-            keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value!.isEmpty) {
-                showToast(context, 'Por favor, rellene el correo electrónico', toastType: ToastType.error);
-                return;
-              }
-              if (!value.contains('@')) {
-                showToast(context, 'Correo electrónico no válido', toastType: ToastType.error);
-                return;
-              }
-              return null;
-            },
-            decoration: _buildDecoration(
-                theme, 'Correo electrónico', Icons.email_rounded),
-          ),
+      ),
+      const SizedBox(height: 20),
+      Container(
+        decoration: _buildDecorationContainer(theme),
+        child: CustomInputText(
+          controller: emailController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: _buildDecoration(
+              theme, 'Correo electrónico', Icons.email_rounded),
         ),
-        const SizedBox(height: 20),
-        // Password input
-        Container(
-          decoration: _buildDecorationContainer(theme),
-          child: CustomInputText(
-            controller: passwordController,
-            obscureText: !isPasswordVisible,
-            validator: (value) {
-              if (value!.isEmpty) {
-                showToast(context, 'Por favor, rellene el campo contraseña', toastType: ToastType.error);
-                return;
-              }
-              if (value.length < 6) {
-                showToast(context, 'Mínimo 6 caracteres', toastType: ToastType.error);
-                return;
-              } 
-              return null;
-            },
-            decoration: _buildDecoration(
-              theme,
-              'Contraseña',
-              Icons.lock_outline,
-              IconButton(
-                icon: Icon(isPasswordVisible
-                    ? Icons.visibility
-                    : Icons.visibility_off),
-                onPressed: onPasswordVisibilityChanged,
-              ),
+      ),
+      const SizedBox(height: 20),
+      // Password input
+      Container(
+        decoration: _buildDecorationContainer(theme),
+        child: CustomInputText(
+          controller: passwordController,
+          obscureText: !isPasswordVisible,
+          decoration: _buildDecoration(
+            theme,
+            'Contraseña',
+            Icons.lock_outline,
+            IconButton(
+              icon: Icon(
+                  isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+              onPressed: onPasswordVisibilityChanged,
             ),
           ),
         ),
-        const SizedBox(height: 20),
-        // Confirm Password input
-        Container(
-          decoration: _buildDecorationContainer(theme),
-          child: CustomInputText(
-            controller: confirmPasswordController,
-            obscureText: !isConfirmPasswordVisible,
-            validator: (value) {
-              if (value!.isEmpty) {
-                showToast(context, 'Por favor, rellene el campo repita su contraseña', toastType: ToastType.error);
-                return;
-              }
-              if (value.length < 6) {
-                showToast(context, 'Mínimo 6 caracteres', toastType: ToastType.error);
-                return;
-              } 
-              return null;
-            },
-            decoration: _buildDecoration(
-              theme,
-              'Confirmar contraseña',
-              Icons.lock_outline,
-              IconButton(
-                icon: Icon(isConfirmPasswordVisible
-                    ? Icons.visibility
-                    : Icons.visibility_off),
-                onPressed: onConfirmPasswordVisibilityChanged,
-              ),
+      ),
+      const SizedBox(height: 20),
+      // Confirm Password input
+      Container(
+        decoration: _buildDecorationContainer(theme),
+        child: CustomInputText(
+          controller: confirmPasswordController,
+          obscureText: !isConfirmPasswordVisible,
+          decoration: _buildDecoration(
+            theme,
+            'Confirmar contraseña',
+            Icons.lock_outline,
+            IconButton(
+              icon: Icon(isConfirmPasswordVisible
+                  ? Icons.visibility
+                  : Icons.visibility_off),
+              onPressed: onConfirmPasswordVisibilityChanged,
             ),
           ),
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
 BoxDecoration _buildDecorationContainer(ThemeData theme) {
   return BoxDecoration(
