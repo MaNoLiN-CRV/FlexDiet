@@ -4,8 +4,9 @@ import '../../firebase_firestore.dart';
 final firestore = FirestoreService.firestore;
 
 class Client {
-  String id; // UUID en el esquema, Firestore genera el ID automáticamente
+  String id; // UUID
   String username;
+  String email;
   String? dietId; // Diet reference
   String? sex;
   double? bodyweight;
@@ -15,6 +16,7 @@ class Client {
   Client({
     required this.id,
     required this.username,
+    required this.email,
     this.dietId,
     this.sex,
     this.bodyweight,
@@ -25,6 +27,7 @@ class Client {
   Map<String, dynamic> toJson() {
     return {
       'username': username,
+      'email': email,
       'dietId': dietId,
       'sex': sex,
       'bodyweight': bodyweight,
@@ -37,6 +40,7 @@ class Client {
     return Client(
       id: id,
       username: json['username'] ?? '',
+      email: json['email'] ?? '',
       dietId: json['dietId'],
       sex: json['sex'],
       bodyweight:
