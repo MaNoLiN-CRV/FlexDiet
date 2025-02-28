@@ -1,5 +1,5 @@
-import '../../firebase_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../firebase_firestore.dart';
 
 final firestore = FirestoreService.firestore;
 
@@ -46,7 +46,6 @@ class Client {
     );
   }
 
-  // Métodos Firestore para Cliente
   static CollectionReference<Client> get collection =>
       firestore.collection('clients').withConverter<Client>(
             fromFirestore: (snapshot, _) =>
@@ -86,4 +85,3 @@ class Client {
     }
   }
 }
-

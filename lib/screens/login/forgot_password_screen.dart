@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/custom_toast.dart';
-import 'package:uni_links/uni_links.dart';
 import 'dart:async';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -33,7 +32,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       end: const Color.fromARGB(48, 98, 15, 231),
     ).animate(_animationController);
 
-    _handleIncomingLinks();
+    // _handleIncomingLinks();
   }
 
   @override
@@ -44,15 +43,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     super.dispose();
   }
 
-  void _handleIncomingLinks() {
-    _sub = uriLinkStream.listen((Uri? uri) {
-      if (uri != null && uri.path == '/reset-password') {
-        _showResetPasswordDialog();
-      }
-    }, onError: (Object err) {
-      // Handle error
-    });
-  }
+  // void _handleIncomingLinks() {
+  //   _sub = uriLinkStream.listen((Uri? uri) {
+  //     if (uri != null && uri.path == '/reset-password') {
+  //       _showResetPasswordDialog();
+  //     }
+  //   }, onError: (Object err) {
+  //     // Handle error
+  //   });
+  // }
 
   Future<void> _sendPasswordResetEmail() async {
     final email = _emailController.text.trim();

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/exceptions/exceptions.dart';
+import 'package:flutter_flexdiet/exceptions/firebase_auth_exceptions_handler.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
@@ -53,6 +54,51 @@ class _RegisterScreenState extends State<RegisterScreen>
     super.dispose();
   }
 
+  Future<void> _register() async {
+    if (myFormKey.currentState?.validate() ?? false) {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+      final username = _usernameController.text.trim();
+
+      try {
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        final user = userCredential.user;
+        if (user != null) {
+          final client = Client(
+            id: user.uid,
+            username: username,
+          );
+
+          await Client.createClient(client);
+
+          if (mounted) {
+            showToast(context, 'Has sido registrado correctamente.',
+                toastType: ToastType.success);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+            );
+          }
+        }
+      } on FirebaseAuthException catch (e) {
+        if (mounted) {
+          showToast(context, _authExceptionsHandler.getExceptionMessage(e.code),
+              toastType: ToastType.error);
+        }
+      } catch (e) {
+        if (mounted) {
+          showToast(context, 'Ocurrió un error inesperado.',
+              toastType: ToastType.error);
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -93,267 +139,225 @@ class _RegisterScreenState extends State<RegisterScreen>
       ),
     );
   }
-}
 
-Decoration _buildBackground(Animation<Color?> backgroundColorAnimation) {
-  return BoxDecoration(
-    color: backgroundColorAnimation.value,
-    image: const DecorationImage(
-      image: AssetImage('assets/images/background.jpg'),
-      opacity: 0.4,
-      fit: BoxFit.cover,
-    ),
-  );
-}
-
-Widget _buildPrincipalContainer(
-  BuildContext context,
-  GlobalKey<FormState> myFormKey,
-  Size screenSize,
-  ThemeData theme,
-  TextEditingController usernameController,
-  TextEditingController emailController,
-  bool isPasswordVisible,
-  bool isConfirmPasswordVisible,
-  TextEditingController passwordController,
-  TextEditingController confirmPasswordController,
-  provider.EmailAuth emailAuthService,
-  void Function()? onPasswordVisibilityChanged,
-  void Function()? onConfirmPasswordVisibilityChanged,
-  FirebaseAuthExceptionsHandler authExceptionsHandler,
-) {
-  return Center(
-    child: SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
-      child: Form(
-        key: myFormKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildUpContainer(screenSize, theme),
-            const SizedBox(height: 50),
-            _buildForm(
-              theme,
-              usernameController,
-              emailController,
-              passwordController,
-              confirmPasswordController,
-              isPasswordVisible,
-              isConfirmPasswordVisible,
-              onPasswordVisibilityChanged,
-              onConfirmPasswordVisibilityChanged,
-            ),
-            const SizedBox(height: 30),
-            // Sign Up button
-            ElevatedButton(
-              onPressed: () async {
-                _checkPassword(
-                    passwordController, confirmPasswordController, context);
-
-                try {
-                  await emailAuthService.signUp(
-                    email: emailController.text,
-                    password: passwordController.text,
-                  );
-                  if (context.mounted) _registerSuccesful(context);
-                } on FirebaseAuthException catch (e) {
-                  if (context.mounted) {
-                    showToast(
-                      context,
-                      authExceptionsHandler.getExceptionMessage(e.code),
-                      toastType: ToastType.error,
-                    );
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    showToast(context, 'Ocurrió un error inesperado.',
-                        toastType: ToastType.error);
-                  }
-                }
-              },
-              style: theme.elevatedButtonTheme.style,
-              child: Text('Regístrate',
-                  style: theme.textTheme.labelMedium
-                      ?.copyWith(color: textLightBlue)),
-            ),
-            const SizedBox(height: 10),
-            // Already have an account?
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    '¿Ya tienes cuenta? Inicia sesión',
-                    style: theme.textTheme.bodyLarge
-                        ?.copyWith(color: textDarkBlue),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+  Decoration _buildBackground(Animation<Color?> backgroundColorAnimation) {
+    return BoxDecoration(
+      color: backgroundColorAnimation.value,
+      image: const DecorationImage(
+        image: AssetImage('assets/images/background.jpg'),
+        opacity: 0.4,
+        fit: BoxFit.cover,
       ),
-    ),
-  );
-}
-
-Widget _buildUpContainer(Size screenSize, ThemeData theme) {
-  return Column(
-    children: [
-      Image.asset(
-        'assets/images/logo.png',
-        height: screenSize.height * 0.18,
-      ),
-      Text(
-        'FlexDiet',
-        textAlign: TextAlign.center,
-        style: theme.textTheme.displayMedium?.copyWith(color: textDarkBlue),
-      ),
-      const SizedBox(height: 8),
-      Text(
-        'Regístrate para empezar tu viaje saludable',
-        textAlign: TextAlign.center,
-        style: theme.textTheme.titleMedium?.copyWith(color: textDarkBlue),
-      ),
-    ],
-  );
-}
-
-Widget _buildForm(
-  ThemeData theme,
-  TextEditingController usernameController,
-  TextEditingController emailController,
-  TextEditingController passwordController,
-  TextEditingController confirmPasswordController,
-  bool isPasswordVisible,
-  bool isConfirmPasswordVisible,
-  void Function()? onPasswordVisibilityChanged,
-  void Function()? onConfirmPasswordVisibilityChanged,
-) {
-  return Column(
-    children: [
-      // Username input
-      Container(
-        decoration: _buildDecorationContainer(theme),
-        child: CustomInputText(
-          controller: usernameController,
-          keyboardType: TextInputType.text,
-          validator: (value) {
-            if (value!.isEmpty) {
-              return 'Por favor, ingresa un nombre de usuario';
-            }
-            return null;
-          },
-          decoration: _buildDecoration(
-              theme, 'Nombre de usuario', Icons.person_outline),
-        ),
-      ),
-      const SizedBox(height: 20),
-      Container(
-        decoration: _buildDecorationContainer(theme),
-        child: CustomInputText(
-          controller: emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: _buildDecoration(
-              theme, 'Correo electrónico', Icons.email_rounded),
-        ),
-      ),
-      const SizedBox(height: 20),
-      // Password input
-      Container(
-        decoration: _buildDecorationContainer(theme),
-        child: CustomInputText(
-          controller: passwordController,
-          obscureText: !isPasswordVisible,
-          validator: (value) {
-            if (value!.length < 8) return 'Mínimo 8 caracteres';
-            return null;
-          },
-          decoration: _buildDecoration(
-            theme,
-            'Contraseña',
-            Icons.lock_outline,
-            IconButton(
-              icon: Icon(
-                  isPasswordVisible ? Icons.visibility : Icons.visibility_off),
-              onPressed: onPasswordVisibilityChanged,
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(height: 20),
-      // Confirm Password input
-      Container(
-        decoration: _buildDecorationContainer(theme),
-        child: CustomInputText(
-          controller: confirmPasswordController,
-          obscureText: !isConfirmPasswordVisible,
-          validator: (value) {
-            if (value!.length < 8) return 'Mínimo 8 caracteres';
-            return null;
-          },
-          decoration: _buildDecoration(
-            theme,
-            'Confirmar contraseña',
-            Icons.lock_outline,
-            IconButton(
-              icon: Icon(isConfirmPasswordVisible
-                  ? Icons.visibility
-                  : Icons.visibility_off),
-              onPressed: onConfirmPasswordVisibilityChanged,
-            ),
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-BoxDecoration _buildDecorationContainer(ThemeData theme) {
-  return BoxDecoration(
-    color: theme.colorScheme.surface,
-    borderRadius: BorderRadius.circular(12),
-    boxShadow: const [
-      BoxShadow(
-        color: Colors.black,
-        blurRadius: 8,
-        offset: Offset(0, 2),
-      ),
-    ],
-  );
-}
-
-InputDecoration _buildDecoration(ThemeData theme, String label, IconData icon,
-    [IconButton? suffix]) {
-  return InputDecoration(
-    hintText: label,
-    labelStyle: theme.inputDecorationTheme.labelStyle,
-    border: InputBorder.none,
-    prefixIcon: Icon(icon),
-    suffixIcon: suffix,
-    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-  );
-}
-
-// Register if else refactor
-void _checkPassword(TextEditingController passwordController,
-    TextEditingController confirmPasswordController, BuildContext context) {
-  if (passwordController.text != confirmPasswordController.text &&
-      context.mounted) {
-    showToast(context, 'Las contraseñas no coinciden.',
-        toastType: ToastType.error);
+    );
   }
-}
 
-void _registerSuccesful(BuildContext context) {
-  showToast(context, 'Has sido registrado correctamente.',
-      toastType: ToastType.success);
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const LoginScreen()),
-  );
+  Widget _buildPrincipalContainer(
+    BuildContext context,
+    GlobalKey<FormState> myFormKey,
+    Size screenSize,
+    ThemeData theme,
+    TextEditingController usernameController,
+    TextEditingController emailController,
+    bool isPasswordVisible,
+    bool isConfirmPasswordVisible,
+    TextEditingController passwordController,
+    TextEditingController confirmPasswordController,
+    provider.EmailAuth emailAuthService,
+    void Function()? onPasswordVisibilityChanged,
+    void Function()? onConfirmPasswordVisibilityChanged,
+    FirebaseAuthExceptionsHandler authExceptionsHandler,
+  ) {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+        child: Form(
+          key: myFormKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildUpContainer(screenSize, theme),
+              const SizedBox(height: 50),
+              _buildForm(
+                theme,
+                usernameController,
+                emailController,
+                passwordController,
+                confirmPasswordController,
+                isPasswordVisible,
+                isConfirmPasswordVisible,
+                onPasswordVisibilityChanged,
+                onConfirmPasswordVisibilityChanged,
+              ),
+              const SizedBox(height: 30),
+              // Sign Up button
+              ElevatedButton(
+                onPressed: _register,
+                style: theme.elevatedButtonTheme.style,
+                child: Text('Regístrate',
+                    style: theme.textTheme.labelMedium
+                        ?.copyWith(color: textLightBlue)),
+              ),
+              const SizedBox(height: 10),
+              // Already have an account?
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      '¿Ya tienes cuenta? Inicia sesión',
+                      style: theme.textTheme.bodyLarge
+                          ?.copyWith(color: textDarkBlue),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUpContainer(Size screenSize, ThemeData theme) {
+    return Column(
+      children: [
+        Image.asset(
+          'assets/images/logo.png',
+          height: screenSize.height * 0.18,
+        ),
+        Text(
+          'FlexDiet',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.displayMedium?.copyWith(color: textDarkBlue),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Regístrate para empezar tu viaje saludable',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.titleMedium?.copyWith(color: textDarkBlue),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildForm(
+    ThemeData theme,
+    TextEditingController usernameController,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+    TextEditingController confirmPasswordController,
+    bool isPasswordVisible,
+    bool isConfirmPasswordVisible,
+    void Function()? onPasswordVisibilityChanged,
+    void Function()? onConfirmPasswordVisibilityChanged,
+  ) {
+    return Column(
+      children: [
+        // Username input
+        Container(
+          decoration: _buildDecorationContainer(theme),
+          child: CustomInputText(
+            controller: usernameController,
+            keyboardType: TextInputType.text,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Por favor, ingresa un nombre de usuario';
+              }
+              return null;
+            },
+            decoration: _buildDecoration(
+                theme, 'Nombre de usuario', Icons.person_outline),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Container(
+          decoration: _buildDecorationContainer(theme),
+          child: CustomInputText(
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: _buildDecoration(
+                theme, 'Correo electrónico', Icons.email_rounded),
+          ),
+        ),
+        const SizedBox(height: 20),
+        // Password input
+        Container(
+          decoration: _buildDecorationContainer(theme),
+          child: CustomInputText(
+            controller: passwordController,
+            obscureText: !isPasswordVisible,
+            validator: (value) {
+              if (value!.length < 8) return 'Mínimo 8 caracteres';
+              return null;
+            },
+            decoration: _buildDecoration(
+              theme,
+              'Contraseña',
+              Icons.lock_outline,
+              IconButton(
+                icon: Icon(isPasswordVisible
+                    ? Icons.visibility
+                    : Icons.visibility_off),
+                onPressed: onPasswordVisibilityChanged,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        // Confirm Password input
+        Container(
+          decoration: _buildDecorationContainer(theme),
+          child: CustomInputText(
+            controller: confirmPasswordController,
+            obscureText: !isConfirmPasswordVisible,
+            validator: (value) {
+              if (value!.length < 8) return 'Mínimo 8 caracteres';
+              return null;
+            },
+            decoration: _buildDecoration(
+              theme,
+              'Confirmar contraseña',
+              Icons.lock_outline,
+              IconButton(
+                icon: Icon(isConfirmPasswordVisible
+                    ? Icons.visibility
+                    : Icons.visibility_off),
+                onPressed: onConfirmPasswordVisibilityChanged,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  BoxDecoration _buildDecorationContainer(ThemeData theme) {
+    return BoxDecoration(
+      color: theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: const [
+        BoxShadow(
+          color: Colors.black,
+          blurRadius: 8,
+          offset: Offset(0, 2),
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _buildDecoration(ThemeData theme, String label, IconData icon,
+      [IconButton? suffix]) {
+    return InputDecoration(
+      hintText: label,
+      labelStyle: theme.inputDecorationTheme.labelStyle,
+      border: InputBorder.none,
+      prefixIcon: Icon(icon),
+      suffixIcon: suffix,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    );
+  }
 }
