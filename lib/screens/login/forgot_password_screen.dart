@@ -248,6 +248,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       onPressed: _sendPasswordResetEmail,
                       child: const Text('Restablecer contraseña'),
                     ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Volver al inicio de sesión',
+                          style: TextStyle(
+                              color: textDarkBlue)), // Texto para regresar
+                    ),
                   ],
                 ),
               ),
