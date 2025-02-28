@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/app_theme_light.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserInfoScreen extends StatefulWidget {
-  const UserInfoScreen({super.key});
+  final Client client;
+  const UserInfoScreen({
+    super.key,
+    required this.client,
+  });
 
   @override
   _UserInfoScreenState createState() => _UserInfoScreenState();
@@ -32,6 +37,30 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   Future<void> _setUserInfoCompleted() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('userInfoCompleted', true);
+  }
+
+  Future<void> _saveUserInfo() async {
+    final userId = widget.client.id;
+    final newClient = Client(
+      id: userId,
+      username: widget.client.username,
+      email: widget.client.email,
+      dietId: _selectedGoal,
+      sex: _selectedGender,
+      bodyweight: _selectedWeight,
+      height: _selectedHeight,
+      description: widget.client.description,
+    );
+
+    bool isClientUpdated = await Client.updateClient(newClient);
+
+    if (isClientUpdated) {
+      showToast(context, 'Información guardada correctamente.',
+          toastType: ToastType.success);
+    } else {
+      showToast(context, 'Error al guardar la información.',
+          toastType: ToastType.error);
+    }
   }
 
   @override
@@ -252,6 +281,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                       return;
                     }
 
+                    await _saveUserInfo();
                     await _setUserInfoCompleted();
                     if (context.mounted) {
                       Navigator.pushReplacement(

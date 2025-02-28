@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
@@ -60,7 +61,8 @@ class _LoginScreenState extends State<LoginScreen>
     googleAuthService = authService.googleAuth();
   }
 
-  Future<void> _navigateToNextScreen(BuildContext context) async {
+  Future<void> _navigateToNextScreen(
+      BuildContext context, Client client) async {
     bool userInfoCompleted = await isUserInfoCompleted();
 
     if (context.mounted) {
@@ -68,8 +70,11 @@ class _LoginScreenState extends State<LoginScreen>
         context,
         MaterialPageRoute(
           builder: (context) => LoadingScreen(
-            targetScreen:
-                userInfoCompleted ? const HomeScreen() : const UserInfoScreen(),
+            targetScreen: userInfoCompleted
+                ? const HomeScreen()
+                : UserInfoScreen(
+                    client: client,
+                  ),
             loadingSeconds: 2,
           ),
         ),
@@ -99,7 +104,8 @@ class _LoginScreenState extends State<LoginScreen>
       if (authenticated && context.mounted) {
         showToast(context, 'Inicio de sesión correcto',
             toastType: ToastType.success);
-        await _navigateToNextScreen(context);
+        Client client = await Client.getClient(authService.currentUser!.uid);
+        await _navigateToNextScreen(context, client);
       }
     } on PlatformException {
       if (!context.mounted) return;
@@ -124,7 +130,8 @@ class _LoginScreenState extends State<LoginScreen>
 
       if (userCredential?.user != null) {
         if (context.mounted) {
-          await _navigateToNextScreen(context);
+          Client client = await Client.getClient(userCredential!.user!.uid);
+          await _navigateToNextScreen(context, client);
         }
       }
 
@@ -145,7 +152,8 @@ class _LoginScreenState extends State<LoginScreen>
       final user = userCredential?.user;
       if (user != null) {
         if (context.mounted) {
-          await _navigateToNextScreen(context);
+          Client client = await Client.getClient(user.uid);
+          await _navigateToNextScreen(context, client);
         }
       }
       if (!context.mounted) return;
