@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:provider/provider.dart';
@@ -85,8 +86,19 @@ class MyApp extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      final hasCompletedInfo = await _hasCompletedUserInfo();
-      return hasCompletedInfo ? const HomeScreen() : const UserInfoScreen();
+      try {
+        final client = await Client.getClient(user.uid);
+        final hasCompletedInfo = await _hasCompletedUserInfo();
+
+        return hasCompletedInfo
+            ? const HomeScreen()
+            : UserInfoScreen(client: client);
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error fetching client data: $e');
+        }
+        return const LoginScreen();
+      }
     } else {
       return const LoginScreen();
     }
