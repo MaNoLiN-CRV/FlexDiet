@@ -135,6 +135,7 @@ Widget _buildPrincipalContainer(
             _buildUpContainer(screenSize, theme),
             const SizedBox(height: 50),
             _buildForm(
+              context,
               theme,
               usernameController,
               emailController,
@@ -243,6 +244,7 @@ Widget _buildUpContainer(Size screenSize, ThemeData theme) {
 }
 
   Widget _buildForm(
+    BuildContext context,
     ThemeData theme,
     TextEditingController usernameController,
     TextEditingController emailController,
