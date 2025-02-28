@@ -150,14 +150,13 @@ Widget _buildPrincipalContainer(
             // Sign Up button
             ElevatedButton(
               onPressed: () async {
-                // Check if any field is empty
                 if (usernameController.text.isEmpty ||
                     emailController.text.isEmpty ||
                     passwordController.text.isEmpty ||
                     confirmPasswordController.text.isEmpty) {
                   showToast(context, 'Por favor, rellena todos los campos.',
                       toastType: ToastType.error);
-                  return; // Exit the function if any field is empty
+                  return;
                 }
 
                 _checkPassword(
