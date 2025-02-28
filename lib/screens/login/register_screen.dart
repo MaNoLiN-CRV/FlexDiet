@@ -264,9 +264,7 @@ class _RegisterScreenState extends State<RegisterScreen>
             controller: usernameController,
             keyboardType: TextInputType.text,
             validator: (value) {
-              if (value!.isEmpty) {
-                return 'Por favor, ingresa un nombre de usuario';
-              }
+              if (value!.isEmpty) return 'Por favor, rellene el campo';
               return null;
             },
             decoration: _buildDecoration(
@@ -279,6 +277,11 @@ class _RegisterScreenState extends State<RegisterScreen>
           child: CustomInputText(
             controller: emailController,
             keyboardType: TextInputType.emailAddress,
+            validator: (value) {
+              if (value!.isEmpty) return 'Por favor, rellene el campo';
+              if (!value.contains('@')) return 'Correo electrónico inválido';
+              return null;
+            },
             decoration: _buildDecoration(
                 theme, 'Correo electrónico', Icons.email_rounded),
           ),
@@ -291,7 +294,8 @@ class _RegisterScreenState extends State<RegisterScreen>
             controller: passwordController,
             obscureText: !isPasswordVisible,
             validator: (value) {
-              if (value!.length < 8) return 'Mínimo 8 caracteres';
+              if (value!.isEmpty) return 'Por favor, rellene el campo';
+              if (value.length < 6) return 'Mínimo 6 caracteres';
               return null;
             },
             decoration: _buildDecoration(
@@ -315,7 +319,8 @@ class _RegisterScreenState extends State<RegisterScreen>
             controller: confirmPasswordController,
             obscureText: !isConfirmPasswordVisible,
             validator: (value) {
-              if (value!.length < 8) return 'Mínimo 8 caracteres';
+              if (value!.isEmpty) return 'Por favor, rellene el campo';
+              if (value.length < 6) return 'Mínimo 6 caracteres';
               return null;
             },
             decoration: _buildDecoration(
