@@ -159,9 +159,17 @@ Widget _buildPrincipalContainer(
                   return;
                 }
 
-                 if(!myFormKey.currentState!.validate()) {
-                _checkPassword(
-                    passwordController, confirmPasswordController, context);
+                // Validate returns true if the form is valid
+                if (myFormKey.currentState!.validate() == false) {
+                  return;
+                }
+
+                //Check Password
+                if (passwordController.text != confirmPasswordController.text) {
+                  showToast(context, 'Las contraseñas no coinciden.',
+                      toastType: ToastType.error);
+                  return;
+                }
 
                 try {
                   UserCredential userCredential = await emailAuthService.signUp(
@@ -189,11 +197,9 @@ Widget _buildPrincipalContainer(
                   }
                 } on FirebaseAuthException catch (e) {
                   if (context.mounted) {
-                    showToast(
-                      context,
-                      authExceptionsHandler.getExceptionMessage(e.code),
-                      toastType: ToastType.error,
-                    );
+                    showToast(context,
+                        authExceptionsHandler.getExceptionMessage(e.code),
+                        toastType: ToastType.error);
                   }
                 } catch (e) {
                   if (context.mounted) {
@@ -201,7 +207,6 @@ Widget _buildPrincipalContainer(
                         toastType: ToastType.error);
                   }
                 }
-                 }
               },
               style: theme.elevatedButtonTheme.style,
               child: Text('Regístrate',
@@ -217,11 +222,9 @@ Widget _buildPrincipalContainer(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text(
-                    '¿Ya tienes cuenta? Inicia sesión',
-                    style: theme.textTheme.bodyLarge
-                        ?.copyWith(color: textDarkBlue),
-                  ),
+                  child: Text('¿Ya tienes cuenta? Inicia sesión',
+                      style: theme.textTheme.bodyLarge
+                          ?.copyWith(color: textDarkBlue)),
                 ),
               ],
             ),
@@ -254,123 +257,112 @@ Widget _buildUpContainer(Size screenSize, ThemeData theme) {
   );
 }
 
-  Widget _buildForm(
-    BuildContext context,
-    ThemeData theme,
-    TextEditingController usernameController,
-    TextEditingController emailController,
-    TextEditingController passwordController,
-    TextEditingController confirmPasswordController,
-    bool isPasswordVisible,
-    bool isConfirmPasswordVisible,
-    void Function()? onPasswordVisibilityChanged,
-    void Function()? onConfirmPasswordVisibilityChanged,
-  ) {
-    return Column(
-      children: [
-        // Username input
-        Container(
-          decoration: _buildDecorationContainer(theme),
-          child: CustomInputText(
-            controller: usernameController,
-            keyboardType: TextInputType.text,
-            validator: (value) {
-              if (value!.isEmpty) {
-                showToast(context, 'Por favor, rellene el campo nombre de usuario', toastType: ToastType.error);
-                return;
-              }
-              return null;
-            },
-            decoration: _buildDecoration(
-                theme, 'Nombre de usuario', Icons.person_outline),
-          ),
+Widget _buildForm(
+  BuildContext context,
+  ThemeData theme,
+  TextEditingController usernameController,
+  TextEditingController emailController,
+  TextEditingController passwordController,
+  TextEditingController confirmPasswordController,
+  bool isPasswordVisible,
+  bool isConfirmPasswordVisible,
+  void Function()? onPasswordVisibilityChanged,
+  void Function()? onConfirmPasswordVisibilityChanged,
+) {
+  return Column(
+    children: [
+      // Username input
+      Container(
+        decoration: _buildDecorationContainer(theme),
+        child: CustomInputText(
+          controller: usernameController,
+          keyboardType: TextInputType.text,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              showToast(
+                  context, 'Por favor, rellene el campo nombre de usuario',
+                  toastType: ToastType.error);
+            }
+            return null;
+          },
+          decoration: _buildDecoration(
+              theme, 'Nombre de usuario', Icons.person_outline),
         ),
-        const SizedBox(height: 20),
-        Container(
-          decoration: _buildDecorationContainer(theme),
-          child: CustomInputText(
-            controller: emailController,
-            keyboardType: TextInputType.emailAddress,
-            validator: (value) {
-              if (value!.isEmpty) {
-                showToast(context, 'Por favor, rellene el correo electrónico', toastType: ToastType.error);
-                return;
-              }
-              if (!value.contains('@')) {
-                showToast(context, 'Correo electrónico no válido', toastType: ToastType.error);
-                return;
-              }
-              return null;
-            },
-            decoration: _buildDecoration(
-                theme, 'Correo electrónico', Icons.email_rounded),
-          ),
+      ),
+      const SizedBox(height: 20),
+      Container(
+        decoration: _buildDecorationContainer(theme),
+        child: CustomInputText(
+          controller: emailController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: _buildDecoration(
+              theme, 'Correo electrónico', Icons.email_rounded),
         ),
-        const SizedBox(height: 20),
-        // Password input
-        Container(
-          decoration: _buildDecorationContainer(theme),
-          child: CustomInputText(
-            controller: passwordController,
-            obscureText: !isPasswordVisible,
-            validator: (value) {
-              if (value!.isEmpty) {
-                showToast(context, 'Por favor, rellene el campo contraseña', toastType: ToastType.error);
-                return;
-              }
-              if (value.length < 6) {
-                showToast(context, 'Mínimo 6 caracteres', toastType: ToastType.error);
-                return;
-              } 
-              return null;
-            },
-            decoration: _buildDecoration(
-              theme,
-              'Contraseña',
-              Icons.lock_outline,
-              IconButton(
-                icon: Icon(isPasswordVisible
-                    ? Icons.visibility
-                    : Icons.visibility_off),
-                onPressed: onPasswordVisibilityChanged,
-              ),
+      ),
+      const SizedBox(height: 20),
+      // Password input
+      Container(
+        decoration: _buildDecorationContainer(theme),
+        child: CustomInputText(
+          controller: passwordController,
+          obscureText: !isPasswordVisible,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              showToast(context, 'Por favor, rellene el campo contraseña',
+                  toastType: ToastType.error);
+              return 'Error';
+            }
+            if (value.length < 6) {
+              showToast(
+                  context, 'La contraseña tienen que tener mínimo 6 caracteres',
+                  toastType: ToastType.error);
+              return 'Error';
+            }
+            return null;
+          },
+          decoration: _buildDecoration(
+            theme,
+            'Contraseña',
+            Icons.lock_outline,
+            IconButton(
+              icon: Icon(
+                  isPasswordVisible ? Icons.visibility : Icons.visibility_off),
+              onPressed: onPasswordVisibilityChanged,
             ),
           ),
         ),
-        const SizedBox(height: 20),
-        // Confirm Password input
-        Container(
-          decoration: _buildDecorationContainer(theme),
-          child: CustomInputText(
-            controller: confirmPasswordController,
-            obscureText: !isConfirmPasswordVisible,
-            validator: (value) {
-              if (value!.isEmpty) {
-                showToast(context, 'Por favor, rellene el campo repita su contraseña', toastType: ToastType.error);
-                return;
-              }
-              if (value.length < 6) {
-                showToast(context, 'Mínimo 6 caracteres', toastType: ToastType.error);
-                return;
-              } 
-              return null;
-            },
-            decoration: _buildDecoration(
-              theme,
-              'Confirmar contraseña',
-              Icons.lock_outline,
-              IconButton(
-                icon: Icon(isConfirmPasswordVisible
-                    ? Icons.visibility
-                    : Icons.visibility_off),
-                onPressed: onConfirmPasswordVisibilityChanged,
-              ),
+      ),
+      const SizedBox(height: 20),
+      // Confirm Password input
+      Container(
+        decoration: _buildDecorationContainer(theme),
+        child: CustomInputText(
+          controller: confirmPasswordController,
+          obscureText: !isConfirmPasswordVisible,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              showToast(
+                  context, 'Por favor, rellene el campo repita su contraseña',
+                  toastType: ToastType.error);
+            }
+            return null;
+          },
+          decoration: _buildDecoration(
+            theme,
+            'Confirmar contraseña',
+            Icons.lock_outline,
+            IconButton(
+              icon: Icon(isConfirmPasswordVisible
+                  ? Icons.visibility
+                  : Icons.visibility_off),
+              onPressed: onConfirmPasswordVisibilityChanged,
             ),
           ),
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
 BoxDecoration _buildDecorationContainer(ThemeData theme) {
   return BoxDecoration(
@@ -396,16 +388,6 @@ InputDecoration _buildDecoration(ThemeData theme, String label, IconData icon,
     suffixIcon: suffix,
     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
   );
-}
-
-// Register if else refactor
-void _checkPassword(TextEditingController passwordController,
-    TextEditingController confirmPasswordController, BuildContext context) {
-  if (passwordController.text != confirmPasswordController.text &&
-      context.mounted) {
-    showToast(context, 'Las contraseñas no coinciden.',
-        toastType: ToastType.error);
-  }
 }
 
 void _registerSuccesful(BuildContext context) {
