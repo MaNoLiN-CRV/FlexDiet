@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -35,20 +36,35 @@ class _SplashScreenState extends State<SplashScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      // User is logged in, check if user info is completed
-      final hasCompletedInfo = await _hasCompletedUserInfo();
-      Widget targetScreen =
-          hasCompletedInfo ? const HomeScreen() : const UserInfoScreen();
+      try {
+        // Get client data from Firestore
+        final client = await Client.getClient(user.uid);
 
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
+        // Check if user info is completed
+        final hasCompletedInfo = await _hasCompletedUserInfo();
+        Widget targetScreen = hasCompletedInfo
+            ? const HomeScreen()
+            : UserInfoScreen(client: client); // Pass client data
+
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
               builder: (context) => LoadingScreen(
-                    targetScreen: targetScreen,
-                    loadingSeconds: 2, // Adjust loading seconds as needed
-                  )),
-        );
+                targetScreen: targetScreen,
+                loadingSeconds: 2,
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        // Handle error loading client data
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        }
       }
     } else {
       // User is not logged in, navigate to the login screen

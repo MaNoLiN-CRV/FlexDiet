@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/services/image_service/image_service.dart';
@@ -89,10 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Theme.of(context).colorScheme.shadow.withValues(alpha: 0.2),
                 shape: const CircleBorder(),
                 child: InkWell(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const UserInfoScreen())),
+                  onTap: _navigateToUserInfo,
                   customBorder: const CircleBorder(),
                   child: Container(
                     padding: const EdgeInsets.all(12),
@@ -120,6 +118,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _navigateToUserInfo() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final client = await Client.getClient(user.uid);
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserInfoScreen(client: client),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showToast(
+          context,
+          'Error al cargar la información del usuario',
+          toastType: ToastType.error,
+        );
+      }
+    }
   }
 }
 
