@@ -158,6 +158,7 @@ class _UsernameInfoSettings extends StatefulWidget {
 
 class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   final ImagePickerService _imagePickerService = ImagePickerService();
+  String? _imagenSeleccionada;
   late String _userName;
   String? _imagePath; // To store the image path
 
@@ -198,6 +199,29 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    void seleccionarImagenDeGaleria() async {
+      if (user != null) {
+        final client = await Client.getClient(user.uid);
+        if (client.image != '' && client.image != null) {
+          setState(() {
+            _imagenSeleccionada = Uri.encodeFull(_imagenSeleccionada!);
+          });
+          return;
+        }
+        final String? imagen = await _imagePickerService.seleccionarImagen(
+            context, ImageSource.gallery, user);
+        if (imagen != null) {
+          setState(() {
+            _imagenSeleccionada = Uri.encodeFull(_imagenSeleccionada!);
+          });
+        } else {
+          if (context.mounted) {
+            showToast(context, "No se seleccionó ninguna imagen",
+                toastType: ToastType.warning);
+          }
+        }
+      }
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -212,12 +236,11 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
               ),
             ),
             child: CircleAvatar(
-              radius: 45,
-              backgroundColor: Colors.grey[200],
-              backgroundImage: _imagePath != null
-                  ? FileImage(File(_imagePath!)) //Use stored path if present
-                  : null,
-            ),
+                radius: 45,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: _imagenSeleccionada != null
+                    ? NetworkImage(_imagenSeleccionada!)
+                    : null),
           ),
           const SizedBox(width: 20),
           Expanded(
@@ -237,15 +260,15 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
                 ElevatedButton(
                   onPressed: () async {
                     if (user != null) {
-                      XFile? image =
+                      String? image =
                           await _imagePickerService.seleccionarImagen(
                               context, ImageSource.gallery, user);
 
                       if (image != null) {
                         setState(() {
-                          _imagePath = image.path;
+                          _imagePath = image;
                         });
-                        await _saveImagePath(image.path);
+                        await _saveImagePath(image);
                       }
                     }
                   },
