@@ -11,68 +11,97 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ImagePickerService {
-  Future<String?> seleccionarImagen(
+  final ImagePicker _picker;
+  final SupabaseClient _supabaseClient;
+
+  ImagePickerService():
+    _picker = ImagePicker(),
+    _supabaseClient = Supabase.instance.client;
+
+  //* Allows the user to select an image from the gallery or camera
+  //* and upload it to Firebase Storage.
+  // Returns the URL of the uploaded image or null if there is an error.
+   Future<String?> selectImage(
       BuildContext context, ImageSource source, firebase.User? user) async {
-    PermissionStatus status;
-    if (source == ImageSource.gallery) {
-      status = await Permission.photos.request();
-    } else {
-      status = await Permission.camera.request();
+    if (user == null) {
+      showError(context, 'Usuario no autenticado');
+      return null;
     }
-    if (status.isGranted) {
-      final ImagePicker picker = ImagePicker();
-      try {
-        final XFile? imagen = await picker.pickImage(source: source);
-        final url = uploadUserFirebase(imagen, user);
-        return url;
-      } catch (e) {
-        if (context.mounted) {
-          showToast(context, 'Error al seleccionar imagen',
-              toastType: ToastType.error);
-        }
-        return null;
+
+    // Request permission according to the source
+    if (!await _askForPerm(context, source)) {
+      return null;
+    }
+
+    try {
+      final XFile? imagen = await _picker.pickImage(source: source);
+      if (imagen == null) {
+        return null; // User cancelled selection
       }
-    } else {
+
+      return await _saveImage(imagen, user);
+    } catch (e) {
       if (context.mounted) {
-        showToast(
-            context, 'No se ha concedido permiso para acceder a la galería',
-            toastType: ToastType.error);
+        showError(context, 'Error al seleccionar imagen');
       }
+      print('Error en seleccionarImagen $e');
       return null;
     }
   }
 
-  Future<String?> uploadUserFirebase(XFile? imagen, firebase.User? user) async {
-    if (imagen == null) throw Exception('No hay ninguna imagen seleccionada');
-    if (user == null)
-      throw Exception('El usuario no se encuentra correctamente registrado');
+  // Request the necessary permissions according to the source of the image
+  Future<bool> _askForPerm(BuildContext context, ImageSource source) async {
+    final PermissionStatus status = await (source == ImageSource.gallery
+        ? Permission.photos.request()
+        : Permission.camera.request());
 
-    final client = await Client.getClient(user.uid);
+    if (!status.isGranted && context.mounted) {
+      showError(
+        context,
+        'No se ha concedido permiso para acceder',
+      );
+    }
 
-    final supabase = Supabase.instance.client;
+    return status.isGranted;
+  }
 
-    File file = File(imagen.path);
-
+  // Upload the selected image to Firebase Storage and update the user profile
+  Future<String?> _saveImage(XFile imagen, firebase.User user) async {
     try {
-      final response = await supabase.storage
+      final client = await Client.getClient(user.uid);
+      final String rutaArchivo = '${user.uid}/${imagen.name}';
+      final File file = File(imagen.path);
+
+      // Upload file to Supabase Storage
+      await _supabaseClient.storage.from('FlexDiet').upload(rutaArchivo, file);
+
+      // Create signed URL
+      final String url = await _supabaseClient.storage
           .from('FlexDiet')
-          .upload('${user.uid}/${imagen.name}', file);
+          .createSignedUrl(rutaArchivo, 60 * 60 * 24); // 24 hours
 
-      final url = await supabase.storage
-          .from('FlexDiet')
-          .createSignedUrl('${user.uid}/${imagen.name}', 60 * 60 * 24);
-
-      await FirestoreService.firestore
-          .collection('clients')
-          .doc(client.id)
-          .set({'image': url}, SetOptions(merge: true));
-
+      // Update customer profile in Firestore
+      await _uploadInFirebase(client.id, url);
       print('Imagen subida con éxito: $url');
-
       return url;
     } catch (e) {
-      print('Error al subir imagen: $e');
+      print('Error al subir imagen a Firebase $e');
+      return null;
     }
-    return null;
+  }
+
+  // Update the customer profile with the new image URL
+  Future<void> _uploadInFirebase(String clientId, String imageUrl) async {
+    await FirestoreService.firestore
+        .collection('clients')
+        .doc(clientId)
+        .set({'image': imageUrl}, SetOptions(merge: true));
+  }
+
+  // Displays an error message to the user
+  void showError(BuildContext context, String mensaje, {ToastType toastType = ToastType.error}) {
+    if (context.mounted) {
+      showToast(context, mensaje, toastType: toastType);
+    }
   }
 }

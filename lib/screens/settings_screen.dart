@@ -210,7 +210,7 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
             _imagenSeleccionada = client.image;
           });
         }
-        final String? imagen = await _imagePickerService.seleccionarImagen(
+        final String? imagen = await _imagePickerService.selectImage(
             context, ImageSource.gallery, user);
         if (imagen != null) {
           setState(() {
