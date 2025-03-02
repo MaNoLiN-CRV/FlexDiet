@@ -102,14 +102,45 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       if (authenticated && context.mounted) {
-        showToast(context, 'Inicio de sesión correcto',
-            toastType: ToastType.success);
-        Client client = await Client.getClient(authService.currentUser!.uid);
-        await _navigateToNextScreen(context, client);
+        final localContext = context; // Capture context locally
+
+        // Retrieve stored user ID *before* showing toast, to prevent timing issues.
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        final String? storedUserId =
+            prefs.getString('userId'); // Retrieve stored user ID
+
+        if (storedUserId != null) {
+          print(
+              "Biometric Auth: User ID found in SharedPreferences: $storedUserId");
+          // User ID found; attempt to fetch client data
+
+          Future.delayed(Duration(milliseconds: 500), () async {
+            try {
+              Client client = await Client.getClient(storedUserId);
+              if (localContext.mounted) {
+                showToast(localContext, 'Inicio de sesión correcto',
+                    toastType: ToastType.success);
+                await _navigateToNextScreen(localContext, client);
+              }
+            } catch (e) {
+              print("Biometric Auth: Error fetching Client: $e");
+              if (localContext.mounted) {
+                showToast(
+                    localContext, 'Error al obtener datos del usuario: $e',
+                    toastType: ToastType.error);
+              }
+            }
+          });
+        } else {
+          print("Biometric Auth: No user ID found in SharedPreferences");
+          showToast(localContext, 'Inicia sesión primero',
+              toastType: ToastType.warning);
+        }
       }
-    } on PlatformException {
+    } on PlatformException catch (e) {
+      print("Biometric Auth: PlatformException: $e");
       if (!context.mounted) return;
-      showToast(context, 'Error en la autenticación biométrica',
+      showToast(context, 'Error en la autenticación biométrica: ${e.message}',
           toastType: ToastType.error);
     }
   }
@@ -129,8 +160,11 @@ class _LoginScreenState extends State<LoginScreen>
           await emailAuthService.signIn(email: email, password: password);
 
       if (userCredential?.user != null) {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+            'userId', userCredential!.user!.uid); // Store user ID.
         if (context.mounted) {
-          Client client = await Client.getClient(userCredential!.user!.uid);
+          Client client = await Client.getClient(userCredential.user!.uid);
           await _navigateToNextScreen(context, client);
         }
       }
@@ -151,6 +185,9 @@ class _LoginScreenState extends State<LoginScreen>
       final userCredential = await googleAuthService.signIn();
       final user = userCredential?.user;
       if (user != null) {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userId', user.uid); //Store user ID
+
         if (context.mounted) {
           Client client = await Client.getClient(user.uid);
           await _navigateToNextScreen(context, client);

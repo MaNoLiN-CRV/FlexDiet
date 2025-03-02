@@ -1,4 +1,3 @@
-import 'package:flutter_flexdiet/models/meal.dart';
 import 'package:flutter_flexdiet/models/models.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter/material.dart';
