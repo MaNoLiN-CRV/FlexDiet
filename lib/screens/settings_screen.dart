@@ -199,22 +199,6 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
-    void seleccionarImagenDeGaleria() async {
-      final XFile? imagen = await _imagePickerService.seleccionarImagen(
-          context, ImageSource.gallery, user);
-      if (imagen != null) {
-        setState(() {
-          _imagePath = imagen.path;
-        });
-        await _saveImagePath(imagen.path);
-      } else {
-        if (context.mounted) {
-          showToast(context, "No se seleccionó ninguna imagen",
-              toastType: ToastType.warning);
-        }
-      }
-    }
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -251,7 +235,20 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
                 ),
                 const SizedBox(height: 4),
                 ElevatedButton(
-                  onPressed: seleccionarImagenDeGaleria,
+                  onPressed: () async {
+                    if (user != null) {
+                      XFile? image =
+                          await _imagePickerService.seleccionarImagen(
+                              context, ImageSource.gallery, user);
+
+                      if (image != null) {
+                        setState(() {
+                          _imagePath = image.path;
+                        });
+                        await _saveImagePath(image.path);
+                      }
+                    }
+                  },
                   child: Text('Establecer Imagen de Perfil',
                       style: ThemeProvider()
                           .themeData

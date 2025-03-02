@@ -38,12 +38,8 @@ class _AdminScreenState extends State<AdminScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Error al cargar los clientes'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        showToast(context, 'Error al cargar los clientes',
+            toastType: ToastType.error);
       }
     }
   }
