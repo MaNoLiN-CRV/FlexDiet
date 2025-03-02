@@ -5,6 +5,7 @@ import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +14,13 @@ import 'package:flutter/foundation.dart';
 
 late SharedPreferences prefs;
 
-void main() async {
+Future<void> main() async {
+
+  await Supabase.initialize(
+    url: 'https://qsabrkicimdalfyurpio.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzYWJya2ljaW1kYWxmeXVycGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA5MTQ2NTQsImV4cCI6MjA1NjQ5MDY1NH0.XLNqLhHxeb0H5pYqpwcy5S2gHPl8eu2JihKSB1jK9II',
+  );
+
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
