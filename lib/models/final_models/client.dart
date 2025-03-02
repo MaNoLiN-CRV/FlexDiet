@@ -7,6 +7,7 @@ class Client {
   String id;
   String username;
   String email;
+  String? image;
   String? userDietId; // Reference to UserDiet instead of template directly
   String? sex;
   double? bodyweight;
@@ -17,6 +18,7 @@ class Client {
     required this.id,
     required this.username,
     required this.email,
+    this.image,
     this.userDietId,
     this.sex,
     this.bodyweight,
@@ -28,6 +30,7 @@ class Client {
     return {
       'username': username,
       'email': email,
+      'image': image,
       'userDietId': userDietId,
       'sex': sex,
       'bodyweight': bodyweight,
@@ -39,6 +42,7 @@ class Client {
   factory Client.fromJson(Map<String, dynamic> json, String id) {
     return Client(
       id: id,
+      image: json['image'] ?? '',
       username: json['username'] ?? '',
       email: json['email'] ?? '',
       userDietId: json['userDietId'],

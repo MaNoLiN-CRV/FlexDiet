@@ -538,7 +538,97 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     );
   }
 
+  Future<Map<String, String>?> _showTemplateDetailsDialog(
+      BuildContext context) async {
+    final formKey = GlobalKey<FormState>();
+    String templateName = '';
+    String templateDescription = '';
+    final theme = Theme.of(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
+        surfaceTintColor: theme.colorScheme.surfaceTint,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+        title: Text(
+          'Detalles de la Plantilla',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : null,
+          ),
+        ),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                style: TextStyle(color: isDarkMode ? Colors.white : null),
+                decoration: InputDecoration(
+                  labelText: 'Nombre de la plantilla',
+                  hintText: 'Ej: Dieta Volumen',
+                  prefixIcon: const Icon(Icons.title),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                validator: (value) =>
+                    value?.isEmpty ?? true ? 'Campo requerido' : null,
+                onSaved: (value) => templateName = value ?? '',
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                style: TextStyle(color: isDarkMode ? Colors.white : null),
+                decoration: InputDecoration(
+                  labelText: 'Descripción',
+                  hintText: 'Ej: Plan de alimentación para ganar masa muscular',
+                  prefixIcon: const Icon(Icons.description),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                maxLines: 3,
+                validator: (value) =>
+                    value?.isEmpty ?? true ? 'Campo requerido' : null,
+                onSaved: (value) => templateDescription = value ?? '',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'CANCELAR',
+              style: TextStyle(color: theme.colorScheme.error),
+            ),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState?.validate() ?? false) {
+                formKey.currentState?.save();
+                Navigator.pop(context, {
+                  'name': templateName,
+                  'description': templateDescription,
+                });
+              }
+            },
+            child: const Text('CONTINUAR'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _saveTemplate() async {
+    // First ask for template details
+    final templateDetails = await _showTemplateDetailsDialog(context);
+    if (templateDetails == null) return; // User cancelled
+
     try {
       // 1. First, save all meals to Firestore
       final List<String> mealIds = [];
@@ -566,15 +656,14 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         }
       }
 
-      // 3. Create the template
+      // 3. Create the template with user-provided details
       final template = Template(
         id: UniqueKey().toString(),
-        name: 'Template for ${widget.client.username}',
-        description: 'Custom diet template',
+        name: templateDetails['name']!,
+        description: templateDetails['description']!,
         dayIds: dayIds,
         calories: widget.dailyCalories,
-        type:
-            'custom', // You can add a type parameter to the constructor if needed
+        type: 'custom',
       );
 
       bool isTemplateCreated = await Template.createTemplate(template);

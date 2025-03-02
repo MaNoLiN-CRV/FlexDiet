@@ -11,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ImagePickerService {
-  Future<XFile?> seleccionarImagen(
+  Future<String?> seleccionarImagen(
       BuildContext context, ImageSource source, firebase.User? user) async {
     PermissionStatus status;
     if (source == ImageSource.gallery) {
@@ -23,8 +23,8 @@ class ImagePickerService {
       final ImagePicker picker = ImagePicker();
       try {
         final XFile? imagen = await picker.pickImage(source: source);
-        uploadUserFirebase(imagen, user);
-        return imagen;
+        final url = uploadUserFirebase(imagen, user);
+        return url;
       } catch (e) {
         if (context.mounted) {
           showToast(context, 'Error al seleccionar imagen',
@@ -42,10 +42,9 @@ class ImagePickerService {
     }
   }
 
-  void uploadUserFirebase(XFile? imagen, firebase.User? user) async {
+  Future<String?> uploadUserFirebase(XFile? imagen, firebase.User? user) async {
     if (imagen == null) throw Exception('No hay ninguna imagen seleccionada');
-    if (user == null)
-      throw Exception('El usuario no se encuentra correctamente registrado');
+    if (user == null) throw Exception('El usuario no se encuentra correctamente registrado');
 
     final client = await Client.getClient(user.uid);
 
@@ -68,8 +67,11 @@ class ImagePickerService {
           .set({'image': url}, SetOptions(merge: true));
 
       print('Imagen subida con éxito: $url');
+
+      return url;
     } catch (e) {
       print('Error al subir imagen: $e');
     }
+    return null;
   }
 }
