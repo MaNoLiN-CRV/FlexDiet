@@ -460,8 +460,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  onSaved: (value) =>
-                      calories = double.tryParse(value ?? '') ?? 0,
+                  onSaved: (value) => calories =
+                      double.tryParse(value ?? '0') ?? 0, // Default to 0
                   validator: (value) => double.tryParse(value ?? '') == null
                       ? 'Valor inválido'
                       : null,
@@ -475,8 +475,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  onSaved: (value) =>
-                      protein = double.tryParse(value ?? '') ?? 0,
+                  onSaved: (value) => protein =
+                      double.tryParse(value ?? '0') ?? 0, // Default to 0
                   validator: (value) => double.tryParse(value ?? '') == null
                       ? 'Valor inválido'
                       : null,
@@ -490,7 +490,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  onSaved: (value) => carbs = double.tryParse(value ?? '') ?? 0,
+                  onSaved: (value) => carbs =
+                      double.tryParse(value ?? '0') ?? 0, // Default to 0
                   validator: (value) => double.tryParse(value ?? '') == null
                       ? 'Valor inválido'
                       : null,
@@ -634,7 +635,21 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
       final List<String> mealIds = [];
       for (var dayMeal in daysData) {
         for (var meal in dayMeal.meals) {
-          bool isMealCreated = await Meal.createMeal(meal);
+          print('Saving meal: ${meal.name}');
+          print('Calories: ${meal.calories}');
+          print('Protein: ${meal.protein}');
+          print('Carbs: ${meal.carbs}');
+          
+          final mealToSave = Meal(
+            id: meal.id,
+            name: meal.name,
+            description: meal.description,
+            calories: meal.calories?.toDouble() ?? 0,
+            protein: meal.protein?.toDouble() ?? 0,
+            carbs: meal.carbs?.toDouble() ?? 0,
+          );
+          
+          bool isMealCreated = await Meal.createMeal(mealToSave);
           if (isMealCreated) {
             mealIds.add(meal.id);
           }
