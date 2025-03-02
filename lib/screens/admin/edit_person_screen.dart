@@ -56,14 +56,7 @@ class _EditPersonState extends State<EditPerson> {
         TextEditingController(text: client?.description ?? '');
     heightController =
         TextEditingController(text: client?.height?.toString() ?? '');
-    // Mapping from client's sex value to DropdownMenuItem values
-    if (client?.sex == 'hombre') {
-      sex = 'Masculino';
-    } else if (client?.sex == 'mujer') {
-      sex = 'Femenino';
-    } else {
-      sex = null; // Or a default value if appropriate
-    }
+    sex = client?.sex;
   }
 
   @override
@@ -133,7 +126,7 @@ class _EditPersonState extends State<EditPerson> {
         if (mounted) {
           showToast(context, 'Cliente eliminado correctamente',
               toastType: ToastType.error);
-          Navigator.pop(context);
+          Navigator.pop(context, true); // Signal deletion
         }
       } else {
         if (mounted) {
@@ -267,53 +260,14 @@ class _EditPersonState extends State<EditPerson> {
                               onPressed: () async {
                                 if (_formKey.currentState?.validate() ??
                                     false) {
-                                  String? sexToSave;
-                                  if (sex == 'Masculino') {
-                                    sexToSave = 'hombre';
-                                  } else if (sex == 'Femenino') {
-                                    sexToSave = 'mujer';
-                                  } else {
-                                    sexToSave = null;
-                                  }
+                                  // Map the selected value back to the format the backend expects.
 
-                                  // Now you can validate and use the controllers to create an updated Client object
-
-                                  final double? parsedKg =
-                                      double.tryParse(kgController?.text ?? '');
-                                  final double? parsedHeight = double.tryParse(
-                                      heightController?.text ?? '');
-
-                                  Client updatedClient = Client(
-                                    id: widget.clientId,
-                                    username: nameController?.text ?? '',
-                                    email: client?.email ??
-                                        '', // Keep the email from the original client
-                                    userDietId: client
-                                        ?.userDietId, // Keep the userDietId from the original client
-                                    sex: sexToSave, // Use the mapped sex value
-                                    bodyweight: parsedKg,
-                                    height: parsedHeight,
-                                    description: descriptionController?.text,
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Guardando cambios...'),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
                                   );
-
-                                  final bool updateSuccess =
-                                      await Client.updateClient(
-                                          updatedClient); // Update the client
-
-                                  if (updateSuccess) {
-                                    if (mounted) {
-                                      showToast(context,
-                                          'Cliente actualizado correctamente',
-                                          toastType: ToastType.success);
-                                      Navigator.pop(context, true);
-                                    }
-                                  } else {
-                                    if (mounted) {
-                                      showToast(context,
-                                          'Error al actualizar el cliente',
-                                          toastType: ToastType.error);
-                                    }
-                                  }
                                 }
                               },
                               icon: const Icon(Icons.save),
