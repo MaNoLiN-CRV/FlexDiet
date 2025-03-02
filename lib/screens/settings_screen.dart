@@ -199,10 +199,8 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    void seleccionarImagenDeGaleria() async {
+  void seleccionarImagenDeGaleria() async {
+      final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         final client = await Client.getClient(user.uid);
         if (client.image != '' && client.image != null) {
@@ -211,7 +209,10 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
           });
         }
         final String? imagen = await _imagePickerService.selectImage(
-            context, ImageSource.gallery, user, 'clients');
+            context: context,
+            source:  ImageSource.gallery,
+            user: user,
+            collection: 'clients');
         if (imagen != null) {
           setState(() {
             _imagenSeleccionada = imagen;
@@ -224,6 +225,9 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
         }
       }
     }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24),
