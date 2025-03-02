@@ -11,14 +11,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_flexdiet/providers/diet_state_provider.dart';
 
 late SharedPreferences prefs;
 
 Future<void> main() async {
-
   await Supabase.initialize(
     url: 'https://qsabrkicimdalfyurpio.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzYWJya2ljaW1kYWxmeXVycGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA5MTQ2NTQsImV4cCI6MjA1NjQ5MDY1NH0.XLNqLhHxeb0H5pYqpwcy5S2gHPl8eu2JihKSB1jK9II',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzYWJya2ljaW1kYWxmeXVycGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA5MTQ2NTQsImV4cCI6MjA1NjQ5MDY1NH0.XLNqLhHxeb0H5pYqpwcy5S2gHPl8eu2JihKSB1jK9II',
   );
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,8 +40,11 @@ Future<void> main() async {
   Intl.defaultLocale = 'es';
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => DietStateProvider()),
+      ],
       child: const MyApp(),
     ),
   );

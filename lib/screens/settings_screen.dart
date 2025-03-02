@@ -166,7 +166,7 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   void initState() {
     super.initState();
     _loadUserName();
-    _loadImagePath(); // Load the image path from SharedPreferences
+    _loadImagePath();
   }
 
   Future<void> _loadUserName() async {

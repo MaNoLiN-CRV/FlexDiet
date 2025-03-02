@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/card_data.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
-import 'package:flutter_flexdiet/models/final_models/day.dart';
 import 'package:flutter_flexdiet/models/final_models/meal.dart';
-import 'package:flutter_flexdiet/models/final_models/template.dart';
 import 'package:flutter_flexdiet/models/final_models/user_diet.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
+import 'package:flutter_flexdiet/providers/diet_state_provider.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:msh_checkbox/msh_checkbox.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
   static const double _cardHeight = 250.0;
@@ -35,115 +32,41 @@ class _HomeScreenContent extends StatefulWidget {
 }
 
 class _HomeScreenContentState extends State<_HomeScreenContent> {
-  Client? _client;
-  UserDiet? _userDiet;
-  Template? _template;
-  List<Day> _days = [];
-  List<Meal> _todayMeals = [];
-  bool _isLoading = true;
-  double _totalCalories = 0;
-  double _totalProtein = 0;
-  double _totalCarbs = 0;
-
   @override
   void initState() {
     super.initState();
-    _loadUserData();
-  }
-
-  Future<void> _loadUserData() async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        // Load client data
-        _client = await Client.getClient(user.uid);
-        print('Client loaded: ${_client?.username}');
-
-        if (_client?.userDietId != null) {
-          // Load user diet
-          _userDiet = await UserDiet.getUserDiet(_client!.userDietId!);
-          print('UserDiet loaded: ${_userDiet?.id}');
-
-          // Load template
-          _template = await Template.getTemplate(_userDiet!.templateId);
-          print('Template loaded: ${_template?.name}');
-
-          // Load days
-          for (String dayId in _template!.dayIds) {
-            final day = await Day.getDay(dayId);
-            _days.add(day);
-            print('Day loaded: ${day.name}');
-          }
-
-          // Get today's day name in Spanish
-          final dayName =
-              DateFormat('EEEE', 'es_ES').format(DateTime.now()).toLowerCase();
-
-          // Find today's meals
-          final todayDay = _days.firstWhere(
-            (day) => day.name?.toLowerCase() == dayName,
-            orElse: () => _days.first,
-          );
-
-          if (todayDay.mealIds != null) {
-            // Load meals for today
-            for (String mealId in todayDay.mealIds!) {
-              final meal = await Meal.getMeal(mealId);
-              _todayMeals.add(meal);
-              print('Meal loaded: ${meal.name}');
-            }
-
-            // Calculate totals
-            _totalCalories =
-                _todayMeals.fold(0, (sum, meal) => sum + (meal.calories ?? 0));
-            _totalProtein =
-                _todayMeals.fold(0, (sum, meal) => sum + (meal.protein ?? 0));
-            _totalCarbs =
-                _todayMeals.fold(0, (sum, meal) => sum + (meal.carbs ?? 0));
-            print('Totals calculated');
-          }
-        }
-      }
-
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    } catch (e, stackTrace) {
-      print('Error loading data: $e');
-      print('Stack trace: $stackTrace');
-      if (mounted) {
-        setState(() => _isLoading = false);
-        showToast(context, 'Error al cargar los datos',
-            toastType: ToastType.error);
-      }
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DietStateProvider>().initializeData();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    return Consumer<DietStateProvider>(
+      builder: (context, dietState, child) {
+        if (dietState.isLoading) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
 
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: _buildAppBar(theme),
-      body: Stack(
-        children: [
-          _buildWaveBackgrounds(theme),
-          _buildMainContent(theme, context),
-        ],
-      ),
-      bottomNavigationBar: BottomNav(
-        selectedIndex: 1,
-        onItemTapped: (index) => navigationRouter(context, index),
-      ),
+        return Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          appBar: _buildAppBar(Theme.of(context)),
+          body: Stack(
+            children: [
+              _buildWaveBackgrounds(Theme.of(context)),
+              _buildMainContent(Theme.of(context), context, dietState),
+            ],
+          ),
+          bottomNavigationBar: BottomNav(
+            selectedIndex: 1,
+            onItemTapped: (index) => navigationRouter(context, index),
+          ),
+        );
+      },
     );
   }
 
@@ -186,19 +109,20 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     );
   }
 
-  Widget _buildMainContent(ThemeData theme, BuildContext context) {
+  Widget _buildMainContent(
+      ThemeData theme, BuildContext context, DietStateProvider dietState) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(HomeScreen._standardPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildNutritionCard(theme)
+            _buildNutritionCard(theme, dietState)
                 .animate()
                 .fadeIn(duration: 300.ms, delay: 0.ms)
                 .slideX(begin: 0.2, end: 0),
             const SizedBox(height: 15),
-            _buildMealsSection(theme, context)
+            _buildMealsSection(theme, context, dietState)
                 .animate()
                 .fadeIn(duration: 300.ms, delay: 100.ms)
                 .slideX(begin: 0.2, end: 0),
@@ -214,7 +138,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   }
 
   // Modify _buildNutritionCard to use real data
-  Widget _buildNutritionCard(ThemeData theme) {
+  Widget _buildNutritionCard(ThemeData theme, DietStateProvider dietState) {
     return GridCard(
       cardTheme: CardTheme(
         color: theme.colorScheme.secondary,
@@ -230,17 +154,17 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
       children: [
         _CaloryInfo(
           title: 'Proteínas',
-          value: '${_totalProtein.toStringAsFixed(1)} g',
+          value: '${dietState.totalProtein.toStringAsFixed(1)} g',
           theme: theme,
         ),
         CalorieWheel(
-          consumedCalories: _totalCalories.toInt(),
-          dailyGoal: _template?.calories ?? 2000,
+          consumedCalories: dietState.totalCalories.toInt(),
+          dailyGoal: dietState.template?.calories ?? 2000,
           theme: theme,
         ),
         _CaloryInfo(
           title: 'Carbohidratos',
-          value: '${_totalCarbs.toStringAsFixed(1)} g',
+          value: '${dietState.totalCarbs.toStringAsFixed(1)} g',
           theme: theme,
         ),
       ],
@@ -248,8 +172,9 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   }
 
   // Modify _buildMealsSection to use real data
-  Widget _buildMealsSection(ThemeData theme, BuildContext context) {
-    if (_todayMeals.isEmpty) {
+  Widget _buildMealsSection(
+      ThemeData theme, BuildContext context, DietStateProvider dietState) {
+    if (dietState.todayMeals.isEmpty) {
       return Center(
         child: Text(
           'No hay comidas para hoy',
@@ -268,7 +193,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
           width: double.infinity,
           child: CardScroll(
             onCardTap: (index) {
-              final meal = _todayMeals[index];
+              final meal = dietState.todayMeals[index];
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -284,16 +209,40 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                 ),
               );
             },
-            cards: _todayMeals
+            cards: dietState.todayMeals
                 .map((meal) => MealCardData(
                       title: meal.name ?? 'Sin nombre',
                       description: meal.description ?? '',
                       imageUrl: meal.image ?? 'default_image_url',
-                      isSelected:
-                          _userDiet?.completedMealIds.contains(meal.id) ??
-                              false,
+                      isSelected: dietState.userDiet?.completedMealIds
+                              .contains(meal.id) ??
+                          false,
                     ))
                 .toList(),
+            meals: dietState.todayMeals,
+            onMealStatusChanged: (mealId, completed) async {
+              final mealInList =
+                  dietState.todayMeals.firstWhere((meal) => meal.id == mealId);
+
+              if (completed) {
+                // Add to completed meals
+                dietState.userDiet?.completedMealIds.add(mealInList.id);
+              } else {
+                // Remove from completed meals
+                dietState.userDiet?.completedMealIds.remove(mealInList.id);
+              }
+
+              // Update UserDiet in Firestore
+              if (dietState.userDiet != null) {
+                await UserDiet.updateUserDiet(dietState.userDiet!);
+              }
+
+              // Save to historic meals for today
+              await dietState.saveHistoricMeals(
+                DateTime.now(),
+                dietState.userDiet?.completedMealIds ?? [],
+              );
+            },
           ),
         ),
       ],
@@ -353,12 +302,16 @@ class MealCardData extends CardData {
 
 class CardScroll extends StatefulWidget {
   final List<MealCardData> cards;
+  final List<Meal> meals;
   final Function(int) onCardTap;
+  final Function(String mealId, bool completed) onMealStatusChanged;
 
   const CardScroll({
     super.key,
     required this.cards,
+    required this.meals,
     required this.onCardTap,
+    required this.onMealStatusChanged,
   });
 
   @override
@@ -450,10 +403,21 @@ class _CardScrollState extends State<CardScroll> {
                           uncheckedColor: theme.colorScheme.onSurface,
                         ),
                         style: MSHCheckboxStyle.stroke,
-                        onChanged: (selected) {
+                        onChanged: (selected) async {
                           setState(() {
                             card.isSelected = selected;
                           });
+
+                          // Get the corresponding meal
+                          final mealInList = widget.meals[index];
+
+                          if (selected) {
+                            // Add to completed meals
+                            widget.onMealStatusChanged(mealInList.id, true);
+                          } else {
+                            // Remove from completed meals
+                            widget.onMealStatusChanged(mealInList.id, false);
+                          }
                         },
                       ),
                     ),
@@ -472,7 +436,7 @@ class _CardScrollState extends State<CardScroll> {
     return Container(
       height: 120,
       width: double.infinity,
-      color: theme.colorScheme.primary.withOpacity(0.1),
+      color: theme.colorScheme.primary.withValues(alpha: 0.1),
       child: Icon(
         icon,
         size: 48,
