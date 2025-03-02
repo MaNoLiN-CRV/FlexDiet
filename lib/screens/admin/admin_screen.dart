@@ -191,7 +191,7 @@ class _AdminScreenState extends State<AdminScreen> {
     return Expanded(
       child: SingleChildScrollView(
         child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.4,
+          height: MediaQuery.of(context).size.height * 0.33,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: _filteredClients.length,
@@ -202,7 +202,7 @@ class _AdminScreenState extends State<AdminScreen> {
 
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                width: 280,
+                width: 220,
                 margin: const EdgeInsets.symmetric(
                   horizontal: 8,
                   vertical: 4,
@@ -233,7 +233,7 @@ class _AdminScreenState extends State<AdminScreen> {
                             ),
                             child: Icon(
                               Icons.person,
-                              size: 64,
+                              size: 48,
                               color: Theme.of(context)
                                   .colorScheme
                                   .onPrimaryContainer,
@@ -242,7 +242,7 @@ class _AdminScreenState extends State<AdminScreen> {
                         ),
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(8),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -250,7 +250,7 @@ class _AdminScreenState extends State<AdminScreen> {
                                   client.username,
                                   style: Theme.of(context)
                                       .textTheme
-                                      .titleLarge
+                                      .titleMedium
                                       ?.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: isSelected
@@ -263,12 +263,12 @@ class _AdminScreenState extends State<AdminScreen> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 if (client.description != null) ...[
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 4),
                                   Text(
                                     client.description!,
                                     style: Theme.of(context)
                                         .textTheme
-                                        .bodyMedium
+                                        .bodySmall
                                         ?.copyWith(
                                           color: isSelected
                                               ? Theme.of(context)
@@ -293,7 +293,7 @@ class _AdminScreenState extends State<AdminScreen> {
                                         isSelected,
                                       ),
                                     if (client.height != null) ...[
-                                      const SizedBox(width: 16),
+                                      const SizedBox(width: 8),
                                       _buildClientInfo(
                                         context,
                                         '${client.height!}cm',
@@ -332,12 +332,12 @@ class _AdminScreenState extends State<AdminScreen> {
       children: [
         Icon(
           icon,
-          size: 16,
+          size: 14, // Reduced icon size
           color: isSelected
               ? Theme.of(context).colorScheme.onPrimary
               : Theme.of(context).colorScheme.primary,
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 2), // Reduced spacing
         Text(
           text,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -436,7 +436,8 @@ class _AdminScreenState extends State<AdminScreen> {
       ),
       child: Text(
         title,
-        style: theme.textTheme.titleMedium?.copyWith(
+        style: theme.textTheme.bodyLarge?.copyWith(
+          // Reduced font size
           fontWeight: FontWeight.bold,
           color: textColor,
         ),
