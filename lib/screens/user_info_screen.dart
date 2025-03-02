@@ -45,7 +45,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       id: userId,
       username: widget.client.username,
       email: widget.client.email,
-      dietId: widget.client.dietId,
+      userDietId: widget.client.userDietId,
       sex: _selectedGender,
       bodyweight: _selectedWeight,
       height: _selectedHeight,

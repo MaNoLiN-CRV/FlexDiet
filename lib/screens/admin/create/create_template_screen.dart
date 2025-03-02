@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/screens/admin/create/select_foods_screen.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 class CreateTemplateScreen extends StatefulWidget {
-  const CreateTemplateScreen({super.key});
+  late Client client;
+  final String clientID;
 
+  CreateTemplateScreen({super.key, required this.clientID});
   @override
   State<CreateTemplateScreen> createState() => _CreateTemplateScreenState();
 }
 
 class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
+  Future<void> _initializeClient() async {
+    widget.client = await Client.getClient(widget.clientID);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeClient();
+  }
+
   int dailyCalories = 2000;
   final List<String> daysOfWeek = [
     'Lunes',
@@ -25,6 +38,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
@@ -233,7 +247,8 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
               MaterialPageRoute(
                 builder: (context) => SelectFoodsScreen(
                     selectedDays: selectedDays.toList(),
-                    dailyCalories: dailyCalories),
+                    dailyCalories: dailyCalories,
+                    client: widget.client),
               ),
             );
           },

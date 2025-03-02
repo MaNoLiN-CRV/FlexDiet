@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/models/final_models/meal.dart';
 import 'package:flutter_flexdiet/models/final_models/day.dart';
 import 'package:flutter_flexdiet/models/day_meals.dart';
+import 'package:flutter_flexdiet/models/final_models/template.dart';
+import 'package:flutter_flexdiet/models/final_models/user_diet.dart';
+import 'package:flutter_flexdiet/widgets/widgets.dart';
 
 class SelectFoodsScreen extends StatefulWidget {
   final List<String> selectedDays;
   final int dailyCalories;
+  final Client client;
 
   const SelectFoodsScreen({
     super.key,
     required this.selectedDays,
     required this.dailyCalories,
+    required this.client,
   });
 
   @override
@@ -88,9 +94,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         child: SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: _saveTemplate,
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
               foregroundColor: theme.colorScheme.onPrimary,
@@ -513,15 +517,16 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 formKey.currentState?.save();
                 setState(() {
                   daysData[selectedDayIndex].meals.add(
-                    Meal(
-                      id: UniqueKey().toString(), // Temporary ID for template
-                      name: name,
-                      description: description,
-                      calories: calories,
-                      protein: protein,
-                      carbs: carbs,
-                    ),
-                  );
+                        Meal(
+                          id: UniqueKey()
+                              .toString(), // Temporary ID for template
+                          name: name,
+                          description: description,
+                          calories: calories,
+                          protein: protein,
+                          carbs: carbs,
+                        ),
+                      );
                 });
                 Navigator.pop(context);
               }
@@ -531,5 +536,92 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _saveTemplate() async {
+    try {
+      // 1. First, save all meals to Firestore
+      final List<String> mealIds = [];
+      for (var dayMeal in daysData) {
+        for (var meal in dayMeal.meals) {
+          bool isMealCreated = await Meal.createMeal(meal);
+          if (isMealCreated) {
+            mealIds.add(meal.id);
+          }
+        }
+      }
+
+      // 2. Create days and store their IDs
+      final List<String> dayIds = [];
+      for (var i = 0; i < daysData.length; i++) {
+        final day = Day(
+          id: UniqueKey().toString(),
+          name: daysData[i].day,
+          mealIds: daysData[i].meals.map((m) => m.id).toList(),
+        );
+
+        bool isDayCreated = await Day.createDay(day);
+        if (isDayCreated) {
+          dayIds.add(day.id);
+        }
+      }
+
+      // 3. Create the template
+      final template = Template(
+        id: UniqueKey().toString(),
+        name: 'Template for ${widget.client.username}',
+        description: 'Custom diet template',
+        dayIds: dayIds,
+        calories: widget.dailyCalories,
+        type:
+            'custom', // You can add a type parameter to the constructor if needed
+      );
+
+      bool isTemplateCreated = await Template.createTemplate(template);
+
+      // 4. Create UserDiet that links to the template
+      if (isTemplateCreated) {
+        final userDiet = UserDiet(
+          id: UniqueKey().toString(),
+          templateId: template.id,
+          completedMealIds: [], // Empty initially
+        );
+
+        bool isUserDietCreated = await UserDiet.createUserDiet(userDiet);
+
+        // 5. Update client with userDiet reference
+        if (isUserDietCreated) {
+          final updatedClient = Client(
+            id: widget.client.id,
+            username: widget.client.username,
+            email: widget.client.email,
+            userDietId: userDiet.id, // Link to UserDiet instead of template
+            sex: widget.client.sex,
+            bodyweight: widget.client.bodyweight,
+            height: widget.client.height,
+            description: widget.client.description,
+          );
+
+          bool isClientUpdated = await Client.updateClient(updatedClient);
+
+          if (isClientUpdated && mounted) {
+            showToast(
+              context,
+              'Plan de comidas guardado correctamente',
+              toastType: ToastType.success,
+            );
+            Navigator.pop(context);
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showToast(
+          context,
+          'Error al guardar el plan de comidas',
+          toastType: ToastType.error,
+        );
+      }
+    }
   }
 }

@@ -4,10 +4,10 @@ import '../../firebase_firestore.dart';
 final firestore = FirestoreService.firestore;
 
 class Client {
-  String id; // UUID
+  String id;
   String username;
   String email;
-  String? dietId; // Diet reference
+  String? userDietId; // Reference to UserDiet instead of template directly
   String? sex;
   double? bodyweight;
   double? height;
@@ -17,7 +17,7 @@ class Client {
     required this.id,
     required this.username,
     required this.email,
-    this.dietId,
+    this.userDietId,
     this.sex,
     this.bodyweight,
     this.height,
@@ -28,7 +28,7 @@ class Client {
     return {
       'username': username,
       'email': email,
-      'dietId': dietId,
+      'userDietId': userDietId,
       'sex': sex,
       'bodyweight': bodyweight,
       'height': height,
@@ -41,7 +41,7 @@ class Client {
       id: id,
       username: json['username'] ?? '',
       email: json['email'] ?? '',
-      dietId: json['dietId'],
+      userDietId: json['userDietId'],
       sex: json['sex'],
       bodyweight:
           json['bodyweight'] != null ? json['bodyweight'].toDouble() : null,

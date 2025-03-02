@@ -4,28 +4,40 @@ import 'package:flutter_flexdiet/firebase_firestore.dart';
 final firestore = FirestoreService.firestore;
 
 class Template {
-  String id; // UUID
-  String? dietId;
-  List<String>? completedMealIds;
+  String id;
+  String name;
+  String description;
+  List<String> dayIds; // References to Day entities
+  int calories;
+  String type; // e.g., "muscle_gain", "weight_loss",
 
   Template({
     required this.id,
-    this.dietId,
-    this.completedMealIds,
+    required this.name,
+    required this.description,
+    required this.dayIds,
+    required this.calories,
+    required this.type,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'dietId': dietId,
-      'completedMealIds': completedMealIds ?? [],
+      'name': name,
+      'description': description,
+      'dayIds': dayIds,
+      'calories': calories,
+      'type': type,
     };
   }
 
   factory Template.fromJson(Map<String, dynamic> json, String id) {
     return Template(
       id: id,
-      dietId: json['dietId'],
-      completedMealIds: List<String>.from(json['completedMealIds'] ?? []),
+      name: json['name'],
+      description: json['description'],
+      dayIds: List<String>.from(json['dayIds'] ?? []),
+      calories: json['calories'],
+      type: json['type'],
     );
   }
 
@@ -37,8 +49,8 @@ class Template {
           );
 
   static Future<Template> getTemplate(String templateId) async {
-      final docSnap = await collection.doc(templateId).get();
-      return docSnap.data()!;
+    final docSnap = await collection.doc(templateId).get();
+    return docSnap.data()!;
   }
 
   static Future<bool> createTemplate(Template template) async {
@@ -68,4 +80,3 @@ class Template {
     }
   }
 }
-

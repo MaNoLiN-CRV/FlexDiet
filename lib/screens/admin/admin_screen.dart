@@ -367,7 +367,9 @@ class _AdminScreenState extends State<AdminScreen> {
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const CreateTemplateScreen()),
+                          builder: (context) => CreateTemplateScreen(
+                                clientID: _selectedClientId!,
+                              )),
                     )
                 : null,
             isSecondary: true,
