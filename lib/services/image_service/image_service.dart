@@ -11,18 +11,23 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ImagePickerService {
+  static final ImagePickerService _imageServices = ImagePickerService._privateContructor();
   final ImagePicker _picker;
   final SupabaseClient _supabaseClient;
 
-  ImagePickerService():
+  ImagePickerService._privateContructor():
     _picker = ImagePicker(),
     _supabaseClient = Supabase.instance.client;
+
+  factory ImagePickerService() {
+    return _imageServices;
+  }
 
   //* Allows the user to select an image from the gallery or camera
   //* and upload it to Firebase Storage.
   // Returns the URL of the uploaded image or null if there is an error.
    Future<String?> selectImage(
-      BuildContext context, ImageSource source, firebase.User? user) async {
+      BuildContext context, ImageSource source, firebase.User? user, String coleccion) async {
     if (user == null) {
       showError(context, 'Usuario no autenticado');
       return null;
@@ -39,7 +44,7 @@ class ImagePickerService {
         return null; // User cancelled selection
       }
 
-      return await _saveImage(imagen, user);
+      return await _saveImage(imagen, user, coleccion);
     } catch (e) {
       if (context.mounted) {
         showError(context, 'Error al seleccionar imagen');
@@ -66,7 +71,7 @@ class ImagePickerService {
   }
 
   // Upload the selected image to Firebase Storage and update the user profile
-  Future<String?> _saveImage(XFile imagen, firebase.User user) async {
+  Future<String?> _saveImage(XFile imagen, firebase.User user, String coleccion) async {
     try {
       final client = await Client.getClient(user.uid);
       final String rutaArchivo = '${user.uid}/${imagen.name}';
@@ -81,7 +86,7 @@ class ImagePickerService {
           .createSignedUrl(rutaArchivo, 60 * 60 * 24); // 24 hours
 
       // Update customer profile in Firestore
-      await _uploadInFirebase(client.id, url);
+      await _uploadInFirebase(client.id, url, coleccion);
       print('Imagen subida con éxito: $url');
       return url;
     } catch (e) {
@@ -91,9 +96,9 @@ class ImagePickerService {
   }
 
   // Update the customer profile with the new image URL
-  Future<void> _uploadInFirebase(String clientId, String imageUrl) async {
+  Future<void> _uploadInFirebase(String clientId, String imageUrl, String coleccion) async {
     await FirestoreService.firestore
-        .collection('clients')
+        .collection(coleccion)
         .doc(clientId)
         .set({'image': imageUrl}, SetOptions(merge: true));
   }

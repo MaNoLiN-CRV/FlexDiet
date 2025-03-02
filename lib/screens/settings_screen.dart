@@ -159,7 +159,7 @@ class _UsernameInfoSettings extends StatefulWidget {
 class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   final ImagePickerService _imagePickerService = ImagePickerService();
   String? _imagenSeleccionada;
-  late String _userName;
+  String _userName = '';
   String? _imagePath; // To store the image path
 
   @override
@@ -211,7 +211,7 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
           });
         }
         final String? imagen = await _imagePickerService.selectImage(
-            context, ImageSource.gallery, user);
+            context, ImageSource.gallery, user, 'clients');
         if (imagen != null) {
           setState(() {
             _imagenSeleccionada = imagen;
