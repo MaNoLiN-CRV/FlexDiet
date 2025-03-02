@@ -175,9 +175,10 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
 
   @override
   Widget build(BuildContext context) {
-    void _seleccionarImagenDeGaleria() async {
+    final user = FirebaseAuth.instance.currentUser;
+    void seleccionarImagenDeGaleria() async {
       final XFile? imagen = await _imagePickerService.seleccionarImagen(
-          context, ImageSource.gallery);
+          context, ImageSource.gallery, user);
       if (imagen != null) {
         setState(() {
           _imagenSeleccionada = imagen;
@@ -225,7 +226,7 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
                 ),
                 const SizedBox(height: 4),
                 ElevatedButton(
-                  onPressed: _seleccionarImagenDeGaleria,
+                  onPressed: seleccionarImagenDeGaleria,
                   child: Text('Establecer Imagen de Perfil',
                       style: ThemeProvider()
                           .themeData
