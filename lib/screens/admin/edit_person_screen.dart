@@ -17,6 +17,8 @@ class _EditPersonState extends State<EditPerson> {
   TextEditingController? kgController;
   TextEditingController? descriptionController;
   TextEditingController? heightController;
+  TextEditingController?
+      targetWeightController; // New controller for Target Weight
   String? sex;
   Client? client;
   bool _isLoading = true;
@@ -56,7 +58,6 @@ class _EditPersonState extends State<EditPerson> {
         TextEditingController(text: client?.description ?? '');
     heightController =
         TextEditingController(text: client?.height?.toString() ?? '');
-
     // Mapping from client's sex value to DropdownMenuItem values
     if (client?.sex == 'hombre') {
       sex = 'Masculino';
@@ -73,6 +74,7 @@ class _EditPersonState extends State<EditPerson> {
     kgController?.dispose();
     descriptionController?.dispose();
     heightController?.dispose();
+    targetWeightController?.dispose(); // Dispose of targetWeightController
     super.dispose();
   }
 
@@ -202,6 +204,18 @@ class _EditPersonState extends State<EditPerson> {
                                   controller: heightController!,
                                   label: 'Altura (cm)',
                                   prefixIcon: Icons.height,
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) =>
+                                      double.tryParse(value ?? '') == null
+                                          ? 'Ingrese un número válido'
+                                          : null,
+                                ).animate().fadeIn().slideX(),
+                              if (targetWeightController !=
+                                  null) // Add the new form field for Target Weight
+                                _buildFormField(
+                                  controller: targetWeightController!,
+                                  label: 'Peso Deseado (kg)',
+                                  prefixIcon: Icons.flag,
                                   keyboardType: TextInputType.number,
                                   validator: (value) =>
                                       double.tryParse(value ?? '') == null
