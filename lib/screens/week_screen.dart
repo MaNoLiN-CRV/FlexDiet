@@ -149,14 +149,6 @@ class _WeekScreenState extends State<WeekScreen> {
     final DateFormat formatter = DateFormat('EEEE, d MMMM yyyy', 'es_ES');
     final String formattedDate = formatter.format(_selectedDate);
 
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calendario de Comidas'),
