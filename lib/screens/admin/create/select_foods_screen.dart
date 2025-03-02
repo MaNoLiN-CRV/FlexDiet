@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/models/final_models/meal.dart';
@@ -387,6 +386,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     double protein = 0;
     double carbs = 0;
     String image = '';
+    String timeOfDay = '';
+
     final ImagePickerService imagePickerService = ImagePickerService();
 
     final inputDecoration = InputDecoration(
@@ -450,7 +451,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 TextFormField(
                   style: TextStyle(color: isDarkMode ? Colors.white : null),
                   decoration: inputDecoration.copyWith(
-                    hintText: 'Descripción (opcional)',
+                    hintText: 'Descripción',
                     prefixIcon: const Icon(Icons.description),
                   ),
                   onSaved: (value) => description = value ?? '',
@@ -503,6 +504,17 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                       : null,
                 ),
                 const SizedBox(height: 16),
+                TextFormField(
+                  style: TextStyle(color: isDarkMode ? Colors.white : null),
+                  decoration: inputDecoration.copyWith(
+                    hintText: 'Momento del día (Desayuno, Snack, Almuerzo...)',
+                    prefixIcon: const Icon(Icons.restaurant_menu),
+                  ),
+                  onSaved: (value) => timeOfDay = value ?? '',
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Campo requerido' : null,
+                ),
+                const SizedBox(height: 16),
                 ElevatedButton(
                     onPressed: () async {
                       image = await imagePickerService.selectImage(
@@ -511,9 +523,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                               uidMeal: uid,
                               collection: 'meals') ??
                           '';
-                      print('La puta imagen: $image');
                     },
-                    child: const Text('Imagen comidad')),
+                    child: const Text('Subir Imagen')),
                 const SizedBox(height: 16),
                 if (image != '')
                   Image(
@@ -542,13 +553,14 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 setState(() {
                   daysData[selectedDayIndex].meals.add(
                         Meal(
-                          id: uid, // Temporary ID for template
-                          name: name,
-                          description: description,
-                          calories: calories,
-                          protein: protein,
-                          carbs: carbs,
-                        ),
+                            id: uid, // Temporary ID for template
+                            name: name,
+                            description: description,
+                            calories: calories,
+                            protein: protein,
+                            carbs: carbs,
+                            image: image, // Save the image URL
+                            timeOfDay: timeOfDay),
                       );
                 });
                 Navigator.pop(context);
@@ -657,11 +669,6 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
       final List<String> mealIds = [];
       for (var dayMeal in daysData) {
         for (var meal in dayMeal.meals) {
-          print('Saving meal: ${meal.name}');
-          print('Calories: ${meal.calories}');
-          print('Protein: ${meal.protein}');
-          print('Carbs: ${meal.carbs}');
-
           final mealToSave = Meal(
             id: meal.id,
             name: meal.name,
@@ -669,6 +676,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             calories: meal.calories?.toDouble() ?? 0,
             protein: meal.protein?.toDouble() ?? 0,
             carbs: meal.carbs?.toDouble() ?? 0,
+            image: meal.image,
+            timeOfDay: meal.timeOfDay,
           );
 
           bool isMealCreated = await Meal.createMeal(mealToSave);

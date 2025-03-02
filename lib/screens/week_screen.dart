@@ -167,7 +167,7 @@ class _WeekScreenState extends State<WeekScreen> {
                                   horizontal: 20, vertical: 5),
                               child: ListTile(
                                 title: Text(
-                                  meal.name ?? 'Comida',
+                                  meal.timeOfDay ?? 'Comida',
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),

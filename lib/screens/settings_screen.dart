@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/final_models/client.dart';
@@ -9,7 +8,6 @@ import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -160,7 +158,6 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   final ImagePickerService _imagePickerService = ImagePickerService();
   String? _imagenSeleccionada;
   String _userName = '';
-  String? _imagePath; // To store the image path
 
   @override
   void initState() {
@@ -180,55 +177,46 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   }
 
   Future<void> _loadImagePath() async {
-    final prefs = await SharedPreferences.getInstance();
     final user = FirebaseAuth.instance.currentUser;
     final userId = user?.uid;
     if (userId != null) {
-      setState(() {
-        _imagePath = prefs.getString('profile_image_$userId');
-      });
-    }
-  }
-
-  Future<void> _saveImagePath(String path) async {
-    final prefs = await SharedPreferences.getInstance();
-    final user = FirebaseAuth.instance.currentUser;
-    final userId = user?.uid;
-    if (userId != null) {
-      await prefs.setString('profile_image_$userId', path);
+      setState(() {});
     }
   }
 
   void seleccionarImagenDeGaleria() async {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        final client = await Client.getClient(user.uid);
-        if (client.image != '' && client.image != null) {
-          setState(() {
-            _imagenSeleccionada = client.image;
-          });
-        }
-        final String? imagen = await _imagePickerService.selectImage(
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final client = await Client.getClient(user.uid);
+      if (client.image != '' && client.image != null) {
+        setState(() {
+          _imagenSeleccionada = client.image;
+        });
+      }
+      String? imagen;
+      if (mounted) {
+        imagen = await _imagePickerService.selectImage(
             context: context,
-            source:  ImageSource.gallery,
+            source: ImageSource.gallery,
             user: user,
             collection: 'clients');
-        if (imagen != null) {
-          setState(() {
-            _imagenSeleccionada = imagen;
-          });
-        } else {
-          if (context.mounted) {
-            showToast(context, "No se seleccionó ninguna imagen",
-                toastType: ToastType.warning);
-          }
+      }
+
+      if (imagen != null) {
+        setState(() {
+          _imagenSeleccionada = imagen;
+        });
+      } else {
+        if (mounted) {
+          showToast(context, "No se seleccionó ninguna imagen",
+              toastType: ToastType.warning);
         }
       }
     }
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
