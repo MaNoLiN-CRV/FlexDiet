@@ -204,15 +204,14 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
         final client = await Client.getClient(user.uid);
         if (client.image != '' && client.image != null) {
           setState(() {
-            _imagenSeleccionada = Uri.encodeFull(_imagenSeleccionada!);
+            _imagenSeleccionada = client.image;
           });
-          return;
         }
         final String? imagen = await _imagePickerService.seleccionarImagen(
             context, ImageSource.gallery, user);
         if (imagen != null) {
           setState(() {
-            _imagenSeleccionada = Uri.encodeFull(_imagenSeleccionada!);
+            _imagenSeleccionada = imagen;
           });
         } else {
           if (context.mounted) {
@@ -258,20 +257,7 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
                 ),
                 const SizedBox(height: 4),
                 ElevatedButton(
-                  onPressed: () async {
-                    if (user != null) {
-                      String? image =
-                          await _imagePickerService.seleccionarImagen(
-                              context, ImageSource.gallery, user);
-
-                      if (image != null) {
-                        setState(() {
-                          _imagePath = image;
-                        });
-                        await _saveImagePath(image);
-                      }
-                    }
-                  },
+                  onPressed: seleccionarImagenDeGaleria,
                   child: Text('Establecer Imagen de Perfil',
                       style: ThemeProvider()
                           .themeData

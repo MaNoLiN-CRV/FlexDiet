@@ -44,7 +44,8 @@ class ImagePickerService {
 
   Future<String?> uploadUserFirebase(XFile? imagen, firebase.User? user) async {
     if (imagen == null) throw Exception('No hay ninguna imagen seleccionada');
-    if (user == null) throw Exception('El usuario no se encuentra correctamente registrado');
+    if (user == null)
+      throw Exception('El usuario no se encuentra correctamente registrado');
 
     final client = await Client.getClient(user.uid);
 
@@ -57,9 +58,9 @@ class ImagePickerService {
           .from('FlexDiet')
           .upload('${user.uid}/${imagen.name}', file);
 
-      final url = supabase.storage
+      final url = await supabase.storage
           .from('FlexDiet')
-          .getPublicUrl('${user.uid}/${imagen.name}');
+          .createSignedUrl('${user.uid}/${imagen.name}', 60 * 60 * 24);
 
       await FirestoreService.firestore
           .collection('clients')
