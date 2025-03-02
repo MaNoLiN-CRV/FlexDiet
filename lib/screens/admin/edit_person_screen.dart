@@ -13,12 +13,13 @@ class EditPerson extends StatefulWidget {
 
 class _EditPersonState extends State<EditPerson> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController nameController;
-  late final TextEditingController kgController;
-  late final TextEditingController descriptionController;
-  late final TextEditingController heightController;
+  TextEditingController? nameController;
+  TextEditingController? kgController;
+  TextEditingController? descriptionController;
+  TextEditingController? heightController;
   String? sex;
   Client? client;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -27,37 +28,51 @@ class _EditPersonState extends State<EditPerson> {
   }
 
   void _initializeData() async {
-    final Client fetchedClient = await Client.getClient(widget.clientId);
-    if (mounted) {
-      setState(() {
-        client = fetchedClient;
-        _initializeControllers();
-      });
-    } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showToast(context, 'Cliente no encontrado', toastType: ToastType.error);
-        Navigator.pop(context);
-      });
+    try {
+      final Client fetchedClient = await Client.getClient(widget.clientId);
+      if (mounted) {
+        setState(() {
+          client = fetchedClient;
+          _initializeControllers();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showToast(context, 'Cliente no encontrado: ${e.toString()}',
+              toastType: ToastType.error);
+          Navigator.pop(context);
+        });
+      }
     }
   }
 
   void _initializeControllers() {
-    nameController = TextEditingController(text: client?.username);
+    nameController = TextEditingController(text: client?.username ?? '');
     kgController =
         TextEditingController(text: client?.bodyweight?.toString() ?? '');
     descriptionController =
         TextEditingController(text: client?.description ?? '');
     heightController =
         TextEditingController(text: client?.height?.toString() ?? '');
-    sex = client?.sex;
+
+    // Mapping from client's sex value to DropdownMenuItem values
+    if (client?.sex == 'hombre') {
+      sex = 'Masculino';
+    } else if (client?.sex == 'mujer') {
+      sex = 'Femenino';
+    } else {
+      sex = null; // Or a default value if appropriate
+    }
   }
 
   @override
   void dispose() {
-    nameController.dispose();
-    kgController.dispose();
-    descriptionController.dispose();
-    heightController.dispose();
+    nameController?.dispose();
+    kgController?.dispose();
+    descriptionController?.dispose();
+    heightController?.dispose();
     super.dispose();
   }
 
@@ -139,142 +154,159 @@ class _EditPersonState extends State<EditPerson> {
         title: const Text('Editar Cliente'),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Información Personal',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Información Personal',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ).animate().fadeIn().slideX(),
+                              const SizedBox(height: 16),
+                              if (nameController != null)
+                                _buildFormField(
+                                  controller: nameController!,
+                                  label: 'Nombre',
+                                  prefixIcon: Icons.person,
+                                  validator: (value) => value?.isEmpty ?? true
+                                      ? 'Campo requerido'
+                                      : null,
+                                ).animate().fadeIn().slideX(),
+                              if (kgController != null)
+                                _buildFormField(
+                                  controller: kgController!,
+                                  label: 'Peso (kg)',
+                                  prefixIcon: Icons.monitor_weight,
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) =>
+                                      double.tryParse(value ?? '') == null
+                                          ? 'Ingrese un número válido'
+                                          : null,
+                                ).animate().fadeIn().slideX(),
+                              if (heightController != null)
+                                _buildFormField(
+                                  controller: heightController!,
+                                  label: 'Altura (cm)',
+                                  prefixIcon: Icons.height,
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) =>
+                                      double.tryParse(value ?? '') == null
+                                          ? 'Ingrese un número válido'
+                                          : null,
+                                ).animate().fadeIn().slideX(),
+                            ],
                           ),
-                        ).animate().fadeIn().slideX(),
-                        const SizedBox(height: 16),
-                        _buildFormField(
-                          controller: nameController,
-                          label: 'Nombre',
-                          prefixIcon: Icons.person,
-                          validator: (value) =>
-                              value?.isEmpty ?? true ? 'Campo requerido' : null,
-                        ).animate().fadeIn().slideX(),
-                        _buildFormField(
-                          controller: kgController,
-                          label: 'Peso (kg)',
-                          prefixIcon: Icons.monitor_weight,
-                          keyboardType: TextInputType.number,
-                          validator: (value) =>
-                              double.tryParse(value ?? '') == null
-                                  ? 'Ingrese un número válido'
-                                  : null,
-                        ).animate().fadeIn().slideX(),
-                        _buildFormField(
-                          controller: heightController,
-                          label: 'Altura (cm)',
-                          prefixIcon: Icons.height,
-                          keyboardType: TextInputType.number,
-                          validator: (value) =>
-                              double.tryParse(value ?? '') == null
-                                  ? 'Ingrese un número válido'
-                                  : null,
-                        ).animate().fadeIn().slideX(),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Detalles Adicionales',
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ).animate().fadeIn().slideX(),
-                        const SizedBox(height: 16),
-                        _buildFormField(
-                          controller: descriptionController,
-                          label: 'Descripción',
-                          prefixIcon: Icons.description,
-                          maxLines: 3,
-                        ).animate().fadeIn().slideX(),
-                        DropdownButtonFormField<String>(
-                          decoration: InputDecoration(
-                            labelText: 'Sexo',
-                            prefixIcon: const Icon(Icons.people),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                          ),
-                          value: sex,
-                          items: ['Masculino', 'Femenino']
-                              .map((String value) => DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  ))
-                              .toList(),
-                          validator: (value) =>
-                              value == null ? 'Campo requerido' : null,
-                          onChanged: (String? newValue) {
-                            setState(() => sex = newValue);
-                          },
-                        ).animate().fadeIn().slideX(),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () {
-                          if (_formKey.currentState?.validate() ?? false) {
-                            // TODO: Implement save logic
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Guardando cambios...'),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          }
-                        },
-                        icon: const Icon(Icons.save),
-                        label: const Text('GUARDAR'),
+                        ),
                       ),
-                    ),
-                  ],
-                ).animate().fadeIn().slideY(),
-                const SizedBox(height: 48),
-                OutlinedButton.icon(
-                  onPressed: _showDeleteDialog,
-                  icon: const Icon(Icons.delete_forever),
-                  label: const Text('ELIMINAR CLIENTE'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: BorderSide(color: Colors.red),
-                    padding: const EdgeInsets.all(16),
+                      const SizedBox(height: 16),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Detalles Adicionales',
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ).animate().fadeIn().slideX(),
+                              const SizedBox(height: 16),
+                              if (descriptionController != null)
+                                _buildFormField(
+                                  controller: descriptionController!,
+                                  label: 'Descripción',
+                                  prefixIcon: Icons.description,
+                                  maxLines: 3,
+                                ).animate().fadeIn().slideX(),
+                              DropdownButtonFormField<String>(
+                                decoration: InputDecoration(
+                                  labelText: 'Sexo',
+                                  prefixIcon: const Icon(Icons.people),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  filled: true,
+                                ),
+                                value: sex,
+                                items: ['Masculino', 'Femenino']
+                                    .map((String value) =>
+                                        DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value),
+                                        ))
+                                    .toList(),
+                                validator: (value) =>
+                                    value == null ? 'Campo requerido' : null,
+                                onChanged: (String? newValue) {
+                                  setState(() => sex = newValue);
+                                },
+                              ).animate().fadeIn().slideX(),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FilledButton.icon(
+                              onPressed: () {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  // Map the selected value back to the format the backend expects.
+                                  if (sex == 'Masculino') {
+                                  } else if (sex == 'Femenino') {
+                                  } else {
+// Handle no selection or error case.
+                                  }
+
+                                  // TODO: Implement save logic.  Include `sexToSave` in the data.
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Guardando cambios...'),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.save),
+                              label: const Text('GUARDAR'),
+                            ),
+                          ),
+                        ],
+                      ).animate().fadeIn().slideY(),
+                      const SizedBox(height: 48),
+                      OutlinedButton.icon(
+                        onPressed: _showDeleteDialog,
+                        icon: const Icon(Icons.delete_forever),
+                        label: const Text('ELIMINAR CLIENTE'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          side: BorderSide(color: Colors.red),
+                          padding: const EdgeInsets.all(16),
+                        ),
+                      ).animate().fadeIn().slideY(),
+                    ],
                   ),
-                ).animate().fadeIn().slideY(),
-              ],
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }
