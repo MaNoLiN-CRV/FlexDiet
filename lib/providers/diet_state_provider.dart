@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/final_models/client.dart';
@@ -66,19 +67,29 @@ class DietStateProvider with ChangeNotifier {
   }
 
   Future<void> _loadTodayMeals() async {
-    final dayName =
-        DateFormat('EEEE', 'es_ES').format(DateTime.now()).toLowerCase();
-    final todayDay = _days.firstWhere(
-      (day) => day.name?.toLowerCase() == dayName,
-      orElse: () => _days.first,
-    );
+    try {
+      final dayName =
+          DateFormat('EEEE', 'es_ES').format(DateTime.now()).toLowerCase();
 
-    if (todayDay.mealIds != null) {
-      _todayMeals.clear();
-      for (String mealId in todayDay.mealIds!) {
-        final meal = await Meal.getMeal(mealId);
-        _todayMeals.add(meal);
+      // Find matching day, if none exists, return empty meals
+      final matchingDay = _days.firstWhereOrNull(
+        (day) => day.name?.toLowerCase() == dayName,
+      );
+
+      if (matchingDay != null && matchingDay.mealIds != null) {
+        _todayMeals.clear();
+        for (String mealId in matchingDay.mealIds!) {
+          final meal = await Meal.getMeal(mealId);
+          _todayMeals.add(meal);
+        }
+      } else {
+        _todayMeals.clear();
       }
+
+      _calculateTotals();
+    } catch (e) {
+      print('Error loading today meals: $e');
+      _todayMeals.clear();
       _calculateTotals();
     }
   }
@@ -93,18 +104,31 @@ class DietStateProvider with ChangeNotifier {
 
   Future<void> saveHistoricMeals(
       DateTime date, List<String> completedMealIds) async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-    if (userId == null) return;
+    try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) return;
 
-    final historicRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userId)
-        .collection('historic_meals')
-        .doc(DateFormat('yyyy-MM-dd').format(date));
+      // Changed path to match the loading path in WeekScreen
+      final historicRef = FirebaseFirestore.instance
+          .collection('historicMeals')
+          .doc(_client!.id)
+          .collection('dates')
+          .doc(DateFormat('yyyy-MM-dd').format(date));
 
-    await historicRef.set({
-      'date': date,
-      'completedMealIds': completedMealIds,
-    });
+      // Add all necessary data
+      await historicRef.set({
+        'date': Timestamp.fromDate(date),
+        'mealIds': _todayMeals
+            .map((meal) => meal.id)
+            .toList(), // All meals for the day
+        'completedMealIds': completedMealIds, // Only completed meals
+        'templateId': _template?.id,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      print('Historic meals saved successfully for date: ${date.toString()}');
+    } catch (e) {
+      print('Error saving historic meals: $e');
+    }
   }
 }

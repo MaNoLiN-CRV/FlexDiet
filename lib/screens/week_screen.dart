@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
+import 'package:collection/collection.dart';
 
 class WeekScreen extends StatefulWidget {
   final Map<DateTime, List<Meal>> mealData;
@@ -68,40 +69,46 @@ class _WeekScreenState extends State<WeekScreen> {
   Future<void> _loadMealsForDate(DateTime date) async {
     try {
       // Si la fecha es anterior a hoy, cargar desde el historial
-      if (date.isBefore(DateTime.now())) {
+      if (date.isBefore(DateTime.now().subtract(const Duration(days: 1)))) {
         final historicMeals = await _loadHistoricMeals(date);
-        setState(() => _todayMeals = historicMeals);
+        if (mounted) {
+          setState(() => _todayMeals = historicMeals);
+        }
         return;
       }
 
       // Si la fecha es hoy o futura, usar el template actual
       final dayName = DateFormat('EEEE', 'es_ES').format(date).toLowerCase();
 
-      // Cargar días del template actual
-      _days = [];
-      for (String dayId in _template!.dayIds) {
-        final day = await Day.getDay(dayId);
-        _days.add(day);
+      // Cargar días del template actual si no están cargados
+      if (_days.isEmpty && _template != null) {
+        for (String dayId in _template!.dayIds) {
+          final day = await Day.getDay(dayId);
+          _days.add(day);
+        }
       }
 
       // Encontrar el día correspondiente en el template
-      final todayDay = _days.firstWhere(
+      final matchingDay = _days.firstWhereOrNull(
         (day) => day.name?.toLowerCase() == dayName,
-        orElse: () => _days.first,
       );
 
-      // Cargar las comidas del dia
-      if (todayDay.mealIds != null) {
-        _todayMeals = await Future.wait(
-            todayDay.mealIds!.map((mealId) => Meal.getMeal(mealId)));
+      if (matchingDay != null && matchingDay.mealIds != null) {
+        final meals = await Future.wait(
+            matchingDay.mealIds!.map((mealId) => Meal.getMeal(mealId)));
+        if (mounted) {
+          setState(() => _todayMeals = meals);
+        }
       } else {
-        _todayMeals = [];
+        if (mounted) {
+          setState(() => _todayMeals = []);
+        }
       }
-
-      setState(() {});
     } catch (e) {
       print('Error loading meals for date: $e');
-      setState(() => _todayMeals = []);
+      if (mounted) {
+        setState(() => _todayMeals = []);
+      }
     }
   }
 
