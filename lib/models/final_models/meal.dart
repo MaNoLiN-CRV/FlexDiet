@@ -7,10 +7,11 @@ class Meal {
   String id; // UUID
   String? name;
   String? description;
-  num? protein; // Make nullable
-  num? calories; // Make nullable
-  num? carbs; // Make nullable
+  num? protein;
+  num? calories;
+  num? carbs;
   String? image;
+  String? timeOfDay;
 
   Meal({
     required this.id,
@@ -20,6 +21,7 @@ class Meal {
     this.calories,
     this.carbs,
     this.image,
+    this.timeOfDay,
   });
 
   Map<String, dynamic> toJson() {
@@ -29,6 +31,7 @@ class Meal {
       'calories': calories,
       'carbs': carbs,
       'image': image,
+      'timeOfDay': timeOfDay,
     };
   }
 
@@ -40,6 +43,7 @@ class Meal {
       calories: json['calories'],
       carbs: json['carbs'],
       image: json['image'],
+      timeOfDay: json['timeOfDay'],
     );
   }
 

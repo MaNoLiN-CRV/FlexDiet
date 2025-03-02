@@ -211,7 +211,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
             },
             cards: dietState.todayMeals
                 .map((meal) => MealCardData(
-                      title: meal.name ?? 'Sin nombre',
+                      title: meal.timeOfDay ?? 'Sin nombre',
                       description: meal.description ?? '',
                       imageUrl: meal.image ?? 'default_image_url',
                       isSelected: dietState.userDiet?.completedMealIds

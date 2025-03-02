@@ -51,6 +51,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
+        backgroundColor: theme.colorScheme.primary,
         title: Text(
           'Planificar Comidas',
           style: theme.textTheme.titleLarge?.copyWith(
@@ -58,7 +59,6 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: theme.colorScheme.primary,
         centerTitle: true,
         elevation: 0,
       ),
@@ -382,6 +382,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     double calories = 0;
     double protein = 0;
     double carbs = 0;
+    String timeOfDay = '';
 
     final inputDecoration = InputDecoration(
       filled: true,
@@ -448,8 +449,6 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                     prefixIcon: const Icon(Icons.description),
                   ),
                   onSaved: (value) => description = value ?? '',
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Campo requerido' : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -460,8 +459,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  onSaved: (value) => calories =
-                      double.tryParse(value ?? '0') ?? 0, // Default to 0
+                  onSaved: (value) =>
+                      calories = double.tryParse(value ?? '') ?? 0,
                   validator: (value) => double.tryParse(value ?? '') == null
                       ? 'Valor inválido'
                       : null,
@@ -475,8 +474,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  onSaved: (value) => protein =
-                      double.tryParse(value ?? '0') ?? 0, // Default to 0
+                  onSaved: (value) =>
+                      protein = double.tryParse(value ?? '') ?? 0,
                   validator: (value) => double.tryParse(value ?? '') == null
                       ? 'Valor inválido'
                       : null,
@@ -490,11 +489,22 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   ),
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  onSaved: (value) => carbs =
-                      double.tryParse(value ?? '0') ?? 0, // Default to 0
+                  onSaved: (value) => carbs = double.tryParse(value ?? '') ?? 0,
                   validator: (value) => double.tryParse(value ?? '') == null
                       ? 'Valor inválido'
                       : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  style: TextStyle(color: isDarkMode ? Colors.white : null),
+                  decoration: inputDecoration.copyWith(
+                    hintText:
+                        'Momento del día (Desayuno, Almuerzo, Cena, etc.)',
+                    prefixIcon: const Icon(Icons.access_time),
+                  ),
+                  onSaved: (value) => timeOfDay = value ?? '',
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Campo requerido' : null,
                 ),
               ],
             ),
@@ -526,6 +536,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                           calories: calories,
                           protein: protein,
                           carbs: carbs,
+                          timeOfDay: timeOfDay,
                         ),
                       );
                 });
@@ -639,7 +650,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
           print('Calories: ${meal.calories}');
           print('Protein: ${meal.protein}');
           print('Carbs: ${meal.carbs}');
-          
+          print('Time of day: ${meal.timeOfDay}');
+
           final mealToSave = Meal(
             id: meal.id,
             name: meal.name,
@@ -647,8 +659,9 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             calories: meal.calories?.toDouble() ?? 0,
             protein: meal.protein?.toDouble() ?? 0,
             carbs: meal.carbs?.toDouble() ?? 0,
+            timeOfDay: meal.timeOfDay,
           );
-          
+
           bool isMealCreated = await Meal.createMeal(mealToSave);
           if (isMealCreated) {
             mealIds.add(meal.id);
