@@ -4,7 +4,7 @@ class DetailsScreen extends StatelessWidget {
   final String title;
   final String subtitle;
   final String description;
-  final String image;
+  final String? image;
   final String kcal;
   final String proteins;
   final String carbs;
@@ -107,7 +107,11 @@ class DetailsScreen extends StatelessWidget {
   }
 }
 
-Widget _buildImageContainer(String image) {
+Widget _buildImageContainer(String? image) {
+  if (image == null) {
+    return Container();
+  }
+
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16),
     height: 200,

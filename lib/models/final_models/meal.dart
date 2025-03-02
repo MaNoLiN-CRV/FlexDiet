@@ -7,9 +7,9 @@ class Meal {
   String id; // UUID
   String? name;
   String? description;
-  num? protein;
-  num? calories;
-  num? carbs;
+  num? protein; // Make nullable
+  num? calories; // Make nullable
+  num? carbs; // Make nullable
   String? image;
 
   Meal({
@@ -26,6 +26,7 @@ class Meal {
     return {
       'name': name,
       'protein': protein,
+      'calories': calories,
       'carbs': carbs,
       'image': image,
     };
@@ -36,6 +37,7 @@ class Meal {
       id: id,
       name: json['name'],
       protein: json['protein'],
+      calories: json['calories'],
       carbs: json['carbs'],
       image: json['image'],
     );
@@ -50,8 +52,8 @@ class Meal {
           );
 
   static Future<Meal> getMeal(String mealId) async {
-      final docSnap = await collection.doc(mealId).get();
-      return docSnap.data()!;
+    final docSnap = await collection.doc(mealId).get();
+    return docSnap.data()!;
   }
 
   static Future<bool> createMeal(Meal meal) async {
@@ -81,4 +83,3 @@ class Meal {
     }
   }
 }
-
