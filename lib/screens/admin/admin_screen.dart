@@ -143,7 +143,7 @@ class _AdminScreenState extends State<AdminScreen> {
                               final isSelected = client.id == _selectedClientId;
 
                               return buildClientCard(
-                                  client, isSelected, context);
+                                  client, isSelected, context, isDarkMode);
                             },
                           ),
                         ),
@@ -225,7 +225,8 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  Widget buildClientCard(Client client, bool isSelected, BuildContext context) {
+  Widget buildClientCard(
+      Client client, bool isSelected, BuildContext context, bool isDarkMode) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: 220,
@@ -288,9 +289,13 @@ class _AdminScreenState extends State<AdminScreen> {
                               ?.copyWith(
                                 color: isSelected
                                     ? Theme.of(context).colorScheme.onPrimary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    : isDarkMode
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .secondaryContainer
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
                               ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -305,6 +310,7 @@ class _AdminScreenState extends State<AdminScreen> {
                               '${client.bodyweight!}kg',
                               Icons.monitor_weight,
                               isSelected,
+                              isDarkMode,
                             ),
                           if (client.height != null) ...[
                             const SizedBox(width: 8),
@@ -313,6 +319,7 @@ class _AdminScreenState extends State<AdminScreen> {
                               '${client.height!}cm',
                               Icons.height,
                               isSelected,
+                              isDarkMode,
                             ),
                           ],
                         ],
@@ -333,23 +340,35 @@ class _AdminScreenState extends State<AdminScreen> {
     String text,
     IconData icon,
     bool isSelected,
+    bool isDarkMode,
   ) {
+    Color textColor;
+    Color iconColor;
+
+    if (isSelected) {
+      textColor = Theme.of(context).colorScheme.onPrimary;
+      iconColor = Theme.of(context).colorScheme.onPrimary;
+    } else {
+      textColor = isDarkMode
+          ? Theme.of(context).colorScheme.secondaryContainer
+          : Theme.of(context).colorScheme.onSurfaceVariant;
+      iconColor = isDarkMode
+          ? Theme.of(context).colorScheme.secondaryContainer
+          : Theme.of(context).colorScheme.primary;
+    }
+
     return Row(
       children: [
         Icon(
           icon,
           size: 14,
-          color: isSelected
-              ? Theme.of(context).colorScheme.onPrimary
-              : Theme.of(context).colorScheme.primary,
+          color: iconColor,
         ),
         const SizedBox(width: 2),
         Text(
           text,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: isSelected
-                    ? Theme.of(context).colorScheme.onPrimary
-                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                color: textColor,
               ),
         ),
       ],
@@ -399,30 +418,20 @@ class _AdminScreenState extends State<AdminScreen> {
             title: 'EDITAR CLIENTE',
             onPressed: _selectedClientId != null
                 ? () async {
-                    if (context.mounted) {
+                    final localContext = context;
+                    if (localContext.mounted) {
                       final result = await Navigator.push(
-                        context,
+                        localContext,
                         MaterialPageRoute(
                           builder: (context) => EditPerson(
                             clientId: _selectedClientId!,
-                            onClientUpdated: (updatedClient) {
-                              // Update the local list without making another API call
-                              setState(() {
-                                final index = _clients.indexWhere(
-                                    (c) => c.id == updatedClient.id);
-                                if (index != -1) {
-                                  _clients[index] = updatedClient;
-                                  _filteredClients = List.from(_clients);
-                                  _clientsNotifier.value = List.from(_clients);
-                                }
-                              });
-                            },
                           ),
                         ),
                       );
 
-                      // If the client was deleted, refresh the entire list
-                      if (result == true) {
+                      if (localContext.mounted &&
+                          result != null &&
+                          result == true) {
                         await _refreshClients();
                       }
                     }
@@ -444,7 +453,7 @@ class _AdminScreenState extends State<AdminScreen> {
   }) {
     final theme = Theme.of(context);
     final buttonColor = isSecondary
-        ? (isDarkMode ? Colors.grey.shade800 : theme.colorScheme.secondary)
+        ? (isDarkMode ? theme.colorScheme.primary : theme.colorScheme.secondary)
         : theme.colorScheme.primary;
     final textColor = isSecondary
         ? (isDarkMode ? Colors.white : theme.colorScheme.onSecondary)
