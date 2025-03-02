@@ -3,6 +3,8 @@ import 'package:flutter_flexdiet/models/card_data.dart';
 import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/screens/admin/edit_person_screen.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
+import 'package:flutter_flexdiet/models/final_models/template.dart';
+import 'package:flutter_flexdiet/models/final_models/user_diet.dart';
 
 class UseTemplateScreen extends StatefulWidget {
   final String clientId;
@@ -24,12 +26,15 @@ class _UseTemplateScreenState extends State<UseTemplateScreen>
   late Animation<double> _fabAnimation;
   Client? _client;
   bool _isLoading = true;
+  List<Template> _templates = [];
+  Template? _selectedTemplate;
 
   @override
   void initState() {
     super.initState();
     _initializeAnimations();
     _loadClient();
+    _loadTemplates();
   }
 
   void _initializeAnimations() {
@@ -62,6 +67,62 @@ class _UseTemplateScreenState extends State<UseTemplateScreen>
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
+      }
+    }
+  }
+
+  Future<void> _loadTemplates() async {
+    try {
+      final snapshot = await Template.collection.get();
+      if (mounted) {
+        setState(() {
+          _templates = snapshot.docs.map((doc) => doc.data()).toList();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showToast(context, 'Error al cargar las plantillas',
+            toastType: ToastType.error);
+      }
+    }
+  }
+
+  Future<void> _assignTemplateToUser(Template template) async {
+    try {
+      final userDiet = UserDiet(
+        id: UniqueKey().toString(),
+        templateId: template.id,
+        completedMealIds: [],
+      );
+
+      bool isUserDietCreated = await UserDiet.createUserDiet(userDiet);
+
+      if (isUserDietCreated && _client != null) {
+        final updatedClient = Client(
+          id: _client!.id,
+          username: _client!.username,
+          email: _client!.email,
+          userDietId: userDiet.id,
+          sex: _client!.sex,
+          bodyweight: _client!.bodyweight,
+          height: _client!.height,
+          description: _client!.description,
+        );
+
+        bool isClientUpdated = await Client.updateClient(updatedClient);
+
+        if (isClientUpdated && mounted) {
+          setState(() {
+            _selectedTemplate = template;
+          });
+          showToast(context, 'Plantilla asignada correctamente',
+              toastType: ToastType.success);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showToast(context, 'Error al asignar la plantilla',
+            toastType: ToastType.error);
       }
     }
   }
@@ -258,35 +319,79 @@ class _UseTemplateScreenState extends State<UseTemplateScreen>
 
   Widget _buildTemplateCards(
       BuildContext context, ThemeData theme, double height) {
-    return SizedBox(
-      height: height * 0.7,
-      child: CardScroll(
-        cards: [
-          CardData(
-            title: 'PLANTILLA PARA MUJERES - PERDER PESO',
-            description:
-                'Dieta de 2000kcal para mujeres que desean perder peso de manera saludable. Incluye un perfil nutricional equilibrado y recetas enfocadas en tus objetivos.',
-            imageUrl:
-                'https://images.unsplash.com/photo-1607178743429-f34aa08f784d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NjQwNzZ8MHwxfHNlYXJjaHwxfHxkaWV0JTIwd29tYW58ZW58MHx8fHwxNzA3NjY3NzYxfDA&ixlib=rb-4.0.3&q=80&w=200',
+    if (_templates.isEmpty) {
+      return Center(
+        child: Text(
+          'No hay plantillas disponibles',
+          style: theme.textTheme.titleLarge,
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        if (_selectedTemplate != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.colorScheme.primary,
+                  width: 2,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    _getTemplateIcon(_selectedTemplate!.type),
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Plantilla seleccionada: ${_selectedTemplate!.name}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          CardData(
-            title: 'DIETA PARA GANAR MASA MUSCULAR',
-            description:
-                'Plan de comidas de 3500kcal optimizado para el crecimiento muscular. Rico en proteInas y carbohidratos complejos para apoyar tus entrenamientos y recuperacion muscular.',
-            imageUrl:
-                'https://images.unsplash.com/photo-1556771512-9804c2c7482f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NjQwNzZ8MHwxfHNlYXJjaHw2fHxidWxrJTIwbXVzY2xlfGVufDB8fHx8MTcwNzY2NzgyOXww&ixlib=rb-4.0.3&q=80&w=200',
+        SizedBox(
+          height: height * 0.7,
+          child: CardScroll(
+            cards: _templates
+                .map((template) => CardData(
+                      title: template.name,
+                      description: template.description,
+                      icon: _getTemplateIcon(template.type),
+                    ))
+                .toList(),
+            onCardTap: (index) => _assignTemplateToUser(_templates[index]),
+            scrollDirection: Axis.vertical,
           ),
-          CardData(
-            title: 'DIETA PARA DEPORTISTAS',
-            description:
-                'Dieta equilibrada de 2500kcal para deportistas que desean mantener un rendimiento optimo. Proporciona la energia y nutrientes necesarios para entrenamientos intensivos y competitivos.',
-            imageUrl:
-                'https://images.unsplash.com/photo-1554999212-c68ed64f0a51?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NjQwNzZ8MHwxfHNlYXJjaHwxfHNsYWxhZCUyMGF0aGxldGV8ZW58MHx8fHwxNzA3NjY3ODc3fDA&ixlib=rb-4.0.3&q=80&w=200',
-          ),
-        ],
-        scrollDirection: Axis.vertical,
-      ),
+        ),
+      ],
     );
+  }
+
+  IconData _getTemplateIcon(String type) {
+    switch (type) {
+      case 'weight_loss':
+        return Icons.fitness_center;
+      case 'muscle_gain':
+        return Icons.sports_gymnastics;
+      case 'athlete':
+        return Icons.running_with_errors;
+      default:
+        return Icons.restaurant;
+    }
   }
 
   Widget _buildProfileButton(BuildContext context) {

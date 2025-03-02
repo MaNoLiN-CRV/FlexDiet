@@ -67,7 +67,7 @@ class CardItem extends StatelessWidget {
                   topRight: Radius.circular(12),
                 ),
                 child: Image.network(
-                  cardData.imageUrl,
+                  cardData.imageUrl ?? 'assets/images/logo.png',
                   height: 120,
                   width: double.infinity,
                   fit: BoxFit.cover,

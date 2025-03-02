@@ -286,7 +286,7 @@ class _CardScrollState extends State<CardScroll> {
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(12)),
                   child: Image.network(
-                    card.imageUrl,
+                    card.imageUrl!,
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
