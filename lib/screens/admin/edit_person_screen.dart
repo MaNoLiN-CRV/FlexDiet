@@ -17,8 +17,6 @@ class _EditPersonState extends State<EditPerson> {
   TextEditingController? kgController;
   TextEditingController? descriptionController;
   TextEditingController? heightController;
-  TextEditingController?
-      targetWeightController; // New controller for Target Weight
   String? sex;
   Client? client;
   bool _isLoading = true;
@@ -74,7 +72,6 @@ class _EditPersonState extends State<EditPerson> {
     kgController?.dispose();
     descriptionController?.dispose();
     heightController?.dispose();
-    targetWeightController?.dispose(); // Dispose of targetWeightController
     super.dispose();
   }
 
@@ -210,18 +207,6 @@ class _EditPersonState extends State<EditPerson> {
                                           ? 'Ingrese un número válido'
                                           : null,
                                 ).animate().fadeIn().slideX(),
-                              if (targetWeightController !=
-                                  null) // Add the new form field for Target Weight
-                                _buildFormField(
-                                  controller: targetWeightController!,
-                                  label: 'Peso Deseado (kg)',
-                                  prefixIcon: Icons.flag,
-                                  keyboardType: TextInputType.number,
-                                  validator: (value) =>
-                                      double.tryParse(value ?? '') == null
-                                          ? 'Ingrese un número válido'
-                                          : null,
-                                ).animate().fadeIn().slideX(),
                             ],
                           ),
                         ),
@@ -279,24 +264,56 @@ class _EditPersonState extends State<EditPerson> {
                         children: [
                           Expanded(
                             child: FilledButton.icon(
-                              onPressed: () {
+                              onPressed: () async {
                                 if (_formKey.currentState?.validate() ??
                                     false) {
-                                  // Map the selected value back to the format the backend expects.
+                                  String? sexToSave;
                                   if (sex == 'Masculino') {
+                                    sexToSave = 'hombre';
                                   } else if (sex == 'Femenino') {
+                                    sexToSave = 'mujer';
                                   } else {
-// Handle no selection or error case.
+                                    sexToSave = null;
                                   }
 
-                                  // TODO: Implement save logic.  Include `sexToSave` in the data.
+                                  // Now you can validate and use the controllers to create an updated Client object
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Guardando cambios...'),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
+                                  final double? parsedKg =
+                                      double.tryParse(kgController?.text ?? '');
+                                  final double? parsedHeight = double.tryParse(
+                                      heightController?.text ?? '');
+
+                                  Client updatedClient = Client(
+                                    id: widget.clientId,
+                                    username: nameController?.text ?? '',
+                                    email: client?.email ??
+                                        '', // Keep the email from the original client
+                                    userDietId: client
+                                        ?.userDietId, // Keep the userDietId from the original client
+                                    sex: sexToSave, // Use the mapped sex value
+                                    bodyweight: parsedKg,
+                                    height: parsedHeight,
+                                    description: descriptionController?.text,
                                   );
+
+                                  final bool updateSuccess =
+                                      await Client.updateClient(
+                                          updatedClient); // Update the client
+
+                                  if (updateSuccess) {
+                                    if (mounted) {
+                                      showToast(context,
+                                          'Cliente actualizado correctamente',
+                                          toastType: ToastType.success);
+                                      Navigator.pop(context, true);
+                                    }
+                                  } else {
+                                    if (mounted) {
+                                      showToast(context,
+                                          'Error al actualizar el cliente',
+                                          toastType: ToastType.error);
+                                    }
+                                  }
                                 }
                               },
                               icon: const Icon(Icons.save),

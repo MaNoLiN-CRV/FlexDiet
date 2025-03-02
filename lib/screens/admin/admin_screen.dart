@@ -19,6 +19,8 @@ class _AdminScreenState extends State<AdminScreen> {
   List<Client> _clients = [];
   List<Client> _filteredClients = [];
   bool _isLoading = true;
+  ValueNotifier<List<Client>> _clientsNotifier =
+      ValueNotifier<List<Client>>([]);
 
   @override
   void initState() {
@@ -28,13 +30,16 @@ class _AdminScreenState extends State<AdminScreen> {
 
   Future<void> _loadClients() async {
     setState(() => _isLoading = true);
+    print("_loadClients started");
     try {
       final snapshot = await Client.collection.get();
-      setState(() {
-        _clients = snapshot.docs.map((doc) => doc.data()).toList();
-        _filteredClients = List.from(_clients);
-        _isLoading = false;
-      });
+      List<Client> loadedClients =
+          snapshot.docs.map((doc) => doc.data()).toList();
+      _clientsNotifier.value = loadedClients;
+      _clients = loadedClients;
+      _filteredClients = List.from(_clients);
+      _isLoading = false;
+      print("_loadClients setState called");
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
@@ -42,6 +47,7 @@ class _AdminScreenState extends State<AdminScreen> {
             toastType: ToastType.error);
       }
     }
+    print("_loadClients finished");
   }
 
   void _selectClient(String clientId) {
@@ -61,6 +67,16 @@ class _AdminScreenState extends State<AdminScreen> {
         }).toList();
       }
     });
+  }
+
+  Future<void> _refreshClients() async {
+    print("_refreshClients called");
+    await _loadClients();
+    final snapshot = await Client.collection.get();
+    List<Client> loadedClients =
+        snapshot.docs.map((doc) => doc.data()).toList();
+    _clientsNotifier.value = loadedClients;
+    print("_refreshClients finished");
   }
 
   @override
@@ -94,10 +110,47 @@ class _AdminScreenState extends State<AdminScreen> {
                     .fadeIn(delay: 200.ms, duration: 600.ms)
                     .slideY(begin: 0.2, end: 0),
                 SizedBox(height: UIConstants.defaultSpacing),
-                _buildClientsList(context)
-                    .animate()
-                    .fadeIn(delay: 400.ms, duration: 800.ms)
-                    .slideX(begin: 0.2, end: 0),
+                ValueListenableBuilder<List<Client>>(
+                  valueListenable: _clientsNotifier,
+                  builder: (context, clients, child) {
+                    _filteredClients = List.from(clients);
+                    if (_isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (clients.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'No se encontraron clientes',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
+                      );
+                    }
+                    return Expanded(
+                      child: SingleChildScrollView(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.33,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _filteredClients.length,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            itemBuilder: (context, index) {
+                              final client = _filteredClients[index];
+                              final isSelected = client.id == _selectedClientId;
+
+                              return buildClientCard(
+                                  client, isSelected, context);
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 _buildActionButtons(context, isDarkMode)
                     .animate()
                     .fadeIn(delay: 600.ms, duration: 600.ms)
@@ -172,154 +225,107 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  Widget _buildClientsList(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_filteredClients.isEmpty) {
-      return Center(
-        child: Text(
-          'No se encontraron clientes',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-      );
-    }
-
-    return Expanded(
-      child: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.33,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _filteredClients.length,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemBuilder: (context, index) {
-              final client = _filteredClients[index];
-              final isSelected = client.id == _selectedClientId;
-
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 220,
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                transform: isSelected
-                    ? (Matrix4.identity()..scale(1.05))
-                    : Matrix4.identity(),
-                child: Card(
-                  elevation: isSelected ? 8 : 4,
-                  color:
-                      isSelected ? Theme.of(context).colorScheme.primary : null,
-                  child: InkWell(
-                    onTap: () => _selectClient(client.id),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.person,
-                              size: 48,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  client.username,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: isSelected
-                                            ? Theme.of(context)
-                                                .colorScheme
-                                                .onPrimary
-                                            : null,
-                                      ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                if (client.description != null) ...[
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    client.description!,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                          color: isSelected
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurfaceVariant,
-                                        ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                                const Spacer(),
-                                Row(
-                                  children: [
-                                    if (client.bodyweight != null)
-                                      _buildClientInfo(
-                                        context,
-                                        '${client.bodyweight!}kg',
-                                        Icons.monitor_weight,
-                                        isSelected,
-                                      ),
-                                    if (client.height != null) ...[
-                                      const SizedBox(width: 8),
-                                      _buildClientInfo(
-                                        context,
-                                        '${client.height!}cm',
-                                        Icons.height,
-                                        isSelected,
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+  Widget buildClientCard(Client client, bool isSelected, BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: 220,
+      margin: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
+      transform:
+          isSelected ? (Matrix4.identity()..scale(1.05)) : Matrix4.identity(),
+      child: Card(
+        elevation: isSelected ? 8 : 4,
+        color: isSelected ? Theme.of(context).colorScheme.primary : null,
+        child: InkWell(
+          onTap: () => _selectClient(client.id),
+          borderRadius: BorderRadius.circular(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
                     ),
                   ),
+                  child: Icon(
+                    Icons.person,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
                 ),
-              )
-                  .animate()
-                  .fadeIn(duration: 300.ms, delay: (100 * index).ms)
-                  .slideX(begin: 0.2, end: 0);
-            },
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        client.username,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : null,
+                                ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (client.description != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          client.description!,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.onPrimary
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                              ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                      const Spacer(),
+                      Row(
+                        children: [
+                          if (client.bodyweight != null)
+                            _buildClientInfo(
+                              context,
+                              '${client.bodyweight!}kg',
+                              Icons.monitor_weight,
+                              isSelected,
+                            ),
+                          if (client.height != null) ...[
+                            const SizedBox(width: 8),
+                            _buildClientInfo(
+                              context,
+                              '${client.height!}cm',
+                              Icons.height,
+                              isSelected,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.2, end: 0);
   }
 
   Widget _buildClientInfo(
@@ -332,12 +338,12 @@ class _AdminScreenState extends State<AdminScreen> {
       children: [
         Icon(
           icon,
-          size: 14, // Reduced icon size
+          size: 14,
           color: isSelected
               ? Theme.of(context).colorScheme.onPrimary
               : Theme.of(context).colorScheme.primary,
         ),
-        const SizedBox(width: 2), // Reduced spacing
+        const SizedBox(width: 2),
         Text(
           text,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -392,14 +398,25 @@ class _AdminScreenState extends State<AdminScreen> {
             context: context,
             title: 'EDITAR CLIENTE',
             onPressed: _selectedClientId != null
-                ? () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditPerson(
-                          clientId: _selectedClientId!,
+                ? () async {
+                    final localContext = context;
+                    if (localContext.mounted) {
+                      final result = await Navigator.push(
+                        localContext,
+                        MaterialPageRoute(
+                          builder: (context) => EditPerson(
+                            clientId: _selectedClientId!,
+                          ),
                         ),
-                      ),
-                    )
+                      );
+
+                      if (localContext.mounted &&
+                          result != null &&
+                          result == true) {
+                        await _refreshClients();
+                      }
+                    }
+                  }
                 : null,
             isDarkMode: isDarkMode,
           ),
@@ -437,7 +454,6 @@ class _AdminScreenState extends State<AdminScreen> {
       child: Text(
         title,
         style: theme.textTheme.bodyLarge?.copyWith(
-          // Reduced font size
           fontWeight: FontWeight.bold,
           color: textColor,
         ),
@@ -467,6 +483,7 @@ class _AdminScreenState extends State<AdminScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _clientsNotifier.dispose();
     super.dispose();
   }
 }
