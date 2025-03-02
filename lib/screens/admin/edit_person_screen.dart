@@ -5,7 +5,13 @@ import 'package:flutter_flexdiet/widgets/custom_toast.dart';
 
 class EditPerson extends StatefulWidget {
   final String clientId;
-  const EditPerson({super.key, required this.clientId});
+  final Function(Client)? onClientUpdated; // callback function
+
+  const EditPerson({
+    super.key,
+    required this.clientId,
+    this.onClientUpdated,
+  });
 
   @override
   State<EditPerson> createState() => _EditPersonState();
@@ -20,6 +26,9 @@ class _EditPersonState extends State<EditPerson> {
   String? sex;
   Client? client;
   bool _isLoading = true;
+
+  static const String GENDER_MALE = 'hombre';
+  static const String GENDER_FEMALE = 'mujer';
 
   @override
   void initState() {
@@ -56,7 +65,29 @@ class _EditPersonState extends State<EditPerson> {
         TextEditingController(text: client?.description ?? '');
     heightController =
         TextEditingController(text: client?.height?.toString() ?? '');
-    sex = client?.sex;
+    sex = _mapDatabaseGenderToUI(client?.sex);
+  }
+
+  String? _mapDatabaseGenderToUI(String? databaseGender) {
+    switch (databaseGender?.toLowerCase()) {
+      case GENDER_MALE:
+        return 'Masculino';
+      case GENDER_FEMALE:
+        return 'Femenino';
+      default:
+        return null;
+    }
+  }
+
+  String? _mapUIGenderToDatabase(String? uiGender) {
+    switch (uiGender) {
+      case 'Masculino':
+        return GENDER_MALE;
+      case 'Femenino':
+        return GENDER_FEMALE;
+      default:
+        return null;
+    }
   }
 
   @override
@@ -106,7 +137,8 @@ class _EditPersonState extends State<EditPerson> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('CANCELAR'),
+            child: Text('CANCELAR',
+                style: TextStyle(color: Colors.black.withValues(alpha: 0.6))),
           ),
           FilledButton.tonal(
             onPressed: () => Navigator.pop(context, true),
@@ -131,6 +163,42 @@ class _EditPersonState extends State<EditPerson> {
       } else {
         if (mounted) {
           showToast(context, 'Error al eliminar el cliente',
+              toastType: ToastType.error);
+        }
+      }
+    }
+  }
+
+  Future<void> _saveChanges() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        final updatedClient = Client(
+          id: widget.clientId,
+          username: nameController?.text ?? '',
+          email: client!.email,
+          sex: _mapUIGenderToDatabase(sex),
+          bodyweight: double.tryParse(kgController?.text ?? ''),
+          height: double.tryParse(heightController?.text ?? ''),
+          description: descriptionController?.text,
+          userDietId: client!.userDietId,
+        );
+
+        final bool updateSuccess = await Client.updateClient(updatedClient);
+
+        if (updateSuccess && mounted) {
+          // Call the callback with the updated client
+          widget.onClientUpdated?.call(updatedClient);
+
+          showToast(context, 'Cambios guardados correctamente',
+              toastType: ToastType.success);
+          Navigator.pop(context, true);
+        } else if (mounted) {
+          showToast(context, 'Error al guardar los cambios',
+              toastType: ToastType.error);
+        }
+      } catch (e) {
+        if (mounted) {
+          showToast(context, 'Error: ${e.toString()}',
               toastType: ToastType.error);
         }
       }
@@ -235,7 +303,7 @@ class _EditPersonState extends State<EditPerson> {
                                   filled: true,
                                 ),
                                 value: sex,
-                                items: ['Masculino', 'Femenino']
+                                items: const ['Masculino', 'Femenino']
                                     .map((String value) =>
                                         DropdownMenuItem<String>(
                                           value: value,
@@ -257,19 +325,7 @@ class _EditPersonState extends State<EditPerson> {
                         children: [
                           Expanded(
                             child: FilledButton.icon(
-                              onPressed: () async {
-                                if (_formKey.currentState?.validate() ??
-                                    false) {
-                                  // Map the selected value back to the format the backend expects.
-
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Guardando cambios...'),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                }
-                              },
+                              onPressed: _saveChanges,
                               icon: const Icon(Icons.save),
                               label: const Text('GUARDAR'),
                             ),

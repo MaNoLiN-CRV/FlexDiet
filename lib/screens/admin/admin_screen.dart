@@ -399,20 +399,30 @@ class _AdminScreenState extends State<AdminScreen> {
             title: 'EDITAR CLIENTE',
             onPressed: _selectedClientId != null
                 ? () async {
-                    final localContext = context;
-                    if (localContext.mounted) {
+                    if (context.mounted) {
                       final result = await Navigator.push(
-                        localContext,
+                        context,
                         MaterialPageRoute(
                           builder: (context) => EditPerson(
                             clientId: _selectedClientId!,
+                            onClientUpdated: (updatedClient) {
+                              // Update the local list without making another API call
+                              setState(() {
+                                final index = _clients.indexWhere(
+                                    (c) => c.id == updatedClient.id);
+                                if (index != -1) {
+                                  _clients[index] = updatedClient;
+                                  _filteredClients = List.from(_clients);
+                                  _clientsNotifier.value = List.from(_clients);
+                                }
+                              });
+                            },
                           ),
                         ),
                       );
 
-                      if (localContext.mounted &&
-                          result != null &&
-                          result == true) {
+                      // If the client was deleted, refresh the entire list
+                      if (result == true) {
                         await _refreshClients();
                       }
                     }
