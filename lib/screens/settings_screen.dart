@@ -9,6 +9,7 @@ import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -157,13 +158,14 @@ class _UsernameInfoSettings extends StatefulWidget {
 
 class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   final ImagePickerService _imagePickerService = ImagePickerService();
-  XFile? _imagenSeleccionada;
   late String _userName;
+  String? _imagePath; // To store the image path
 
   @override
   void initState() {
     super.initState();
     _loadUserName();
+    _loadImagePath(); // Load the image path from SharedPreferences
   }
 
   Future<void> _loadUserName() async {
@@ -173,16 +175,38 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
     });
   }
 
+  Future<void> _loadImagePath() async {
+    final prefs = await SharedPreferences.getInstance();
+    final user = FirebaseAuth.instance.currentUser;
+    final userId = user?.uid;
+    if (userId != null) {
+      setState(() {
+        _imagePath = prefs.getString('profile_image_$userId');
+      });
+    }
+  }
+
+  Future<void> _saveImagePath(String path) async {
+    final prefs = await SharedPreferences.getInstance();
+    final user = FirebaseAuth.instance.currentUser;
+    final userId = user?.uid;
+    if (userId != null) {
+      await prefs.setString('profile_image_$userId', path);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+
     void seleccionarImagenDeGaleria() async {
       final XFile? imagen = await _imagePickerService.seleccionarImagen(
           context, ImageSource.gallery, user);
       if (imagen != null) {
         setState(() {
-          _imagenSeleccionada = imagen;
+          _imagePath = imagen.path;
         });
+        await _saveImagePath(imagen.path);
       } else {
         if (context.mounted) {
           showToast(context, "No se seleccionó ninguna imagen",
@@ -204,11 +228,12 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
               ),
             ),
             child: CircleAvatar(
-                radius: 45,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: _imagenSeleccionada != null
-                    ? FileImage(File(_imagenSeleccionada!.path))
-                    : null),
+              radius: 45,
+              backgroundColor: Colors.grey[200],
+              backgroundImage: _imagePath != null
+                  ? FileImage(File(_imagePath!)) //Use stored path if present
+                  : null,
+            ),
           ),
           const SizedBox(width: 20),
           Expanded(
