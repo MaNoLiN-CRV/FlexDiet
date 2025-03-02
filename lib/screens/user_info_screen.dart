@@ -18,9 +18,7 @@ class UserInfoScreen extends StatefulWidget {
 
 class _UserInfoScreenState extends State<UserInfoScreen> {
   final _pageController = PageController(initialPage: 0);
-
   final TextEditingController _targetWeightController = TextEditingController();
-
   int _currentPage = 0;
   String? _selectedGoal;
   String? _selectedGender;
@@ -41,26 +39,53 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
 
   Future<void> _saveUserInfo() async {
     final userId = widget.client.id;
+
+    // Format the values as requested
+    final double? formattedWeight = _selectedWeight != null
+        ? double.parse(_selectedWeight!.toStringAsFixed(1))
+        : null;
+    final double? formattedHeight = _selectedHeight != null
+        ? double.parse(_selectedHeight!.round().toString())
+        : null; // Round to integer
+    final String? formattedTargetWeight =
+        _targetWeightController.text.isNotEmpty
+            ? double.tryParse(_targetWeightController.text)?.toStringAsFixed(1)
+            : null;
+
+    String description = 'Objetivo para el cliente: $_selectedGoal\n';
+
+    if (formattedTargetWeight != null) {
+      description +=
+          'Peso deseado: $formattedTargetWeight kg\n'; // Display the value
+    }
+    description +=
+        '${widget.client.description ?? ''}'; //Null-aware operator to avoid displaying null if widget.client.description is null
+
     final newClient = Client(
       id: userId,
       username: widget.client.username,
       email: widget.client.email,
       userDietId: widget.client.userDietId,
       sex: _selectedGender,
-      bodyweight: _selectedWeight,
-      height: _selectedHeight,
-      description:
-          'Objetivo para el cliente: $_selectedGoal \nPeso deseado: $_targetWeightController \n${widget.client.description} ',
+      bodyweight: formattedWeight,
+      height: formattedHeight != null
+          ? formattedHeight.toDouble()
+          : null, // Ensure it's a double
+      description: description,
     );
 
     bool isClientUpdated = await Client.updateClient(newClient);
 
     if (isClientUpdated) {
-      showToast(context, 'Información guardada correctamente.',
-          toastType: ToastType.success);
+      if (mounted) {
+        showToast(context, 'Información guardada correctamente.',
+            toastType: ToastType.success);
+      }
     } else {
-      showToast(context, 'Error al guardar la información.',
-          toastType: ToastType.error);
+      if (mounted) {
+        showToast(context, 'Error al guardar la información.',
+            toastType: ToastType.error);
+      }
     }
   }
 
