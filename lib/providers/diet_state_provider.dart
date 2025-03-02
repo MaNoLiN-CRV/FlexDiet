@@ -32,6 +32,8 @@ class DietStateProvider with ChangeNotifier {
   double get totalProtein => _totalProtein;
   double get totalCarbs => _totalCarbs;
 
+  bool get isInitialized => _isInitialized;
+
   Future<void> initializeData() async {
     if (_isInitialized) return;
 
@@ -61,6 +63,7 @@ class DietStateProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _isLoading = false;
+      _isInitialized = false;
       notifyListeners();
       rethrow;
     }

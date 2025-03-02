@@ -7,9 +7,8 @@ void navigationRouter(BuildContext context, int index) async {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const WeekScreen(
-          mealData: {}, // Empty initial data, will be loaded in the screen
-        ),
+        builder: (context) => const WeekScreen(),
+        maintainState: true,
       ),
     );
   } else if (index == 1) {
