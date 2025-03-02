@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/final_models/client.dart';
 import 'package:flutter_flexdiet/models/final_models/meal.dart';
@@ -5,7 +6,9 @@ import 'package:flutter_flexdiet/models/final_models/day.dart';
 import 'package:flutter_flexdiet/models/day_meals.dart';
 import 'package:flutter_flexdiet/models/final_models/template.dart';
 import 'package:flutter_flexdiet/models/final_models/user_diet.dart';
+import 'package:flutter_flexdiet/services/image_service/image_service.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SelectFoodsScreen extends StatefulWidget {
   final List<String> selectedDays;
@@ -377,11 +380,14 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     final formKey = GlobalKey<FormState>();
     final theme = Theme.of(context);
 
+    String uid = UniqueKey().toString();
     String name = '';
     String description = '';
     double calories = 0;
     double protein = 0;
     double carbs = 0;
+    String image = '';
+    final ImagePickerService imagePickerService = ImagePickerService();
 
     final inputDecoration = InputDecoration(
       filled: true,
@@ -496,6 +502,22 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                       ? 'Valor inválido'
                       : null,
                 ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    image = await imagePickerService.selectImage(
+                      context: context,
+                      source: ImageSource.gallery,
+                      uidMeal: uid,
+                      collection: 'meals'
+                    ) ?? '';
+                    print('La puta imagen: $image');
+                  },
+                  child: const Text('Imagen comidad')
+                ),
+                const SizedBox(height: 16),
+                if(image != '') Image(image: NetworkImage(image),)
+                
               ],
             ),
           ),
@@ -519,8 +541,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 setState(() {
                   daysData[selectedDayIndex].meals.add(
                         Meal(
-                          id: UniqueKey()
-                              .toString(), // Temporary ID for template
+                          id: uid, // Temporary ID for template
                           name: name,
                           description: description,
                           calories: calories,
