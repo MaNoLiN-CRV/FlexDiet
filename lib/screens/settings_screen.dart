@@ -171,9 +171,12 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
 
   Future<void> _loadUserName() async {
     final user = FirebaseAuth.instance.currentUser;
-    setState(() {
-      _userName = user?.displayName ?? user?.email ?? 'Nombre de Usuario';
-    });
+    if (user != null) {
+      final Client client = await Client.getClient(user.uid);
+      setState(() {
+        _userName = client.username;
+      });
+    }
   }
 
   Future<void> _loadImagePath() async {
