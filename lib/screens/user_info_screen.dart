@@ -70,7 +70,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       sex: _selectedGender,
       bodyweight: formattedWeight,
       height: formattedHeight?.toDouble(),
-      bodyweightHistory: widget.client.bodyweightHistory ?? [],
+      bodyweightHistory: widget.client.bodyweightHistory,
       description: description,
     );
 

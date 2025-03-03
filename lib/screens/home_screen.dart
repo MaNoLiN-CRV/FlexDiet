@@ -7,6 +7,7 @@ import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:msh_checkbox/msh_checkbox.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_flexdiet/services/notification_service.dart';
 
 class HomeScreen extends StatelessWidget {
   static const double _cardHeight = 250.0;
@@ -33,13 +34,181 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   double _completedCalories = 0;
   double _completedProtein = 0;
   double _completedCarbs = 0;
+  final TextEditingController _weightController = TextEditingController();
+  final _notificationService = NotificationService();
+
+  @override
+  void dispose() {
+    _weightController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DietStateProvider>().initializeData();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final dietState = context.read<DietStateProvider>();
+      await dietState.initializeData();
+
+      // Verificar si debe mostrar el diálogo de actualización de peso
+      _checkAndShowWeightUpdateDialog();
     });
+  }
+
+  // Verificar si debe mostrar el diálogo de actualización de peso
+  Future<void> _checkAndShowWeightUpdateDialog() async {
+    final bool shouldShow =
+        await _notificationService.shouldShowBodyweightUpdateDialog();
+
+    if (shouldShow) {
+      // Esperar un momento para que la pantalla termine de cargarse
+      await Future.delayed(const Duration(milliseconds: 500));
+      await _showWeightUpdateDialog();
+    }
+  }
+
+  // Función para mostrar el diálogo de actualización de peso
+  Future<void> _showWeightUpdateDialog() async {
+    final DietStateProvider dietState;
+    if (mounted) {
+      dietState = context.read<DietStateProvider>();
+
+      // Obtener el peso más reciente como valor por defecto
+      final currentWeight = dietState.client?.bodyweight ?? 0.0;
+      final latestBodyweight = await _notificationService.getLatestBodyweight();
+
+      // Usar el peso guardado si existe, de lo contrario usar el peso actual
+      _weightController.text = (latestBodyweight ?? currentWeight).toString();
+
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          final theme = Theme.of(context);
+          final isDarkMode = theme.brightness == Brightness.dark;
+          final dialogBackgroundColor =
+              isDarkMode ? Colors.grey[850] : Colors.white;
+          final textColor = isDarkMode ? Colors.white : Colors.black;
+          final buttonColor = isDarkMode
+              ? theme.colorScheme.secondary
+              : theme.colorScheme.primary;
+          final buttonTextColor = isDarkMode ? Colors.black : Colors.white;
+
+          return AlertDialog(
+            backgroundColor: dialogBackgroundColor,
+            titleTextStyle: TextStyle(color: textColor, fontSize: 20),
+            contentTextStyle: TextStyle(color: textColor),
+            title:
+                Text('Actualiza tu peso', style: TextStyle(color: textColor)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Es importante registrar tu peso para realizar un seguimiento adecuado de tu progreso.',
+                  style: TextStyle(color: textColor),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _weightController,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: 'Peso (kg)',
+                    labelStyle: TextStyle(color: textColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(color: textColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: textColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: textColor),
+                    ),
+                  ),
+                  style: TextStyle(color: textColor),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  // Guardar el peso ingresado para usarlo mañana si el usuario elige "Más tarde"
+                  final enteredWeight = double.tryParse(_weightController.text);
+                  if (enteredWeight != null) {
+                    await _notificationService
+                        .setLatestBodyweight(enteredWeight);
+                  }
+
+                  // Mark the dialog as not shown for tomorrow
+                  await _notificationService.snoozeBodyweightUpdateDialog();
+
+                  Navigator.of(context).pop();
+                },
+                child: Text('Más tarde', style: TextStyle(color: textColor)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: buttonColor,
+                  foregroundColor: buttonTextColor,
+                ),
+                onPressed: () async {
+                  // Obtener y validar el peso ingresado
+                  final enteredWeight = double.tryParse(_weightController.text);
+                  if (enteredWeight == null || enteredWeight <= 0) {
+                    final SnackBar snackBar = const SnackBar(
+                      content: Text('Por favor, introduce un peso válido'),
+                      backgroundColor: Colors.red,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    return;
+                  }
+
+                  // Actualizar el peso en el modelo Cliente
+                  if (dietState.client != null) {
+                    final success =
+                        await dietState.client!.updateBodyweight(enteredWeight);
+
+                    if (success) {
+                      // Marcar el diálogo como mostrado hoy
+                      await _notificationService
+                          .setBodyweightUpdateDialogShownToday(true);
+                      // Set the weight update date for weekly suppression
+                      await _notificationService.setLastWeightUpdateDate();
+                      // Limpiar el peso guardado
+                      await _notificationService.setLatestBodyweight(null);
+
+                      // Actualizar el estado para refrescar el gráfico
+                      setState(() {});
+
+                      if (mounted) {
+                        final SnackBar snackBar = const SnackBar(
+                          content: Text('Peso actualizado correctamente'),
+                          backgroundColor: Colors.green,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        Navigator.of(context).pop();
+                      }
+                    } else {
+                      if (mounted) {
+                        final SnackBar snackBar = const SnackBar(
+                          content: Text('Error al actualizar el peso'),
+                          backgroundColor: Colors.red,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                    }
+                  }
+                },
+                child: const Text('Actualizar'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   void _updateCompletedNutrients(DietStateProvider dietState) {
@@ -80,6 +249,11 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
           bottomNavigationBar: BottomNav(
             selectedIndex: 1,
             onItemTapped: (index) => navigationRouter(context, index),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: _showWeightUpdateDialog,
+            child: const Icon(Icons.monitor_weight),
+            tooltip: 'Actualizar peso',
           ),
         );
       },
@@ -155,7 +329,6 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     );
   }
 
-  // Modify _buildNutritionCard to use real data
   Widget _buildNutritionCard(ThemeData theme, DietStateProvider dietState) {
     _updateCompletedNutrients(dietState);
 
@@ -191,7 +364,6 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     );
   }
 
-  // Modify _buildMealsSection to use real data
   Widget _buildMealsSection(
       ThemeData theme, BuildContext context, DietStateProvider dietState) {
     if (dietState.todayMeals.isEmpty) {
@@ -309,7 +481,7 @@ class _CaloryInfo extends StatelessWidget {
   }
 }
 
-// Modify MealCardData to include an icon
+// Clases existentes sin cambios
 class MealCardData extends CardData {
   bool isSelected;
   final IconData defaultIcon;

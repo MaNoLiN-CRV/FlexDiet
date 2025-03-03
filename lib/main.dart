@@ -50,10 +50,13 @@ Future<void> main() async {
   await NotificationService().requestPermissions();
   await NotificationService().requestExactAlarmPermission();
 
-  // Programar notificación para pruebas (activar al minuto)
-  await NotificationService().scheduleMinuteWeighInNotification(
-    minute: DateTime.now().minute,
-  );
+  // Schedule a default weekly notification (e.g., Monday at 8:00 AM)
+  // You'll probably want to get these values from settings.
+  // TimeOfDay defaultTime = const TimeOfDay(hour: 8, minute: 0);
+  // await NotificationService().scheduleWeeklyWeighInNotification(
+  //   time: defaultTime,
+  //   dayOfWeek: DayOfWeek.monday,
+  // );
 
   Intl.defaultLocale = 'es';
 
@@ -118,9 +121,6 @@ class MyApp extends StatelessWidget {
       try {
         final client = await Client.getClient(user.uid);
         final hasCompletedInfo = await _hasCompletedUserInfo();
-
-        // Load saved notification preferences
-        await NotificationService().loadSavedNotification();
 
         return hasCompletedInfo
             ? const HomeScreen()

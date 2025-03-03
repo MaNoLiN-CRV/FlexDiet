@@ -180,7 +180,7 @@ class _EditPersonState extends State<EditPerson> {
           image: client!.image ?? '',
           bodyweight: double.tryParse(kgController?.text ?? ''),
           height: double.tryParse(heightController?.text ?? ''),
-          bodyweightHistory: client!.bodyweightHistory ?? [],
+          bodyweightHistory: client!.bodyweightHistory,
           description: descriptionController?.text,
           userDietId: client!.userDietId,
         );

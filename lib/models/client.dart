@@ -14,7 +14,7 @@ class Client {
   double? bodyweight;
   double? height;
   String? description;
-  List<HistoricalBodyweight> bodyweightHistory; // Historical bodyweight
+  List<HistoricalBodyweight> bodyweightHistory;
 
   Client({
     required this.id,
@@ -114,7 +114,7 @@ class Client {
       // Sort history by date
       bodyweightHistory.sort((a, b) => b.date.compareTo(a.date));
 
-      // Keep only last 30 entries
+      // Keep only last 8 entries
       if (bodyweightHistory.length > 8) {
         bodyweightHistory = bodyweightHistory.take(8).toList();
       }
