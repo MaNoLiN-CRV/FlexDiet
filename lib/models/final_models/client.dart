@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../firebase_firestore.dart';
+import 'historical_bodyweight.dart';
 
 final firestore = FirestoreService.firestore;
 
@@ -8,11 +9,12 @@ class Client {
   String username;
   String email;
   String? image;
-  String? userDietId; // Reference to UserDiet instead of template directly
+  String? userDietId;
   String? sex;
   double? bodyweight;
   double? height;
   String? description;
+  List<HistoricalBodyweight> bodyweightHistory; // Historical bodyweight
 
   Client({
     required this.id,
@@ -24,7 +26,8 @@ class Client {
     this.bodyweight,
     this.height,
     this.description,
-  });
+    List<HistoricalBodyweight>? bodyweightHistory,
+  }) : bodyweightHistory = bodyweightHistory ?? [];
 
   Map<String, dynamic> toJson() {
     return {
@@ -36,6 +39,7 @@ class Client {
       'bodyweight': bodyweight,
       'height': height,
       'description': description,
+      'bodyweightHistory': bodyweightHistory.map((h) => h.toJson()).toList(),
     };
   }
 
@@ -47,10 +51,13 @@ class Client {
       email: json['email'] ?? '',
       userDietId: json['userDietId'],
       sex: json['sex'],
-      bodyweight:
-          json['bodyweight']?.toDouble(),
+      bodyweight: json['bodyweight']?.toDouble(),
       height: json['height']?.toDouble(),
       description: json['description'],
+      bodyweightHistory: (json['bodyweightHistory'] as List<dynamic>?)
+              ?.map((h) => HistoricalBodyweight.fromJson(h))
+              .toList() ??
+          [],
     );
   }
 
@@ -89,6 +96,32 @@ class Client {
       await collection.doc(clientId).delete();
       return true;
     } catch (e) {
+      return false;
+    }
+  }
+
+  // Add method to update bodyweight with history
+  Future<bool> updateBodyweight(double newWeight) async {
+    try {
+      bodyweight = newWeight;
+      bodyweightHistory.add(
+        HistoricalBodyweight(
+          date: DateTime.now(),
+          weight: newWeight,
+        ),
+      );
+
+      // Sort history by date
+      bodyweightHistory.sort((a, b) => b.date.compareTo(a.date));
+
+      // Keep only last 30 entries
+      if (bodyweightHistory.length > 30) {
+        bodyweightHistory = bodyweightHistory.take(30).toList();
+      }
+
+      return await updateClient(this);
+    } catch (e) {
+      print('Error updating bodyweight: $e');
       return false;
     }
   }
