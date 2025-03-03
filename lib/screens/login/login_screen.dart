@@ -177,9 +177,22 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   Future<void> _handleGoogleSignIn(BuildContext context) async {
+    // Create a new Client entity in Firestore
     try {
       final userCredential = await googleAuthService.signIn();
-      final user = userCredential?.user;
+      
+      if(userCredential!.additionalUserInfo!.isNewUser) {
+        print('Hola mundo');
+        final newClient = Client(
+          id: userCredential.user!.uid,
+          username: userCredential.user!.displayName!,
+          email: userCredential.user!.email!,
+        );
+        print('Paco: ${newClient.id}/${newClient.username}/${newClient.email}');
+        await Client.createClient(newClient);
+      }
+
+      final user = userCredential.user;
       if (user != null) {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('userId', user.uid); //Store user ID
