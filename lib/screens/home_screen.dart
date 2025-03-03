@@ -252,8 +252,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: _showWeightUpdateDialog,
-            child: const Icon(Icons.monitor_weight),
             tooltip: 'Actualizar peso',
+            child: const Icon(Icons.monitor_weight),
           ),
         );
       },
