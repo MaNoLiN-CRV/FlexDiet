@@ -66,9 +66,11 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       username: widget.client.username,
       email: widget.client.email,
       userDietId: widget.client.userDietId,
+      image: widget.client.image ?? '',
       sex: _selectedGender,
       bodyweight: formattedWeight,
-      height: formattedHeight?.toDouble(), // Ensure it's a double
+      height: formattedHeight?.toDouble(),
+      bodyweightHistory: widget.client.bodyweightHistory ?? [],
       description: description,
     );
 

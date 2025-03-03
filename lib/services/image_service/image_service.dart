@@ -85,6 +85,9 @@ class ImagePickerService {
       final String rutaArchivo = '${user.uid}/${imagen.name}';
       final File file = File(imagen.path);
 
+      // Remove image profile
+      _removeProfileImage(client);
+
       // Upload file to Supabase Storage
       await _supabaseClient.storage.from('FlexDiet').upload(rutaArchivo, file);
 
@@ -110,6 +113,23 @@ class ImagePickerService {
         .collection(coleccion)
         .doc(uid)
         .set({'image': imageUrl}, SetOptions(merge: true));
+  }
+
+  // In this method we control that unused user images are deleted.
+  Future<void> _removeProfileImage(Client client) async {
+    // 1. Listar todos los archivos existentes en la carpeta del usuario
+      final List<FileObject> existingFiles = await _supabaseClient
+          .storage
+          .from('FlexDiet')
+          .list(path: client.id);
+      
+      // 2. Eliminar todas las imágenes anteriores
+      for (var file in existingFiles) {
+        await _supabaseClient
+            .storage
+            .from('FlexDiet')
+            .remove(['${client.id}/${file.name}']);
+      }
   }
 
   Future<String?> _saveFoodImage(

@@ -177,8 +177,10 @@ class _EditPersonState extends State<EditPerson> {
           username: nameController?.text ?? '',
           email: client!.email,
           sex: _mapUIGenderToDatabase(sex),
+          image: client!.image ?? '',
           bodyweight: double.tryParse(kgController?.text ?? ''),
           height: double.tryParse(heightController?.text ?? ''),
+          bodyweightHistory: client!.bodyweightHistory ?? [],
           description: descriptionController?.text,
           userDietId: client!.userDietId,
         );
