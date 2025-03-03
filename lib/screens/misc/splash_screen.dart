@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_flexdiet/services/admin_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_flexdiet/models/client.dart';
 
@@ -37,14 +38,28 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (user != null) {
       try {
-        // Get client data from Firestore
-        final client = await Client.getClient(user.uid);
+        // Check if user is admin first
+        final adminService = AdminService();
+        await adminService.initialize();
+        final isAdmin = await adminService.isUserAdmin();
 
-        // Check if user info is completed
+        if (isAdmin) {
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AdminScreen()),
+            );
+          }
+          return;
+        }
+
+        // If not admin, proceed with regular user flow
+        final client = await Client.getClient(user.uid);
         final hasCompletedInfo = await _hasCompletedUserInfo();
+
         Widget targetScreen = hasCompletedInfo
             ? const HomeScreen()
-            : UserInfoScreen(client: client); // Pass client data
+            : UserInfoScreen(client: client);
 
         if (mounted) {
           Navigator.pushReplacement(
@@ -58,7 +73,6 @@ class _SplashScreenState extends State<SplashScreen> {
           );
         }
       } catch (e) {
-        // Handle error loading client data
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -67,7 +81,6 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       }
     } else {
-      // User is not logged in, navigate to the login screen
       if (mounted) {
         Navigator.pushReplacement(
           context,

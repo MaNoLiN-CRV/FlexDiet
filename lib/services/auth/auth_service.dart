@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
 import 'dart:async';
+import 'package:flutter_flexdiet/services/admin_service.dart';
 
 //* This is a service that manages client authentication.
 class AuthService {
@@ -39,6 +40,7 @@ class AuthService {
   Future<void> signOut() async {
     try {
       await _auth.signOut();
+      AdminService().clearAdminStatus(); // Clear admin status on logout
       _signOutController.add(null);
     } catch (e) {
       rethrow;

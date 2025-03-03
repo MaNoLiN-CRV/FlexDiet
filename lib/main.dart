@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
+import 'package:flutter_flexdiet/services/admin_service.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -116,15 +117,28 @@ class MyApp extends StatelessWidget {
 
     if (user != null) {
       try {
+        // Initialize admin service first
+        final adminService = AdminService();
+        await adminService.initialize();
+        final isAdmin = await adminService.isUserAdmin();
+
+        // If admin, return AdminScreen immediately without checking for client data
+        if (isAdmin) {
+          return const AdminScreen();
+        }
+
+        // Only fetch client data for non-admin users
         final client = await Client.getClient(user.uid);
         final hasCompletedInfo = await _hasCompletedUserInfo();
 
         // Load saved notification preferences
         await NotificationService().loadSavedNotification();
 
-        return hasCompletedInfo
-            ? const HomeScreen()
-            : UserInfoScreen(client: client);
+        if (!hasCompletedInfo) {
+          return UserInfoScreen(client: client);
+        }
+
+        return const HomeScreen();
       } catch (e) {
         if (kDebugMode) {
           print('Error fetching client data: $e');
