@@ -378,6 +378,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
   Future<void> _showAddMealDialog(BuildContext context, bool isDarkMode) async {
     final formKey = GlobalKey<FormState>();
     final theme = Theme.of(context);
+    final ImagePickerService imagePickerService = ImagePickerService();
 
     String uid = UniqueKey().toString();
     String name = '';
@@ -385,210 +386,362 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     double calories = 0;
     double protein = 0;
     double carbs = 0;
-    String image = '';
     String timeOfDay = '';
 
-    final ImagePickerService imagePickerService = ImagePickerService();
-
-    final inputDecoration = InputDecoration(
-      filled: true,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: isDarkMode
-              ? Colors.grey.shade600
-              : theme.colorScheme.outline.withValues(alpha: 0.3),
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: theme.colorScheme.primary,
-          width: 2,
-        ),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      labelStyle: TextStyle(color: isDarkMode ? Colors.white70 : null),
-      hintStyle: TextStyle(color: isDarkMode ? Colors.grey.shade500 : null),
-      prefixIconColor: isDarkMode ? Colors.white70 : null,
-    );
+    String? currentImage;
 
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: theme.colorScheme.surface,
-        surfaceTintColor: theme.colorScheme.surfaceTint,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        title: Text(
-          'Añadir Comida',
-          style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : null),
-        ),
-        content: SingleChildScrollView(
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  style: TextStyle(color: isDarkMode ? Colors.white : null),
-                  decoration: inputDecoration.copyWith(
-                    hintText: 'Nombre del plato',
-                    prefixIcon: const Icon(Icons.restaurant_menu),
-                  ),
-                  onSaved: (value) => name = value ?? '',
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Campo requerido' : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  style: TextStyle(color: isDarkMode ? Colors.white : null),
-                  decoration: inputDecoration.copyWith(
-                    hintText: 'Descripción',
-                    prefixIcon: const Icon(Icons.description),
-                  ),
-                  onSaved: (value) => description = value ?? '',
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Campo requerido' : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  style: TextStyle(color: isDarkMode ? Colors.white : null),
-                  decoration: inputDecoration.copyWith(
-                    hintText: 'Calorías (kcal)',
-                    prefixIcon: const Icon(Icons.local_fire_department),
-                  ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  onSaved: (value) => calories =
-                      double.tryParse(value ?? '0') ?? 0, // Default to 0
-                  validator: (value) => double.tryParse(value ?? '') == null
-                      ? 'Valor inválido'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  style: TextStyle(color: isDarkMode ? Colors.white : null),
-                  decoration: inputDecoration.copyWith(
-                    hintText: 'Proteínas (g)',
-                    prefixIcon: const Icon(Icons.fitness_center),
-                  ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  onSaved: (value) => protein =
-                      double.tryParse(value ?? '0') ?? 0, // Default to 0
-                  validator: (value) => double.tryParse(value ?? '') == null
-                      ? 'Valor inválido'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  style: TextStyle(color: isDarkMode ? Colors.white : null),
-                  decoration: inputDecoration.copyWith(
-                    hintText: 'Carbohidratos (g)',
-                    prefixIcon: const Icon(Icons.grain),
-                  ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  onSaved: (value) => carbs =
-                      double.tryParse(value ?? '0') ?? 0, // Default to 0
-                  validator: (value) => double.tryParse(value ?? '') == null
-                      ? 'Valor inválido'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  style: TextStyle(color: isDarkMode ? Colors.white : null),
-                  decoration: inputDecoration.copyWith(
-                    hintText: 'Momento del día (Desayuno, Snack, Almuerzo...)',
-                    prefixIcon: const Icon(Icons.restaurant_menu),
-                  ),
-                  onSaved: (value) => timeOfDay = value ?? '',
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Campo requerido' : null,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                    onPressed: () async {
-                      final newImage = await imagePickerService.selectImage(
-                          context: context,
-                          source: ImageSource.gallery,
-                          uidMeal: uid,
-                          collection: 'meals');
-
-                      if (newImage != null) {
-                        // Utiliza setState fuera del then para asegurar que se ejecuta correctamente
-                        setState(() {
-                          image = newImage;
-                          print(
-                              "Imagen actualizada a: $image"); // Para depuración
-                        });
-
-                        // Forzar una reconstrucción del widget después de un breve retraso
-                        Future.delayed(Duration(milliseconds: 100), () {
-                          if (mounted) setState(() {});
-                        });
-                      }
-                    },
-                    child: const Text('Imagen comida')),
-                const SizedBox(height: 16),
-                if (image.isNotEmpty)
-                  Container(
-                    key: UniqueKey(), // Esto fuerza la reconstrucción completa
-                    child: Image(
-                      image: NetworkImage(image),
-                      errorBuilder: (context, error, stackTrace) {
-                        print("Error cargando imagen: $error");
-                        return Text('Error al cargar la imagen');
-                      },
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: theme.colorScheme.surface,
+          surfaceTintColor: theme.colorScheme.surfaceTint,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          title: Text(
+            'Añadir Comida',
+            style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : null),
+          ),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    style: TextStyle(color: isDarkMode ? Colors.white : null),
+                    decoration: InputDecoration(
+                      hintText: 'Nombre del plato',
+                      prefixIcon: const Icon(Icons.restaurant_menu),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDarkMode
+                              ? Colors.grey.shade600
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      labelStyle:
+                          TextStyle(color: isDarkMode ? Colors.white70 : null),
+                      hintStyle: TextStyle(
+                          color: isDarkMode ? Colors.grey.shade500 : null),
+                      prefixIconColor: isDarkMode ? Colors.white70 : null,
                     ),
+                    onSaved: (value) => name = value ?? '',
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Campo requerido' : null,
                   ),
-              ],
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    style: TextStyle(color: isDarkMode ? Colors.white : null),
+                    decoration: InputDecoration(
+                      hintText: 'Descripción',
+                      prefixIcon: const Icon(Icons.description),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDarkMode
+                              ? Colors.grey.shade600
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      labelStyle:
+                          TextStyle(color: isDarkMode ? Colors.white70 : null),
+                      hintStyle: TextStyle(
+                          color: isDarkMode ? Colors.grey.shade500 : null),
+                      prefixIconColor: isDarkMode ? Colors.white70 : null,
+                    ),
+                    onSaved: (value) => description = value ?? '',
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Campo requerido' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    style: TextStyle(color: isDarkMode ? Colors.white : null),
+                    decoration: InputDecoration(
+                      hintText: 'Calorías (kcal)',
+                      prefixIcon: const Icon(Icons.local_fire_department),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDarkMode
+                              ? Colors.grey.shade600
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      labelStyle:
+                          TextStyle(color: isDarkMode ? Colors.white70 : null),
+                      hintStyle: TextStyle(
+                          color: isDarkMode ? Colors.grey.shade500 : null),
+                      prefixIconColor: isDarkMode ? Colors.white70 : null,
+                    ),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    onSaved: (value) => calories =
+                        double.tryParse(value ?? '0') ?? 0, // Default to 0
+                    validator: (value) => double.tryParse(value ?? '') == null
+                        ? 'Valor inválido'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    style: TextStyle(color: isDarkMode ? Colors.white : null),
+                    decoration: InputDecoration(
+                      hintText: 'Proteínas (g)',
+                      prefixIcon: const Icon(Icons.fitness_center),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDarkMode
+                              ? Colors.grey.shade600
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      labelStyle:
+                          TextStyle(color: isDarkMode ? Colors.white70 : null),
+                      hintStyle: TextStyle(
+                          color: isDarkMode ? Colors.grey.shade500 : null),
+                      prefixIconColor: isDarkMode ? Colors.white70 : null,
+                    ),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    onSaved: (value) => protein =
+                        double.tryParse(value ?? '0') ?? 0, // Default to 0
+                    validator: (value) => double.tryParse(value ?? '') == null
+                        ? 'Valor inválido'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    style: TextStyle(color: isDarkMode ? Colors.white : null),
+                    decoration: InputDecoration(
+                      hintText: 'Carbohidratos (g)',
+                      prefixIcon: const Icon(Icons.grain),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDarkMode
+                              ? Colors.grey.shade600
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      labelStyle:
+                          TextStyle(color: isDarkMode ? Colors.white70 : null),
+                      hintStyle: TextStyle(
+                          color: isDarkMode ? Colors.grey.shade500 : null),
+                      prefixIconColor: isDarkMode ? Colors.white70 : null,
+                    ),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    onSaved: (value) => carbs =
+                        double.tryParse(value ?? '0') ?? 0, // Default to 0
+                    validator: (value) => double.tryParse(value ?? '') == null
+                        ? 'Valor inválido'
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    style: TextStyle(color: isDarkMode ? Colors.white : null),
+                    decoration: InputDecoration(
+                      hintText:
+                          'Momento del día (Desayuno, Snack, Almuerzo...)',
+                      prefixIcon: const Icon(Icons.restaurant_menu),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDarkMode
+                              ? Colors.grey.shade600
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      labelStyle:
+                          TextStyle(color: isDarkMode ? Colors.white70 : null),
+                      hintStyle: TextStyle(
+                          color: isDarkMode ? Colors.grey.shade500 : null),
+                      prefixIconColor: isDarkMode ? Colors.white70 : null,
+                    ),
+                    onSaved: (value) => timeOfDay = value ?? '',
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Campo requerido' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                      onPressed: () async {
+                        final newImage = await imagePickerService.selectImage(
+                            context: context,
+                            source: ImageSource.gallery,
+                            uidMeal: uid,
+                            collection: 'meals');
+
+                        if (newImage != null) {
+                          setDialogState(() {
+                            currentImage = newImage;
+                          });
+                        }
+                      },
+                      child: const Text('Imagen comida')),
+                  const SizedBox(height: 16),
+                  if (currentImage != null)
+                    Container(
+                      key: ValueKey(currentImage),
+                      height: 200, // Add fixed height
+                      width: double.infinity,
+                      child: Image(
+                        image: NetworkImage(currentImage!),
+                        fit: BoxFit.cover, // Add fit property
+                        errorBuilder: (context, error, stackTrace) {
+                          print("Error cargando imagen: $error");
+                          return const Center(
+                              child: Text('Error al cargar la imagen'));
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: theme.colorScheme.error,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCELAR'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+              onPressed: () {
+                if (formKey.currentState?.validate() ?? false) {
+                  formKey.currentState?.save();
+                  setState(() {
+                    daysData[selectedDayIndex].meals.add(
+                          Meal(
+                              id: uid, // Temporary ID for template
+                              name: name,
+                              description: description,
+                              calories: calories,
+                              protein: protein,
+                              carbs: carbs,
+                              image: currentImage, // Use currentImage here
+                              timeOfDay: timeOfDay),
+                        );
+                  });
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('AÑADIR'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: theme.colorScheme.error,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCELAR'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            onPressed: () {
-              if (formKey.currentState?.validate() ?? false) {
-                formKey.currentState?.save();
-                setState(() {
-                  daysData[selectedDayIndex].meals.add(
-                        Meal(
-                            id: uid, // Temporary ID for template
-                            name: name,
-                            description: description,
-                            calories: calories,
-                            protein: protein,
-                            carbs: carbs,
-                            image: image, // Save the image URL
-                            timeOfDay: timeOfDay),
-                      );
-                });
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('AÑADIR'),
-          ),
-        ],
       ),
     );
   }
@@ -704,7 +857,6 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             image: meal.image,
             timeOfDay: meal.timeOfDay,
           );
-
 
           bool isMealCreated = await Meal.createMeal(mealToSave);
           if (isMealCreated) {
