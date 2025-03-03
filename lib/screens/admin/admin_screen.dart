@@ -239,6 +239,9 @@ class _AdminScreenState extends State<AdminScreen> {
       child: Card(
         elevation: isSelected ? 8 : 4,
         color: isSelected ? Theme.of(context).colorScheme.primary : null,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: InkWell(
           onTap: () => _selectClient(client.id),
           borderRadius: BorderRadius.circular(12),
@@ -247,24 +250,28 @@ class _AdminScreenState extends State<AdminScreen> {
             children: [
               AspectRatio(
                 aspectRatio: 16 / 9,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(12),
-                    ),
+                child: ClipRRect(
+                  // Added ClipRRect
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
                   ),
-                  child: client.image != null && client.image!.isNotEmpty
-                      ? Image(
-                          image: NetworkImage(client.image!),
-                          fit: BoxFit.cover,
-                        )
-                      : Icon(
-                          Icons.person,
-                          size: 48,
-                          color:
-                              Theme.of(context).colorScheme.onPrimaryContainer,
-                        ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                    ),
+                    child: client.image != null && client.image!.isNotEmpty
+                        ? Image(
+                            image: NetworkImage(client.image!),
+                            fit: BoxFit.cover,
+                          )
+                        : Icon(
+                            Icons.person,
+                            size: 48,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onPrimaryContainer,
+                          ),
+                  ),
                 ),
               ),
               Expanded(
