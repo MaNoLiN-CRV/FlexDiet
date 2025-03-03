@@ -103,10 +103,12 @@ class _UseTemplateScreenState extends State<UseTemplateScreen>
           username: _client!.username,
           email: _client!.email,
           userDietId: userDiet.id,
-          sex: _client!.sex,
-          bodyweight: _client!.bodyweight,
+          sex: _client?.sex,
+          bodyweight: _client?.bodyweight,
+          image: _client?.image,
           height: _client!.height,
-          description: _client!.description,
+          description: _client?.description,
+          bodyweightHistory: _client?.bodyweightHistory,
         );
 
         bool isClientUpdated = await Client.updateClient(updatedClient);
