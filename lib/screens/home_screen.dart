@@ -200,12 +200,12 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                   builder: (BuildContext context) => DetailsScreen(
                     title: meal.name ?? '',
                     subtitle: 'Detalles de la comida',
-                    description: meal.description ?? '',
+                    description: meal.description ?? 'Sin descripción',
                     image: meal.image,
                     kcal: '${meal.calories?.toStringAsFixed(0)} kcal',
                     proteins: '${meal.protein?.toStringAsFixed(1)} g',
                     carbs: '${meal.carbs?.toStringAsFixed(1)} g',
-                    ingredients: meal.ingredients ?? '',
+                    ingredients: meal.ingredients ?? 'Sin ingredientes',
                   ),
                 ),
               );

@@ -391,6 +391,57 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
 
     String? currentImage;
 
+    // Common InputDecoration
+    final inputDecoration = InputDecoration(
+      filled: true,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: isDarkMode
+              ? Colors.grey.shade600
+              : theme.colorScheme.outline.withValues(alpha: 0.3),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: theme.colorScheme.primary,
+          width: 2,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      labelStyle: TextStyle(color: isDarkMode ? Colors.white70 : null),
+      hintStyle: TextStyle(color: isDarkMode ? Colors.grey.shade500 : null),
+      prefixIconColor: isDarkMode ? Colors.white70 : null,
+    );
+
+    Widget buildTextFormField({
+      required String hintText,
+      required IconData prefixIcon,
+      TextInputType? keyboardType,
+      String? Function(String?)? validator,
+      void Function(String?)? onSaved,
+      int? maxLines = 1,
+      int? minLines = 1,
+    }) {
+      return TextFormField(
+        style: TextStyle(color: isDarkMode ? Colors.white : null),
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        minLines: minLines,
+        decoration: inputDecoration.copyWith(
+          hintText: hintText,
+          prefixIcon: Icon(prefixIcon),
+        ),
+        validator: validator,
+        onSaved: onSaved,
+      );
+    }
+
     await showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -412,291 +463,75 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextFormField(
-                    style: TextStyle(color: isDarkMode ? Colors.white : null),
-                    decoration: InputDecoration(
-                      hintText: 'Nombre del plato',
-                      prefixIcon: const Icon(Icons.restaurant_menu),
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Colors.grey.shade600
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.3),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      labelStyle:
-                          TextStyle(color: isDarkMode ? Colors.white70 : null),
-                      hintStyle: TextStyle(
-                          color: isDarkMode ? Colors.grey.shade500 : null),
-                      prefixIconColor: isDarkMode ? Colors.white70 : null,
-                    ),
+                  buildTextFormField(
+                    hintText: 'Nombre del plato',
+                    prefixIcon: Icons.restaurant_menu,
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Campo requerido' : null,
                     onSaved: (value) => name = value ?? '',
-                    validator: (value) =>
-                        value?.isEmpty ?? true ? 'Campo requerido' : null,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    style: TextStyle(color: isDarkMode ? Colors.white : null),
-                    decoration: InputDecoration(
-                      hintText:
-                          'Momento del día (Desayuno, Snack, Almuerzo...)',
-                      prefixIcon: const Icon(Icons.restaurant_menu),
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Colors.grey.shade600
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.3),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      labelStyle:
-                          TextStyle(color: isDarkMode ? Colors.white70 : null),
-                      hintStyle: TextStyle(
-                          color: isDarkMode ? Colors.grey.shade500 : null),
-                      prefixIconColor: isDarkMode ? Colors.white70 : null,
-                    ),
+                  buildTextFormField(
+                    hintText: 'Momento del día (Desayuno, Snack, Almuerzo...)',
+                    prefixIcon: Icons.restaurant_menu,
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Campo requerido' : null,
                     onSaved: (value) => timeOfDay = value ?? '',
-                    validator: (value) =>
-                        value?.isEmpty ?? true ? 'Campo requerido' : null,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    style: TextStyle(color: isDarkMode ? Colors.white : null),
-                    minLines: 1,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      hintText: 'Ingredientes',
-                      prefixIcon: const Icon(Icons.restaurant_menu),
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Colors.grey.shade600
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.3),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      labelStyle:
-                          TextStyle(color: isDarkMode ? Colors.white70 : null),
-                      hintStyle: TextStyle(
-                          color: isDarkMode ? Colors.grey.shade500 : null),
-                      prefixIconColor: isDarkMode ? Colors.white70 : null,
-                    ),
+                  buildTextFormField(
+                    hintText: 'Ingredientes',
+                    prefixIcon: Icons.restaurant_menu,
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Campo requerido' : null,
                     onSaved: (value) => ingredients = value ?? '',
-                    validator: (value) =>
-                        value?.isEmpty ?? true ? 'Campo requerido' : null,
+                    maxLines: null,
+                    minLines: 1,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    style: TextStyle(color: isDarkMode ? Colors.white : null),
-                    decoration: InputDecoration(
-                      hintText: 'Descripción',
-                      prefixIcon: const Icon(Icons.description),
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Colors.grey.shade600
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.3),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      labelStyle:
-                          TextStyle(color: isDarkMode ? Colors.white70 : null),
-                      hintStyle: TextStyle(
-                          color: isDarkMode ? Colors.grey.shade500 : null),
-                      prefixIconColor: isDarkMode ? Colors.white70 : null,
-                    ),
-                    onSaved: (value) => description = value ?? '',
+                  buildTextFormField(
+                    hintText: 'Descripción',
+                    prefixIcon: Icons.description,
                     validator: (value) => null,
+                    onSaved: (value) => description = value ?? '',
+                    maxLines: null,
+                    minLines: 1,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    style: TextStyle(color: isDarkMode ? Colors.white : null),
-                    decoration: InputDecoration(
-                      hintText: 'Calorías (kcal)',
-                      prefixIcon: const Icon(Icons.local_fire_department),
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Colors.grey.shade600
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.3),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      labelStyle:
-                          TextStyle(color: isDarkMode ? Colors.white70 : null),
-                      hintStyle: TextStyle(
-                          color: isDarkMode ? Colors.grey.shade500 : null),
-                      prefixIconColor: isDarkMode ? Colors.white70 : null,
-                    ),
+                  buildTextFormField(
+                    hintText: 'Calorías (kcal)',
+                    prefixIcon: Icons.local_fire_department,
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
+                    validator: (value) => double.tryParse(value ?? '') == null
+                        ? 'Valor inválido'
+                        : null,
                     onSaved: (value) => calories =
                         double.tryParse(value ?? '0') ?? 0, // Default to 0
+                  ),
+                  const SizedBox(height: 16),
+                  buildTextFormField(
+                    hintText: 'Proteínas (g)',
+                    prefixIcon: Icons.fitness_center,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     validator: (value) => double.tryParse(value ?? '') == null
                         ? 'Valor inválido'
                         : null,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    style: TextStyle(color: isDarkMode ? Colors.white : null),
-                    decoration: InputDecoration(
-                      hintText: 'Proteínas (g)',
-                      prefixIcon: const Icon(Icons.fitness_center),
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Colors.grey.shade600
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.3),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      labelStyle:
-                          TextStyle(color: isDarkMode ? Colors.white70 : null),
-                      hintStyle: TextStyle(
-                          color: isDarkMode ? Colors.grey.shade500 : null),
-                      prefixIconColor: isDarkMode ? Colors.white70 : null,
-                    ),
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
                     onSaved: (value) => protein =
                         double.tryParse(value ?? '0') ?? 0, // Default to 0
-                    validator: (value) => double.tryParse(value ?? '') == null
-                        ? 'Valor inválido'
-                        : null,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    style: TextStyle(color: isDarkMode ? Colors.white : null),
-                    decoration: InputDecoration(
-                      hintText: 'Carbohidratos (g)',
-                      prefixIcon: const Icon(Icons.grain),
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Colors.grey.shade600
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.3),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      labelStyle:
-                          TextStyle(color: isDarkMode ? Colors.white70 : null),
-                      hintStyle: TextStyle(
-                          color: isDarkMode ? Colors.grey.shade500 : null),
-                      prefixIconColor: isDarkMode ? Colors.white70 : null,
-                    ),
+                  buildTextFormField(
+                    hintText: 'Carbohidratos (g)',
+                    prefixIcon: Icons.grain,
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
-                    onSaved: (value) => carbs =
-                        double.tryParse(value ?? '0') ?? 0, // Default to 0
                     validator: (value) => double.tryParse(value ?? '') == null
                         ? 'Valor inválido'
                         : null,
+                    onSaved: (value) => carbs =
+                        double.tryParse(value ?? '0') ?? 0, // Default to 0
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
