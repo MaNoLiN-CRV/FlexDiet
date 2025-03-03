@@ -55,18 +55,16 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   void _filterClients(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        _filteredClients = List.from(_clients);
-      } else {
-        final lowercaseQuery = query.toLowerCase();
-        _filteredClients = _clients.where((client) {
-          return client.username.toLowerCase().contains(lowercaseQuery) ||
-              (client.description?.toLowerCase().contains(lowercaseQuery) ??
-                  false);
-        }).toList();
-      }
-    });
+    if (query.isEmpty) {
+      _clientsNotifier.value = List.from(_clients);
+    } else {
+      final lowercaseQuery = query.toLowerCase();
+      _clientsNotifier.value = _clients.where((client) {
+        return client.username.toLowerCase().contains(lowercaseQuery) ||
+            (client.description?.toLowerCase().contains(lowercaseQuery) ??
+                false);
+      }).toList();
+    }
   }
 
   Future<void> _refreshClients() async {
@@ -113,7 +111,6 @@ class _AdminScreenState extends State<AdminScreen> {
                 ValueListenableBuilder<List<Client>>(
                   valueListenable: _clientsNotifier,
                   builder: (context, clients, child) {
-                    _filteredClients = List.from(clients);
                     if (_isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
@@ -136,10 +133,10 @@ class _AdminScreenState extends State<AdminScreen> {
                           height: MediaQuery.of(context).size.height * 0.33,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: _filteredClients.length,
+                            itemCount: clients.length,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             itemBuilder: (context, index) {
-                              final client = _filteredClients[index];
+                              final client = clients[index];
                               final isSelected = client.id == _selectedClientId;
 
                               return buildClientCard(
