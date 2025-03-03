@@ -12,17 +12,18 @@ class Meal {
   num? carbs;
   String? image;
   String? timeOfDay;
+  String? ingredients;
 
-  Meal({
-    required this.id,
-    this.name,
-    this.description,
-    this.protein,
-    this.calories,
-    this.carbs,
-    this.image,
-    this.timeOfDay,
-  });
+  Meal(
+      {required this.id,
+      this.name,
+      this.description,
+      this.protein,
+      this.calories,
+      this.carbs,
+      this.image,
+      this.timeOfDay,
+      this.ingredients});
 
   Map<String, dynamic> toJson() {
     return {
@@ -32,6 +33,7 @@ class Meal {
       'carbs': carbs,
       'image': image,
       'timeOfDay': timeOfDay,
+      'ingredients': ingredients
     };
   }
 
@@ -44,6 +46,7 @@ class Meal {
       carbs: json['carbs'],
       image: json['image'],
       timeOfDay: json['timeOfDay'],
+      ingredients: json['ingredients'],
     );
   }
 

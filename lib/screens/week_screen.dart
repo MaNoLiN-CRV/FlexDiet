@@ -152,12 +152,13 @@ class _WeekScreenState extends State<WeekScreen> {
                                     title: meal.name ?? 'Comida',
                                     subtitle: 'Comida del día',
                                     description: meal.description ?? '',
-                                    image: meal.image,
+                                    image: meal.image ?? '',
                                     carbs: '${meal.carbs?.toString() ?? "0"}g',
                                     kcal:
                                         '${meal.calories?.toString() ?? "0"} kcal',
                                     proteins:
                                         '${meal.protein?.toString() ?? "0"}g',
+                                    ingredients: meal.ingredients ?? '',
                                   ),
                                 ),
                               );

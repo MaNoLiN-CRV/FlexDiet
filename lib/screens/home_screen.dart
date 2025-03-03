@@ -205,6 +205,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                     kcal: '${meal.calories?.toStringAsFixed(0)} kcal',
                     proteins: '${meal.protein?.toStringAsFixed(1)} g',
                     carbs: '${meal.carbs?.toStringAsFixed(1)} g',
+                    ingredients: meal.ingredients ?? '',
                   ),
                 ),
               );

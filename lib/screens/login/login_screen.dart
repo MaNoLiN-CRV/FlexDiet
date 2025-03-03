@@ -110,10 +110,6 @@ class _LoginScreenState extends State<LoginScreen>
             prefs.getString('userId'); // Retrieve stored user ID
 
         if (storedUserId != null) {
-          print(
-              "Biometric Auth: User ID found in SharedPreferences: $storedUserId");
-          // User ID found; attempt to fetch client data
-
           Future.delayed(Duration(milliseconds: 500), () async {
             try {
               Client client = await Client.getClient(storedUserId);
@@ -123,7 +119,6 @@ class _LoginScreenState extends State<LoginScreen>
                 await _navigateToNextScreen(localContext, client);
               }
             } catch (e) {
-              print("Biometric Auth: Error fetching Client: $e");
               if (localContext.mounted) {
                 showToast(
                     localContext, 'Error al obtener datos del usuario: $e',
@@ -132,13 +127,13 @@ class _LoginScreenState extends State<LoginScreen>
             }
           });
         } else {
-          print("Biometric Auth: No user ID found in SharedPreferences");
-          showToast(localContext, 'Inicia sesión primero',
-              toastType: ToastType.warning);
+          if (context.mounted) {
+            showToast(localContext, 'Inicia sesión primero',
+                toastType: ToastType.warning);
+          }
         }
       }
     } on PlatformException catch (e) {
-      print("Biometric Auth: PlatformException: $e");
       if (!context.mounted) return;
       showToast(context, 'Error en la autenticación biométrica: ${e.message}',
           toastType: ToastType.error);
@@ -165,10 +160,11 @@ class _LoginScreenState extends State<LoginScreen>
             'userId', userCredential!.user!.uid); // Store user ID.
         if (context.mounted) {
           Client client = await Client.getClient(userCredential.user!.uid);
-          await _navigateToNextScreen(context, client);
+          if (context.mounted) {
+            await _navigateToNextScreen(context, client);
+          }
         }
       }
-
       if (!context.mounted) return;
       showToast(context, 'Inicio de sesión correcto',
           toastType: ToastType.success);

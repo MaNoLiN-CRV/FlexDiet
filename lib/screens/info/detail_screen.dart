@@ -8,16 +8,19 @@ class DetailsScreen extends StatelessWidget {
   final String kcal;
   final String proteins;
   final String carbs;
+  final String ingredients;
 
-  const DetailsScreen(
-      {super.key,
-      required this.title,
-      required this.subtitle,
-      required this.description,
-      required this.image,
-      required this.kcal,
-      required this.proteins,
-      required this.carbs});
+  const DetailsScreen({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.description,
+    required this.image,
+    required this.kcal,
+    required this.proteins,
+    required this.carbs,
+    required this.ingredients,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +37,8 @@ class DetailsScreen extends StatelessWidget {
             // Imagen del plato
             _buildImageContainer(image),
             // Detalles de la comida
-            _buildPrincipalContainer(
-                theme, subtitle, description, kcal, proteins, carbs)
+            _buildPrincipalContainer(theme, subtitle, description, kcal,
+                proteins, carbs, ingredients),
           ],
         ),
       ),
@@ -74,9 +77,9 @@ class DetailsScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildMacroInfo('Calorías', '350 kcal'),
-          _buildMacroInfo('Proteínas', '20g'),
-          _buildMacroInfo('Carbohidratos', '40g'),
+          _buildMacroInfo('Calorías', kcal),
+          _buildMacroInfo('Proteínas', proteins),
+          _buildMacroInfo('Carbohidratos', carbs),
         ],
       ),
     );
@@ -105,36 +108,45 @@ class DetailsScreen extends StatelessWidget {
       ],
     );
   }
-}
 
-Widget _buildImageContainer(String? image) {
-  if (image == null) {
-    return Container();
+  Widget _buildImageContainer(String? image) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.grey[200],
+      ),
+      child: image != null && image.isNotEmpty
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.network(
+                image,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            )
+          : Center(
+              child: Icon(
+                Icons.restaurant,
+                size: 100,
+                color: Colors.grey[400],
+              ),
+            ),
+    );
   }
 
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16),
-    height: 200,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(20),
-      image: DecorationImage(
-        image: NetworkImage(image),
-        fit: BoxFit.cover,
-      ),
-      boxShadow: [
-        BoxShadow(
-          blurRadius: 10,
-          offset: const Offset(0, 5),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildPrincipalContainer(ThemeData theme, String subtitle,
-    String description, String kcal, String proteins, String carbs) {
-  return Container(
-      margin: EdgeInsets.symmetric(vertical: 20),
+  Widget _buildPrincipalContainer(
+      ThemeData theme,
+      String subtitle,
+      String description,
+      String kcal,
+      String proteins,
+      String carbs,
+      String ingredients) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
@@ -162,22 +174,21 @@ Widget _buildPrincipalContainer(ThemeData theme, String subtitle,
                 const SizedBox(height: 16),
                 Text(
                   description,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontSize: 16,
-                    height: 1.5,
-                  ),
+                  style: theme.textTheme.titleSmall
+                      ?.copyWith(fontSize: 16, height: 1.5),
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Información nutricional',
+                  'Ingredientes',
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                Text(ingredients),
                 const SizedBox(height: 12),
                 Text(
-                  'Información nutricional detallada: \n\n- Calorías: $kcal \n- Proteínas: $proteins \n- Carbohidratos: $carbs \n- Grasas: 15g \n\nRecuerda que estos valores son aproximados y pueden variar según los ingredientes y las porciones.',
+                  '\n\nRecuerda que estos valores son aproximados y pueden variar según los ingredientes y las porciones.',
                   style: const TextStyle(
                     fontSize: 16,
                     height: 1.5,
@@ -187,5 +198,7 @@ Widget _buildPrincipalContainer(ThemeData theme, String subtitle,
             ),
           ),
         ),
-      ));
+      ),
+    );
+  }
 }

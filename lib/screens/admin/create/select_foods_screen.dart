@@ -387,6 +387,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     double protein = 0;
     double carbs = 0;
     String timeOfDay = '';
+    String ingredients = '';
 
     String? currentImage;
 
@@ -453,6 +454,87 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   TextFormField(
                     style: TextStyle(color: isDarkMode ? Colors.white : null),
                     decoration: InputDecoration(
+                      hintText:
+                          'Momento del día (Desayuno, Snack, Almuerzo...)',
+                      prefixIcon: const Icon(Icons.restaurant_menu),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDarkMode
+                              ? Colors.grey.shade600
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      labelStyle:
+                          TextStyle(color: isDarkMode ? Colors.white70 : null),
+                      hintStyle: TextStyle(
+                          color: isDarkMode ? Colors.grey.shade500 : null),
+                      prefixIconColor: isDarkMode ? Colors.white70 : null,
+                    ),
+                    onSaved: (value) => timeOfDay = value ?? '',
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Campo requerido' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    style: TextStyle(color: isDarkMode ? Colors.white : null),
+                    minLines: 1,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      hintText: 'Ingredientes',
+                      prefixIcon: const Icon(Icons.restaurant_menu),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: isDarkMode
+                              ? Colors.grey.shade600
+                              : theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: theme.colorScheme.primary,
+                          width: 2,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      labelStyle:
+                          TextStyle(color: isDarkMode ? Colors.white70 : null),
+                      hintStyle: TextStyle(
+                          color: isDarkMode ? Colors.grey.shade500 : null),
+                      prefixIconColor: isDarkMode ? Colors.white70 : null,
+                    ),
+                    onSaved: (value) => ingredients = value ?? '',
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Campo requerido' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    style: TextStyle(color: isDarkMode ? Colors.white : null),
+                    decoration: InputDecoration(
                       hintText: 'Descripción',
                       prefixIcon: const Icon(Icons.description),
                       filled: true,
@@ -485,8 +567,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                       prefixIconColor: isDarkMode ? Colors.white70 : null,
                     ),
                     onSaved: (value) => description = value ?? '',
-                    validator: (value) =>
-                        value?.isEmpty ?? true ? 'Campo requerido' : null,
+                    validator: (value) => null,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
@@ -618,46 +699,6 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    style: TextStyle(color: isDarkMode ? Colors.white : null),
-                    decoration: InputDecoration(
-                      hintText:
-                          'Momento del día (Desayuno, Snack, Almuerzo...)',
-                      prefixIcon: const Icon(Icons.restaurant_menu),
-                      filled: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: isDarkMode
-                              ? Colors.grey.shade600
-                              : theme.colorScheme.outline
-                                  .withValues(alpha: 0.3),
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: theme.colorScheme.primary,
-                          width: 2,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      labelStyle:
-                          TextStyle(color: isDarkMode ? Colors.white70 : null),
-                      hintStyle: TextStyle(
-                          color: isDarkMode ? Colors.grey.shade500 : null),
-                      prefixIconColor: isDarkMode ? Colors.white70 : null,
-                    ),
-                    onSaved: (value) => timeOfDay = value ?? '',
-                    validator: (value) =>
-                        value?.isEmpty ?? true ? 'Campo requerido' : null,
-                  ),
-                  const SizedBox(height: 16),
                   ElevatedButton(
                       onPressed: () async {
                         final newImage = await imagePickerService.selectImage(
@@ -731,8 +772,9 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                               calories: calories,
                               protein: protein,
                               carbs: carbs,
-                              image: currentImage, // Use currentImage here
-                              timeOfDay: timeOfDay),
+                              image: currentImage,
+                              timeOfDay: timeOfDay,
+                              ingredients: ingredients),
                         );
                   });
                   Navigator.pop(context);
@@ -842,11 +884,6 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
       final List<String> mealIds = [];
       for (var dayMeal in daysData) {
         for (var meal in dayMeal.meals) {
-          print('Saving meal: ${meal.name}');
-          print('Calories: ${meal.calories}');
-          print('Protein: ${meal.protein}');
-          print('Carbs: ${meal.carbs}');
-
           final mealToSave = Meal(
             id: meal.id,
             name: meal.name,
@@ -856,6 +893,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             carbs: meal.carbs?.toDouble() ?? 0,
             image: meal.image,
             timeOfDay: meal.timeOfDay,
+            ingredients: meal.ingredients,
           );
 
           bool isMealCreated = await Meal.createMeal(mealToSave);
