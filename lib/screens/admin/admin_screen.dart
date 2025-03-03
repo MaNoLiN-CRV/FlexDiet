@@ -254,14 +254,17 @@ class _AdminScreenState extends State<AdminScreen> {
                       top: Radius.circular(12),
                     ),
                   ),
-                  child: client.image != null && client.image!.isNotEmpty ?
-                  Image(
-                    image: NetworkImage(client.image!)
-                  ) : Icon(
-                    Icons.person,
-                    size: 48,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+                  child: client.image != null && client.image!.isNotEmpty
+                      ? Image(
+                          image: NetworkImage(client.image!),
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.person,
+                          size: 48,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
                 ),
               ),
               Expanded(
