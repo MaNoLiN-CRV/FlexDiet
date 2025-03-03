@@ -89,4 +89,26 @@ class Meal {
       return false;
     }
   }
+
+  static Future<List<Meal>> getMeals(List<String> mealIds) async {
+    if (mealIds.isEmpty) return [];
+
+    // Get meals in batches of 10 to avoid too many concurrent reads
+    const batchSize = 10;
+    final batches = <List<String>>[];
+
+    for (var i = 0; i < mealIds.length; i += batchSize) {
+      batches.add(mealIds.skip(i).take(batchSize).toList());
+    }
+
+    final allMeals = <Meal>[];
+
+    for (final batch in batches) {
+      final snapshots =
+          await Future.wait(batch.map((id) => collection.doc(id).get()));
+      allMeals.addAll(snapshots.map((s) => s.data()!));
+    }
+
+    return allMeals;
+  }
 }
