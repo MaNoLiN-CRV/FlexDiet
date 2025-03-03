@@ -91,7 +91,7 @@ class ImagePickerService {
       // Create signed URL
       final String url = await _supabaseClient.storage
           .from('FlexDiet')
-          .createSignedUrl(rutaArchivo, 60 * 60 * 24); // 24 hours
+          .createSignedUrl(rutaArchivo, 31 * 60 * 60 * 24); // One year
 
       // Update customer profile in Firestore
       await _uploadInFirebase(client.id, url, coleccion);
