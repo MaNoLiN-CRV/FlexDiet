@@ -17,6 +17,8 @@ import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 late SharedPreferences prefs;
+// Variable global para controlar si la aplicación fue abierta por notificación
+bool appOpenedByNotification = false;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,8 +37,23 @@ Future<void> main() async {
   await NotificationService().initialize(
       onDidReceiveNotificationResponse: (NotificationResponse details) {
     print('Received notification tap with payload: ${details.payload}');
-    // Handle the payload here (e.g., navigate to a specific screen)
+    // Si la aplicación es abierta por notificación, establecer la variable global
+    if (details.payload == 'weight_update') {
+      appOpenedByNotification = true;
+
+      // Limpiar el estado del diálogo para asegurar que se muestre
+      NotificationService().setBodyweightUpdateDialogShownToday(false);
+    }
   });
+
+  // Solicitar permisos para notificaciones
+  await NotificationService().requestPermissions();
+  await NotificationService().requestExactAlarmPermission();
+
+  // Programar notificación para pruebas (activar al minuto)
+  await NotificationService().scheduleMinuteWeighInNotification(
+    minute: DateTime.now().minute,
+  );
 
   Intl.defaultLocale = 'es';
 
