@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
+import 'package:flutter_flexdiet/services/admin_service.dart';
 import 'package:flutter_flexdiet/services/auth/auth_service.dart';
 import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
@@ -63,6 +64,27 @@ class _LoginScreenState extends State<LoginScreen>
 
   Future<void> _navigateToNextScreen(
       BuildContext context, Client client) async {
+    // Check admin status first
+    final adminService = AdminService();
+    await adminService.initialize();
+    final isAdmin = await adminService.isUserAdmin();
+
+    if (isAdmin) {
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LoadingScreen(
+              targetScreen: const AdminScreen(),
+              loadingSeconds: 2,
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    // If not admin, proceed with regular user flow
     bool userInfoCompleted = await isUserInfoCompleted();
 
     if (context.mounted) {
@@ -180,8 +202,8 @@ class _LoginScreenState extends State<LoginScreen>
     // Create a new Client entity in Firestore
     try {
       final userCredential = await googleAuthService.signIn();
-      
-      if(userCredential!.additionalUserInfo!.isNewUser) {
+
+      if (userCredential!.additionalUserInfo!.isNewUser) {
         print('Hola mundo');
         final newClient = Client(
           id: userCredential.user!.uid,
