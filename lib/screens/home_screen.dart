@@ -145,7 +145,9 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                 .fadeIn(duration: 300.ms, delay: 100.ms)
                 .slideX(begin: 0.2, end: 0),
             const SizedBox(height: 15),
-            WeightChart()
+            WeightChart(
+              weightHistory: dietState.client?.bodyweightHistory ?? [],
+            )
                 .animate()
                 .fadeIn(duration: 300.ms, delay: 200.ms)
                 .slideX(begin: 0.2, end: 0),

@@ -1,29 +1,24 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-class WeightData {
-  final DateTime date;
-  final double weight;
-
-  WeightData(this.date, this.weight);
-}
+import 'dart:math';
+import 'package:flutter_flexdiet/models/final_models/historical_bodyweight.dart';
 
 class WeightChart extends StatelessWidget {
-  final List<WeightData> data = [
-    WeightData(DateTime(2024, 1, 1), 80.5),
-    WeightData(DateTime(2024, 1, 8), 79.8),
-    WeightData(DateTime(2024, 1, 15), 79.2),
-    WeightData(DateTime(2024, 1, 22), 78.9),
-    WeightData(DateTime(2024, 1, 29), 78.3),
-    WeightData(DateTime(2024, 2, 5), 77.8),
-    WeightData(DateTime(2024, 2, 12), 77.2),
-  ];
+  final List<HistoricalBodyweight> weightHistory;
 
-  WeightChart({super.key});
+  const WeightChart({
+    super.key,
+    required this.weightHistory,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // If less than 3 records, don't show the chart
+    if (weightHistory.length < 3) {
+      return const SizedBox.shrink();
+    }
+
     final theme = Theme.of(context);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
@@ -36,6 +31,15 @@ class WeightChart extends StatelessWidget {
         : theme.colorScheme.outline.withValues(alpha: 0.1);
     final backgroundColor =
         isDarkMode ? Colors.grey[900] : theme.colorScheme.surface;
+
+    // Sort weight history by date
+    final sortedHistory = List<HistoricalBodyweight>.from(weightHistory)
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    // Calculate min and max values for Y axis
+    final minWeight = sortedHistory.map((e) => e.weight).reduce(min);
+    final maxWeight = sortedHistory.map((e) => e.weight).reduce(max);
+    final padding = (maxWeight - minWeight) * 0.1;
 
     return Container(
       height: 300,
@@ -63,7 +67,7 @@ class WeightChart extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Últimas 7 semanas',
+            'Últimos ${sortedHistory.length} registros',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: secondaryTextColor,
             ),
@@ -91,13 +95,15 @@ class WeightChart extends StatelessWidget {
                       interval: 1,
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
-                        if (index >= 0 && index < data.length) {
+                        if (index >= 0 && index < sortedHistory.length) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              DateFormat('dd/MM').format(data[index].date),
-                              style: theme.textTheme.bodySmall
-                                  ?.copyWith(color: textColor), // Use textColor
+                              DateFormat('dd/MM')
+                                  .format(sortedHistory[index].date),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: textColor,
+                              ),
                             ),
                           );
                         }
@@ -113,8 +119,9 @@ class WeightChart extends StatelessWidget {
                       getTitlesWidget: (value, meta) {
                         return Text(
                           '${value.toInt()}kg',
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: textColor),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: textColor,
+                          ),
                         );
                       },
                     ),
@@ -129,7 +136,7 @@ class WeightChart extends StatelessWidget {
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: data.asMap().entries.map((entry) {
+                    spots: sortedHistory.asMap().entries.map((entry) {
                       return FlSpot(entry.key.toDouble(), entry.value.weight);
                     }).toList(),
                     isCurved: true,
@@ -148,13 +155,14 @@ class WeightChart extends StatelessWidget {
                     ),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: theme.colorScheme.inversePrimary
-                          .withValues(alpha: 0.2),
+                      color: theme.colorScheme.inversePrimary.withValues(
+                        alpha: 0.2,
+                      ),
                     ),
                   ),
                 ],
-                minY: 75,
-                maxY: 82,
+                minY: minWeight - padding,
+                maxY: maxWeight + padding,
               ),
             ),
           ),
