@@ -58,17 +58,19 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       description +=
           'Peso deseado: $formattedTargetWeight kg\n'; // Display the value
     }
-    description +=
-        widget.client.description ?? ''; //Null-aware operator to avoid displaying null if widget.client.description is null
+    description += widget.client.description ??
+        ''; //Null-aware operator to avoid displaying null if widget.client.description is null
 
     final newClient = Client(
       id: userId,
       username: widget.client.username,
       email: widget.client.email,
       userDietId: widget.client.userDietId,
+      image: widget.client.image ?? '',
       sex: _selectedGender,
       bodyweight: formattedWeight,
-      height: formattedHeight?.toDouble(), // Ensure it's a double
+      height: formattedHeight?.toDouble(),
+      bodyweightHistory: widget.client.bodyweightHistory ?? [],
       description: description,
     );
 
