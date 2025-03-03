@@ -32,12 +32,30 @@ class _HomeScreenContent extends StatefulWidget {
 }
 
 class _HomeScreenContentState extends State<_HomeScreenContent> {
+  double _completedCalories = 0;
+  double _completedProtein = 0;
+  double _completedCarbs = 0;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DietStateProvider>().initializeData();
     });
+  }
+
+  void _updateCompletedNutrients(DietStateProvider dietState) {
+    _completedCalories = 0;
+    _completedProtein = 0;
+    _completedCarbs = 0;
+
+    for (final meal in dietState.todayMeals) {
+      if (dietState.userDiet?.completedMealIds.contains(meal.id) ?? false) {
+        _completedCalories += meal.calories ?? 0;
+        _completedProtein += meal.protein ?? 0;
+        _completedCarbs += meal.carbs ?? 0;
+      }
+    }
   }
 
   @override
@@ -139,6 +157,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
 
   // Modify _buildNutritionCard to use real data
   Widget _buildNutritionCard(ThemeData theme, DietStateProvider dietState) {
+    _updateCompletedNutrients(dietState);
+
     return GridCard(
       cardTheme: CardTheme(
         color: theme.colorScheme.secondary,
@@ -154,17 +174,17 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
       children: [
         _CaloryInfo(
           title: 'Proteínas',
-          value: '${dietState.totalProtein.toStringAsFixed(1)} g',
+          value: '${_completedProtein.toStringAsFixed(1)} g',
           theme: theme,
         ),
         CalorieWheel(
-          consumedCalories: dietState.totalCalories.toInt(),
+          consumedCalories: _completedCalories.toInt(),
           dailyGoal: dietState.template?.calories ?? 2000,
           theme: theme,
         ),
         _CaloryInfo(
           title: 'Carbohidratos',
-          value: '${dietState.totalCarbs.toStringAsFixed(1)} g',
+          value: '${_completedCarbs.toStringAsFixed(1)} g',
           theme: theme,
         ),
       ],
@@ -226,12 +246,14 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                   dietState.todayMeals.firstWhere((meal) => meal.id == mealId);
 
               if (completed) {
-                // Add to completed meals
                 dietState.userDiet?.completedMealIds.add(mealInList.id);
               } else {
-                // Remove from completed meals
                 dietState.userDiet?.completedMealIds.remove(mealInList.id);
               }
+
+              setState(() {
+                _updateCompletedNutrients(dietState);
+              });
 
               // Update UserDiet in Firestore
               if (dietState.userDiet != null) {
