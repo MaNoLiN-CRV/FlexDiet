@@ -179,7 +179,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
         ),
         CalorieWheel(
           consumedCalories: _completedCalories.toInt(),
-          dailyGoal: dietState.template?.calories ?? 2000,
+          dailyGoal: dietState.totalCalories.toInt(),
           theme: theme,
         ),
         _CaloryInfo(

@@ -72,6 +72,14 @@ class DietStateProvider with ChangeNotifier {
     }
   }
 
+  /// Loads meals for today's day in the template, and calculates totals.
+  ///
+  /// If the day is not found in the template, it clears the list of today's meals.
+  ///
+  /// If an error occurs when loading the meals, it also clears the list of today's
+  /// meals and prints the error to the console.
+  ///
+  /// It uses the [CacheService] to cache the meals.
   Future<void> _loadTodayMeals() async {
     try {
       final dayName =
@@ -105,6 +113,11 @@ class DietStateProvider with ChangeNotifier {
     }
   }
 
+  /// Calculates the total calories, protein, and carbohydrates in the meals for today.
+  ///
+  /// It does this by folding the list of meals, adding the calories, protein, and carbohydrates
+  /// of each meal to the total. If a meal does not have a value for one of the nutrients,
+  /// it is ignored.
   void _calculateTotals() {
     _totalCalories =
         _todayMeals.fold(0, (sum, meal) => sum + (meal.calories ?? 0));
@@ -112,6 +125,25 @@ class DietStateProvider with ChangeNotifier {
         _todayMeals.fold(0, (sum, meal) => sum + (meal.protein ?? 0));
     _totalCarbs = _todayMeals.fold(0, (sum, meal) => sum + (meal.carbs ?? 0));
   }
+
+  /// Saves the meals for a specific date as historic data in Firestore.
+  ///
+  /// This function stores the IDs of all meals for the given date, along with
+  /// the IDs of completed meals and the associated template ID. The data is
+  /// saved under the 'historicMeals' collection, organized by client ID and date.
+  ///
+  /// If the current user is not authenticated, the function will return without
+  /// performing any operation.
+  ///
+  /// The data includes:
+  /// - 'date': Timestamp of the given date.
+  /// - 'mealIds': List of all meal IDs for the day.
+  /// - 'completedMealIds': List of meal IDs that were completed.
+  /// - 'templateId': ID of the associated meal template.
+  /// - 'updatedAt': Server timestamp indicating the last update.
+  ///
+  /// If an error occurs during the saving process, it logs the error message
+  /// to the console.
 
   Future<void> saveHistoricMeals(
       DateTime date, List<String> completedMealIds) async {
