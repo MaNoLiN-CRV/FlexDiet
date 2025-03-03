@@ -16,10 +16,13 @@ import 'package:flutter_flexdiet/providers/diet_state_provider.dart';
 import 'package:flutter_flexdiet/services/notification_service.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/date_symbol_data_local.dart'; // Import this
 
 late SharedPreferences prefs;
 // Variable global para controlar si la aplicación fue abierta por notificación
 bool appOpenedByNotification = false;
+
+const String _appFirstLaunchKey = 'appFirstLaunch'; // Key to track first launch
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +63,24 @@ Future<void> main() async {
   // );
 
   Intl.defaultLocale = 'es';
+
+  // Initialize locale data for date formatting
+  await initializeDateFormatting('es', null); // Initialize the 'es' locale
+
+  // Check if the app is launching for the first time
+  bool isFirstLaunch = prefs.getBool(_appFirstLaunchKey) ?? true;
+
+  if (isFirstLaunch) {
+    // Set lastWeightUpdateDate to a date in the future (7 days from now)
+    DateTime futureDate = DateTime.now().add(const Duration(days: 7));
+    String futureDateString = DateFormat('yyyy-MM-dd', 'es')
+        .format(futureDate); // Specify the locale here as well
+    await prefs.setString(
+        NotificationService.lastWeightUpdateDateKey, futureDateString);
+
+    // Set the flag to false so this only runs once
+    await prefs.setBool(_appFirstLaunchKey, false);
+  }
 
   runApp(
     MultiProvider(
