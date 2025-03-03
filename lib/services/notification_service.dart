@@ -1,9 +1,5 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class NotificationService {
   static final NotificationService _notificationService =
@@ -15,9 +11,6 @@ class NotificationService {
 
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
   static const String weighInTimeKey = 'weighInTime';
   static const String weighInDayKey = 'weighInDay';
   static const String bodyweightUpdateDialogShownKey =
@@ -27,83 +20,8 @@ class NotificationService {
   static const String latestNewBodyweight = 'latestNewBodyweight';
   static const String lastSnoozedBodyweightUpdateDateKey =
       'lastSnoozedBodyweightUpdateDate';
-  static const String lastWeightUpdateDateKey =
-      'lastWeightUpdateDate'; // NEW key
-  static const String snoozeDurationDaysKey = 'snoozeDurationDays'; // NEW key
-
-  Future<void> initialize(
-      {required DidReceiveNotificationResponseCallback?
-          onDidReceiveNotificationResponse}) async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_notification');
-
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-    );
-  }
-
-  Future<void> scheduleWeeklyWeighInNotification({
-    required TimeOfDay time,
-    required DayOfWeek dayOfWeek,
-  }) async {
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-      'weekly_weigh_in', // Channel ID
-      'Weekly Weigh-in Reminders', // Channel name
-      channelDescription: 'Reminders to weigh yourself weekly.',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-      icon: '@mipmap/ic_notification',
-      color: Colors.blue,
-      styleInformation: DefaultStyleInformation(true, true),
-    );
-
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      0, // Notification ID (unique)
-      '¡Es hora de pesarse!', // Notification title
-      'Recuerda registrar tu peso para seguir tu progreso.', // Notification body
-      _nextInstanceOfDayAndTime(time, dayOfWeek),
-      NotificationDetails(
-        android: androidNotificationDetails,
-      ),
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-      payload: 'weight_update',
-    );
-  }
-
-  tz.TZDateTime _nextInstanceOfDayAndTime(TimeOfDay time, DayOfWeek dayOfWeek) {
-    tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    int dayDifference = dayOfWeek.value - now.weekday;
-    if (dayDifference <= 0) {
-      dayDifference += 7;
-    }
-
-    tz.TZDateTime scheduledDate = now.add(Duration(days: dayDifference));
-    scheduledDate = tz.TZDateTime(tz.local, scheduledDate.year,
-        scheduledDate.month, scheduledDate.day, time.hour, time.minute);
-
-    return scheduledDate;
-  }
-
-  Future<void> requestPermissions() async {
-    await Permission.notification.request();
-  }
-
-  Future<void> requestExactAlarmPermission() async {
-    if (await Permission.scheduleExactAlarm.status.isDenied) {
-      await Permission.scheduleExactAlarm.request();
-    }
-  }
+  static const String lastWeightUpdateDateKey = 'lastWeightUpdateDate';
+  static const String snoozeDurationDaysKey = 'snoozeDurationDays';
 
   Future<void> setLatestBodyweight(double? weight) async {
     final prefs = await SharedPreferences.getInstance();
@@ -176,13 +94,9 @@ class NotificationService {
           await prefs.remove(lastWeightUpdateDateKey);
         }
       } catch (e) {
-        // Handle parsing errors
-        print("Error parsing lastWeightUpdateDate: $e");
         await prefs.remove(lastWeightUpdateDateKey);
       }
     }
-
-    // Check if it's already been shown today
 
     // Check if snoozed and if snooze date is today
     final lastSnoozedDate = prefs.getString(lastSnoozedBodyweightUpdateDateKey);
@@ -209,26 +123,9 @@ class NotificationService {
   }
 
   Future<void> cancelNotification() async {
-    await flutterLocalNotificationsPlugin
-        .cancel(0); // Cancel notification with ID 0
-
     final prefs = await SharedPreferences.getInstance();
     prefs.remove(weighInTimeKey);
     prefs.remove(weighInDayKey);
     prefs.remove(bodyweightUpdateDialogShownKey);
   }
-}
-
-// Helper enum to represent days of the week
-enum DayOfWeek {
-  monday(1),
-  tuesday(2),
-  wednesday(3),
-  thursday(4),
-  friday(5),
-  saturday(6),
-  sunday(7);
-
-  const DayOfWeek(this.value);
-  final int value;
 }

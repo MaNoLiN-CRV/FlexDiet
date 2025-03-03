@@ -15,12 +15,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_flexdiet/providers/diet_state_provider.dart';
 import 'package:flutter_flexdiet/services/notification_service.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:intl/date_symbol_data_local.dart'; // Import this
+import 'package:intl/date_symbol_data_local.dart';
 
 late SharedPreferences prefs;
-// Variable global para controlar si la aplicación fue abierta por notificación
-bool appOpenedByNotification = false;
 
 const String _appFirstLaunchKey = 'appFirstLaunch'; // Key to track first launch
 
@@ -38,29 +35,6 @@ Future<void> main() async {
 
   // Initialize Timezone and Notification Service
   tzdata.initializeTimeZones();
-  await NotificationService().initialize(
-      onDidReceiveNotificationResponse: (NotificationResponse details) {
-    print('Received notification tap with payload: ${details.payload}');
-    // Si la aplicación es abierta por notificación, establecer la variable global
-    if (details.payload == 'weight_update') {
-      appOpenedByNotification = true;
-
-      // Limpiar el estado del diálogo para asegurar que se muestre
-      NotificationService().setBodyweightUpdateDialogShownToday(false);
-    }
-  });
-
-  // Solicitar permisos para notificaciones
-  await NotificationService().requestPermissions();
-  await NotificationService().requestExactAlarmPermission();
-
-  // Schedule a default weekly notification (e.g., Monday at 8:00 AM)
-  // You'll probably want to get these values from settings.
-  // TimeOfDay defaultTime = const TimeOfDay(hour: 8, minute: 0);
-  // await NotificationService().scheduleWeeklyWeighInNotification(
-  //   time: defaultTime,
-  //   dayOfWeek: DayOfWeek.monday,
-  // );
 
   Intl.defaultLocale = 'es';
 
