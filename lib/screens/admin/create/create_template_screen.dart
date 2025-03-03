@@ -23,7 +23,6 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
     _initializeClient();
   }
 
-  int dailyCalories = 2000;
   final List<String> daysOfWeek = [
     'Lunes',
     'Martes',
@@ -69,10 +68,6 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                _buildSectionTitle('Calorías Diarias', theme, isDarkMode),
-                const SizedBox(height: 16),
-                _buildCaloriesInput(theme, isDarkMode),
-                const SizedBox(height: 40),
                 _buildSectionTitle('Días de la Semana', theme, isDarkMode),
                 const SizedBox(height: 20),
                 _buildDaysSelection(theme, isDarkMode),
@@ -91,7 +86,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
     final titleColor = isDarkMode ? Colors.white : theme.colorScheme.primary;
     final borderColor = isDarkMode
         ? Colors.grey.shade700
-        : theme.colorScheme.primary.withValues(alpha: 0.2);
+        : theme.colorScheme.primary.withOpacity(0.2);
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -109,62 +104,6 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
           fontWeight: FontWeight.bold,
           color: titleColor,
         ),
-      ),
-    );
-  }
-
-  Widget _buildCaloriesInput(ThemeData theme, bool isDarkMode) {
-    final shadowColor = isDarkMode
-        ? Colors.grey.shade900
-        : theme.colorScheme.shadow.withValues(alpha: 0.1);
-    final fillColor =
-        isDarkMode ? Colors.grey.shade800 : theme.colorScheme.surface;
-    final textColor =
-        isDarkMode ? Colors.white : theme.textTheme.bodyLarge?.color;
-    final hintColor = isDarkMode ? Colors.grey.shade500 : theme.hintColor;
-    final iconColor = isDarkMode ? Colors.white70 : theme.colorScheme.primary;
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: TextField(
-        keyboardType: TextInputType.number,
-        style: theme.textTheme.bodyLarge
-            ?.copyWith(fontWeight: FontWeight.w500, color: textColor),
-        decoration: InputDecoration(
-          hintText: 'Ej. 2000',
-          hintStyle: theme.textTheme.bodyLarge?.copyWith(
-            color: hintColor,
-          ),
-          prefixIcon: Icon(
-            Icons.local_fire_department_rounded,
-            color: iconColor,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: fillColor,
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 16.0,
-            horizontal: 16.0,
-          ),
-        ),
-        onChanged: (value) {
-          setState(() {
-            dailyCalories = int.tryParse(value) ?? 2000;
-          });
-        },
-        controller: TextEditingController(text: dailyCalories.toString()),
       ),
     );
   }
@@ -228,9 +167,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: theme.colorScheme.primary.withValues(
-                alpha: 0.3,
-              ),
+              color: theme.colorScheme.primary.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -247,7 +184,7 @@ class _CreateTemplateScreenState extends State<CreateTemplateScreen> {
               MaterialPageRoute(
                 builder: (context) => SelectFoodsScreen(
                     selectedDays: selectedDays.toList(),
-                    dailyCalories: dailyCalories,
+                    dailyCalories: 2000, // Default value since input is removed
                     client: widget.client),
               ),
             );
