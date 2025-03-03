@@ -780,6 +780,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             userDietId: userDiet.id,
             sex: widget.client.sex,
             bodyweight: widget.client.bodyweight,
+            image: widget.client.image,
+            bodyweightHistory: widget.client.bodyweightHistory,
             height: widget.client.height,
             description: widget.client.description,
           );
