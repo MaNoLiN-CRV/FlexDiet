@@ -48,8 +48,8 @@ class Client {
       userDietId: json['userDietId'],
       sex: json['sex'],
       bodyweight:
-          json['bodyweight'] != null ? json['bodyweight'].toDouble() : null,
-      height: json['height'] != null ? json['height'].toDouble() : null,
+          json['bodyweight']?.toDouble(),
+      height: json['height']?.toDouble(),
       description: json['description'],
     );
   }

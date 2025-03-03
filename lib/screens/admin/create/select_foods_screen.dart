@@ -517,19 +517,39 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                     onPressed: () async {
-                      image = await imagePickerService.selectImage(
-                              context: context,
-                              source: ImageSource.gallery,
-                              uidMeal: uid,
-                              collection: 'meals') ??
-                          '';
+                      final newImage = await imagePickerService.selectImage(
+                          context: context,
+                          source: ImageSource.gallery,
+                          uidMeal: uid,
+                          collection: 'meals');
+
+                      if (newImage != null) {
+                        // Utiliza setState fuera del then para asegurar que se ejecuta correctamente
+                        setState(() {
+                          image = newImage;
+                          print(
+                              "Imagen actualizada a: $image"); // Para depuración
+                        });
+
+                        // Forzar una reconstrucción del widget después de un breve retraso
+                        Future.delayed(Duration(milliseconds: 100), () {
+                          if (mounted) setState(() {});
+                        });
+                      }
                     },
-                    child: const Text('Subir Imagen')),
+                    child: const Text('Imagen comida')),
                 const SizedBox(height: 16),
-                if (image != '')
-                  Image(
-                    image: NetworkImage(image),
-                  )
+                if (image.isNotEmpty)
+                  Container(
+                    key: UniqueKey(), // Esto fuerza la reconstrucción completa
+                    child: Image(
+                      image: NetworkImage(image),
+                      errorBuilder: (context, error, stackTrace) {
+                        print("Error cargando imagen: $error");
+                        return Text('Error al cargar la imagen');
+                      },
+                    ),
+                  ),
               ],
             ),
           ),
@@ -669,6 +689,11 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
       final List<String> mealIds = [];
       for (var dayMeal in daysData) {
         for (var meal in dayMeal.meals) {
+          print('Saving meal: ${meal.name}');
+          print('Calories: ${meal.calories}');
+          print('Protein: ${meal.protein}');
+          print('Carbs: ${meal.carbs}');
+
           final mealToSave = Meal(
             id: meal.id,
             name: meal.name,
@@ -679,6 +704,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             image: meal.image,
             timeOfDay: meal.timeOfDay,
           );
+
 
           bool isMealCreated = await Meal.createMeal(mealToSave);
           if (isMealCreated) {

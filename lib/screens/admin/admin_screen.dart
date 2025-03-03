@@ -19,7 +19,7 @@ class _AdminScreenState extends State<AdminScreen> {
   List<Client> _clients = [];
   List<Client> _filteredClients = [];
   bool _isLoading = true;
-  ValueNotifier<List<Client>> _clientsNotifier =
+  final ValueNotifier<List<Client>> _clientsNotifier =
       ValueNotifier<List<Client>>([]);
 
   @override

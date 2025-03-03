@@ -58,6 +58,7 @@ class ImagePickerService {
       print('Error en seleccionarImagen $e');
       return null;
     }
+    return null;
   }
 
   // Request the necessary permissions according to the source of the image
@@ -114,7 +115,7 @@ class ImagePickerService {
   Future<String?> _saveFoodImage(
       XFile imagen, String uidMeal, String coleccion) async {
     try {
-      final String rutaArchivo = '$uidMeal/${imagen.name}';
+      final String rutaArchivo = '$coleccion/${imagen.name}';
       final File file = File(imagen.path);
 
       // Upload file to Supabase Storage

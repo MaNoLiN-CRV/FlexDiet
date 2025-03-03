@@ -13,8 +13,8 @@ class DietStateProvider with ChangeNotifier {
   Client? _client;
   UserDiet? _userDiet;
   Template? _template;
-  List<Day> _days = [];
-  List<Meal> _todayMeals = [];
+  final List<Day> _days = [];
+  final List<Meal> _todayMeals = [];
   bool _isLoading = true;
   double _totalCalories = 0;
   double _totalProtein = 0;

@@ -41,7 +41,7 @@ class GoogleAuth implements provider.AuthProvider {
       if (kDebugMode) {
         print("Error during Google Sign-In: $e");
       }
-      throw e; // Re-throw the error for handling in the UI
+      rethrow; // Re-throw the error for handling in the UI
     }
   }
 
