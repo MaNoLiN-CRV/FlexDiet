@@ -382,13 +382,12 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
 
     String uid = UniqueKey().toString();
     String name = '';
-    String description = '';
+    String mealDescription = '';
     double calories = 0;
     double protein = 0;
     double carbs = 0;
     String timeOfDay = '';
     String ingredients = '';
-
     String? currentImage;
 
     // Common InputDecoration
@@ -491,9 +490,10 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                   const SizedBox(height: 16),
                   buildTextFormField(
                     hintText: 'Descripción',
-                    prefixIcon: Icons.description,
-                    validator: (value) => null,
-                    onSaved: (value) => description = value ?? '',
+                    prefixIcon: Icons.restaurant_menu,
+                    validator: (value) =>
+                        value?.isEmpty ?? true ? 'Campo requerido' : null,
+                    onSaved: (value) => mealDescription = value ?? '',
                     maxLines: null,
                     minLines: 1,
                   ),
@@ -506,8 +506,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                     validator: (value) => double.tryParse(value ?? '') == null
                         ? 'Valor inválido'
                         : null,
-                    onSaved: (value) => calories =
-                        double.tryParse(value ?? '0') ?? 0, // Default to 0
+                    onSaved: (value) =>
+                        calories = double.tryParse(value ?? '0') ?? 0,
                   ),
                   const SizedBox(height: 16),
                   buildTextFormField(
@@ -518,8 +518,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                     validator: (value) => double.tryParse(value ?? '') == null
                         ? 'Valor inválido'
                         : null,
-                    onSaved: (value) => protein =
-                        double.tryParse(value ?? '0') ?? 0, // Default to 0
+                    onSaved: (value) =>
+                        protein = double.tryParse(value ?? '0') ?? 0,
                   ),
                   const SizedBox(height: 16),
                   buildTextFormField(
@@ -530,8 +530,8 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                     validator: (value) => double.tryParse(value ?? '') == null
                         ? 'Valor inválido'
                         : null,
-                    onSaved: (value) => carbs =
-                        double.tryParse(value ?? '0') ?? 0, // Default to 0
+                    onSaved: (value) =>
+                        carbs = double.tryParse(value ?? '0') ?? 0,
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
@@ -543,21 +543,23 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                             collection: 'meals');
 
                         if (newImage != null) {
-                          setDialogState(() {
-                            currentImage = newImage;
-                          });
+                          if (mounted) {
+                            setDialogState(() {
+                              currentImage = newImage;
+                            });
+                          }
                         }
                       },
                       child: const Text('Imagen comida')),
                   const SizedBox(height: 16),
                   if (currentImage != null)
-                    Container(
+                    SizedBox(
                       key: ValueKey(currentImage),
-                      height: 200, // Add fixed height
+                      height: 200,
                       width: double.infinity,
                       child: Image(
                         image: NetworkImage(currentImage!),
-                        fit: BoxFit.cover, // Add fit property
+                        fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           print("Error cargando imagen: $error");
                           return const Center(
@@ -603,7 +605,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
                           Meal(
                               id: uid, // Temporary ID for template
                               name: name,
-                              description: description,
+                              description: mealDescription,
                               calories: calories,
                               protein: protein,
                               carbs: carbs,
@@ -713,7 +715,6 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
     // First ask for template details
     final templateDetails = await _showTemplateDetailsDialog(context);
     if (templateDetails == null) return; // User cancelled
-
     try {
       // 1. First, save all meals to Firestore
       final List<String> mealIds = [];
@@ -781,7 +782,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
             id: widget.client.id,
             username: widget.client.username,
             email: widget.client.email,
-            userDietId: userDiet.id, // Link to UserDiet instead of template
+            userDietId: userDiet.id,
             sex: widget.client.sex,
             bodyweight: widget.client.bodyweight,
             height: widget.client.height,

@@ -33,6 +33,7 @@ class Meal {
       'carbs': carbs,
       'image': image,
       'timeOfDay': timeOfDay,
+      'description': description,
       'ingredients': ingredients
     };
   }
@@ -46,6 +47,7 @@ class Meal {
       carbs: json['carbs'],
       image: json['image'],
       timeOfDay: json['timeOfDay'],
+      description: json['description'],
       ingredients: json['ingredients'],
     );
   }

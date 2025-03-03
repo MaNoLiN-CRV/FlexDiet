@@ -125,6 +125,15 @@ class DetailsScreen extends StatelessWidget {
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,
+                errorBuilder: (context, error, stackTrace) {
+                  return Center(
+                    child: Icon(
+                      Icons.error,
+                      size: 100,
+                      color: Colors.grey[400],
+                    ),
+                  );
+                },
               ),
             )
           : Center(
@@ -185,7 +194,7 @@ class DetailsScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(ingredients),
+                Text(ingredients.isNotEmpty ? ingredients : 'Sin ingredientes'),
                 const SizedBox(height: 12),
                 Text(
                   '\n\nRecuerda que estos valores son aproximados y pueden variar según los ingredientes y las porciones.',
