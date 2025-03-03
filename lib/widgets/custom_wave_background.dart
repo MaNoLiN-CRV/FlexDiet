@@ -40,20 +40,22 @@ class _WaveBackgroundState extends State<WaveBackground>
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return CustomPaint(
-            isComplex: true,
-            willChange: true,
-            painter: WavePainter(
-              color: widget.color.withValues(alpha: 0.2),
-              frequency: widget.frequency,
-              phase: _controller.value * 2 * math.pi + widget.phase,
-            ),
-          );
-        },
+    return IgnorePointer(
+      child: RepaintBoundary(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return CustomPaint(
+              isComplex: true,
+              willChange: true,
+              painter: WavePainter(
+                color: widget.color.withValues(alpha: 0.2),
+                frequency: widget.frequency,
+                phase: _controller.value * 2 * math.pi + widget.phase,
+              ),
+            );
+          },
+        ),
       ),
     );
   }
