@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
+import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/app_theme_light.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
@@ -58,8 +58,8 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
       description +=
           'Peso deseado: $formattedTargetWeight kg\n'; // Display the value
     }
-    description +=
-        widget.client.description ?? ''; //Null-aware operator to avoid displaying null if widget.client.description is null
+    description += widget.client.description ??
+        ''; //Null-aware operator to avoid displaying null if widget.client.description is null
 
     final newClient = Client(
       id: userId,

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
+import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
 import 'package:provider/provider.dart';
@@ -12,30 +12,31 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_flexdiet/providers/diet_state_provider.dart';
+import 'package:flutter_flexdiet/services/notification_service.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 late SharedPreferences prefs;
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await Supabase.initialize(
     url: 'https://qsabrkicimdalfyurpio.supabase.co',
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzYWJya2ljaW1kYWxmeXVycGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA5MTQ2NTQsImV4cCI6MjA1NjQ5MDY1NH0.XLNqLhHxeb0H5pYqpwcy5S2gHPl8eu2JihKSB1jK9II',
   );
 
-  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  prefs = await SharedPreferences.getInstance();
 
-  try {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-    prefs = await SharedPreferences.getInstance();
-    if (kDebugMode) {
-      print('SharedPreferences initialized in main()');
-    }
-  } catch (e) {
-    if (kDebugMode) {
-      print('Error during initialization: $e');
-    }
-  }
+  // Initialize Timezone and Notification Service
+  tzdata.initializeTimeZones();
+  await NotificationService().initialize(
+      onDidReceiveNotificationResponse: (NotificationResponse details) {
+    print('Received notification tap with payload: ${details.payload}');
+    // Handle the payload here (e.g., navigate to a specific screen)
+  });
 
   Intl.defaultLocale = 'es';
 
@@ -100,6 +101,9 @@ class MyApp extends StatelessWidget {
       try {
         final client = await Client.getClient(user.uid);
         final hasCompletedInfo = await _hasCompletedUserInfo();
+
+        // Load saved notification preferences
+        await NotificationService().loadSavedNotification();
 
         return hasCompletedInfo
             ? const HomeScreen()

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
+import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/screens/admin/create/select_foods_screen.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 
+// ignore: must_be_immutable
 class CreateTemplateScreen extends StatefulWidget {
   late Client client;
   final String clientID;

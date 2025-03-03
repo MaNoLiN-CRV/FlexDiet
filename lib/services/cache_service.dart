@@ -1,4 +1,4 @@
-import 'package:flutter_flexdiet/models/final_models/meal.dart';
+import 'package:flutter_flexdiet/models/meal.dart';
 
 class CacheService {
   static final CacheService _instance = CacheService._internal();

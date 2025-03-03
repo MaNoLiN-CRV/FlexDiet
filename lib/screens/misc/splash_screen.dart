@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
+import 'package:flutter_flexdiet/models/client.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

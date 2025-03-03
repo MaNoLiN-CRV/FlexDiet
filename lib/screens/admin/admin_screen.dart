@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
+import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/models/ui_constants.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
@@ -17,7 +17,6 @@ class _AdminScreenState extends State<AdminScreen> {
   String? _selectedClientId;
   final TextEditingController _searchController = TextEditingController();
   List<Client> _clients = [];
-  List<Client> _filteredClients = [];
   bool _isLoading = true;
   final ValueNotifier<List<Client>> _clientsNotifier =
       ValueNotifier<List<Client>>([]);
@@ -37,7 +36,6 @@ class _AdminScreenState extends State<AdminScreen> {
           snapshot.docs.map((doc) => doc.data()).toList();
       _clientsNotifier.value = loadedClients;
       _clients = loadedClients;
-      _filteredClients = List.from(_clients);
       _isLoading = false;
       print("_loadClients setState called");
     } catch (e) {

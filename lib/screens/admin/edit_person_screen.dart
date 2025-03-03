@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
+import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_flexdiet/widgets/custom_toast.dart';
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/card_data.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
+import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/screens/admin/edit_person_screen.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
-import 'package:flutter_flexdiet/models/final_models/template.dart';
-import 'package:flutter_flexdiet/models/final_models/user_diet.dart';
+import 'package:flutter_flexdiet/models/template.dart';
+import 'package:flutter_flexdiet/models/user_diet.dart';
 
 class UseTemplateScreen extends StatefulWidget {
   final String clientId;

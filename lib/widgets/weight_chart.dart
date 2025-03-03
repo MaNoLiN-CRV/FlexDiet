@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
-import 'package:flutter_flexdiet/models/final_models/historical_bodyweight.dart';
+import 'package:flutter_flexdiet/models/historical_bodyweight.dart';
 
 class WeightChart extends StatelessWidget {
   final List<HistoricalBodyweight> weightHistory;

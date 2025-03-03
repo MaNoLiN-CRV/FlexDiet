@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
-import 'package:flutter_flexdiet/models/final_models/day.dart';
-import 'package:flutter_flexdiet/models/final_models/meal.dart';
-import 'package:flutter_flexdiet/models/final_models/template.dart';
-import 'package:flutter_flexdiet/models/final_models/user_diet.dart';
+import 'package:flutter_flexdiet/models/client.dart';
+import 'package:flutter_flexdiet/models/day.dart';
+import 'package:flutter_flexdiet/models/meal.dart';
+import 'package:flutter_flexdiet/models/template.dart';
+import 'package:flutter_flexdiet/models/user_diet.dart';
 import 'package:flutter_flexdiet/services/cache_service.dart';
 import 'package:intl/intl.dart';
 

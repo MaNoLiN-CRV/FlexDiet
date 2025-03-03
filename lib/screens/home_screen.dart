@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/card_data.dart';
-import 'package:flutter_flexdiet/models/final_models/meal.dart';
-import 'package:flutter_flexdiet/models/final_models/user_diet.dart';
+import 'package:flutter_flexdiet/models/models.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
 import 'package:flutter_flexdiet/providers/diet_state_provider.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';

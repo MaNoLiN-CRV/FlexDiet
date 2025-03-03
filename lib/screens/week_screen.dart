@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/final_models/meal.dart';
+import 'package:flutter_flexdiet/models/meal.dart';
 import 'package:flutter_flexdiet/providers/diet_state_provider.dart';
 import 'package:flutter_flexdiet/services/cache_service.dart';
 import 'package:intl/intl.dart';

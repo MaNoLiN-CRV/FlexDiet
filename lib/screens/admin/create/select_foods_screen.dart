@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexdiet/models/final_models/client.dart';
-import 'package:flutter_flexdiet/models/final_models/meal.dart';
-import 'package:flutter_flexdiet/models/final_models/day.dart';
-import 'package:flutter_flexdiet/models/day_meals.dart';
-import 'package:flutter_flexdiet/models/final_models/template.dart';
-import 'package:flutter_flexdiet/models/final_models/user_diet.dart';
+import 'package:flutter_flexdiet/models/models.dart';
 import 'package:flutter_flexdiet/services/image_service/image_service.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:image_picker/image_picker.dart';
