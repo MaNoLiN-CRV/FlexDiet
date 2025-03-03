@@ -24,6 +24,7 @@ void navigationRouter(BuildContext context, int index) async {
       context,
       MaterialPageRoute(
         builder: (context) => const SettingsScreen(),
+        maintainState: true,
       ),
     );
   } else if (index == 3) {

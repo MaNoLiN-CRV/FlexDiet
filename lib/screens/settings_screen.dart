@@ -158,59 +158,64 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
   final ImagePickerService _imagePickerService = ImagePickerService();
   String? _imagenSeleccionada;
   String _userName = '';
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadUserName();
-    _loadImagePath();
+    _loadUserData();
   }
 
-  Future<void> _loadUserName() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final Client client = await Client.getClient(user.uid);
-      setState(() {
-        _userName = client.username;
-      });
-    }
-  }
-
-  Future<void> _loadImagePath() async {
-    final user = FirebaseAuth.instance.currentUser;
-    final userId = user?.uid;
-    if (userId != null) {
-      setState(() {});
-    }
-  }
-
-  void seleccionarImagenDeGaleria() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final client = await Client.getClient(user.uid);
-      if (client.image != '' && client.image != null) {
-        setState(() {
-          _imagenSeleccionada = client.image;
-        });
+  Future<void> _loadUserData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final Client client = await Client.getClient(user.uid);
+        if (mounted) {
+          setState(() {
+            _userName = client.username;
+            _imagenSeleccionada = client.image;
+            _isLoading = false;
+          });
+        }
       }
-      String? imagen;
+    } catch (e) {
+      print('Error loading user data: $e');
       if (mounted) {
-        imagen = await _imagePickerService.selectImage(
-            context: context,
-            source: ImageSource.gallery,
-            user: user,
-            collection: 'clients');
+        setState(() => _isLoading = false);
       }
+    }
+  }
 
-      if (imagen != null) {
+  Future<void> seleccionarImagenDeGaleria() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      setState(() => _isLoading = true);
+
+      final imagen = await _imagePickerService.selectImage(
+          context: context,
+          source: ImageSource.gallery,
+          user: user,
+          collection: 'clients');
+
+      if (mounted && imagen != null) {
         setState(() {
           _imagenSeleccionada = imagen;
+          _isLoading = false;
         });
-      } else {
-        if (mounted) {
-          showToast(context, "No se seleccionó ninguna imagen",
-              toastType: ToastType.warning);
-        }
+      } else if (mounted) {
+        setState(() => _isLoading = false);
+        showToast(context, "No se seleccionó ninguna imagen",
+            toastType: ToastType.warning);
+      }
+    } catch (e) {
+      print('Error selecting image: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+        showToast(context, "Error al seleccionar la imagen",
+            toastType: ToastType.error);
       }
     }
   }
@@ -229,12 +234,33 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
                 width: 4,
               ),
             ),
-            child: CircleAvatar(
-                radius: 45,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: _imagenSeleccionada != null
-                    ? NetworkImage(_imagenSeleccionada!)
-                    : null),
+            child: _isLoading
+                ? const CircularProgressIndicator()
+                : CircleAvatar(
+                    radius: 45,
+                    backgroundColor: Colors.grey[200],
+                    child: _imagenSeleccionada != null
+                        ? ClipOval(
+                            child: FadeInImage.assetNetwork(
+                              placeholder: 'assets/images/logo.png',
+                              image: _imagenSeleccionada!,
+                              fit: BoxFit.cover,
+                              width: 90,
+                              height: 90,
+                              imageErrorBuilder: (context, error, stackTrace) {
+                                print('Error loading profile image: $error');
+                                return Image.asset(
+                                  'assets/images/logo.png',
+                                  width: 90,
+                                  height: 90,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ),
+                          )
+                        : const Icon(Icons.person,
+                            size: 45, color: Colors.grey),
+                  ),
           ),
           const SizedBox(width: 20),
           Expanded(
@@ -252,13 +278,12 @@ class _UsernameInfoSettingsState extends State<_UsernameInfoSettings> {
                 ),
                 const SizedBox(height: 4),
                 ElevatedButton(
-                  onPressed: seleccionarImagenDeGaleria,
-                  child: Text('Establecer Imagen de Perfil',
-                      style: ThemeProvider()
-                          .themeData
-                          .textTheme
-                          .labelLarge
-                          ?.copyWith(color: ThemeData().colorScheme.onPrimary)),
+                  onPressed: _isLoading ? null : seleccionarImagenDeGaleria,
+                  child: Text(
+                    'Establecer Imagen de Perfil',
+                    style: widget.theme.textTheme.labelLarge
+                        ?.copyWith(color: widget.theme.colorScheme.onPrimary),
+                  ),
                 )
               ],
             ),
