@@ -59,17 +59,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         theme: theme,
                       ),
                       const SizedBox(height: 24),
-                      _CardLogic(
-                        text: 'Tamaño de la fuente:',
-                        list: ['Pequeña', 'Mediana', 'Grande'],
-                        value: themeProvider.currentThemeName,
-                        onChange: (value) {
-                          themeProvider.setTheme(value);
-                        },
-                        themeProvider: themeProvider,
-                        theme: theme,
-                      ),
-                      const SizedBox(height: 24),
                       _ElevatedButtonSettings(),
                       const SizedBox(height: 24),
                     ],
