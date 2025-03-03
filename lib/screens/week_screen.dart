@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/final_models/meal.dart';
 import 'package:flutter_flexdiet/providers/diet_state_provider.dart';
+import 'package:flutter_flexdiet/services/cache_service.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_flexdiet/navigation/bottom_navigation.dart';
 import 'package:flutter_flexdiet/navigation/navigation_router.dart';
@@ -19,10 +20,19 @@ class WeekScreen extends StatefulWidget {
 class _WeekScreenState extends State<WeekScreen> {
   DateTime _selectedDate = DateTime.now();
   List<Meal> _todayMeals = [];
+  final _cacheService = CacheService();
+
+  // Add date range limits
+  late final DateTime _minDate;
+  late final DateTime _maxDate;
 
   @override
   void initState() {
     super.initState();
+    // Set date range to today + 2 weeks
+    _minDate = DateTime.now();
+    _maxDate = _minDate.add(const Duration(days: 14));
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DietStateProvider>().initializeData().then((_) {
         _loadMealsForDate(_selectedDate, context.read<DietStateProvider>());
@@ -38,12 +48,35 @@ class _WeekScreenState extends State<WeekScreen> {
 
   Future<void> _loadMealsForDate(
       DateTime date, DietStateProvider dietState) async {
+    final dateStr = DateFormat('yyyy-MM-dd').format(date);
+
+    try {
+      final meals = await _cacheService.getCachedMealsForDate(
+        dateStr,
+        () => _fetchMealsForDate(date, dietState),
+      );
+
+      if (mounted) {
+        setState(() => _todayMeals = meals);
+      }
+    } catch (e) {
+      print('Error loading meals for date: $e');
+      if (mounted) {
+        setState(() => _todayMeals = []);
+      }
+    }
+  }
+
+  Future<List<Meal>> _fetchMealsForDate(
+      DateTime date, DietStateProvider dietState) async {
+    // Si la fecha es anterior a hoy o después de 2 semanas, retornar vacío
+    if (date.isBefore(_minDate) || date.isAfter(_maxDate)) {
+      return [];
+    }
+
     // Si la fecha es anterior a hoy, cargar desde el historial
-    if (date.isBefore(DateTime.now().subtract(const Duration(days: 1)))) {
-      final historicMeals =
-          await _loadHistoricMeals(date, dietState.client!.id);
-      setState(() => _todayMeals = historicMeals);
-      return;
+    if (date.isBefore(DateTime.now())) {
+      return _loadHistoricMeals(date, dietState.client!.id);
     }
 
     // Si la fecha es hoy o futura, usar el template actual
@@ -52,13 +85,17 @@ class _WeekScreenState extends State<WeekScreen> {
       (day) => day.name?.toLowerCase() == dayName,
     );
 
-    if (matchingDay != null && matchingDay.mealIds != null) {
-      final meals = await Future.wait(
-          matchingDay.mealIds!.map((mealId) => Meal.getMeal(mealId)));
-      setState(() => _todayMeals = meals);
-    } else {
-      setState(() => _todayMeals = []);
-    }
+    if (matchingDay?.mealIds == null) return [];
+
+    return Future.wait(
+      matchingDay!.mealIds!.map((mealId) async {
+        return await _cacheService.getCachedMeal(
+              mealId,
+              () => Meal.getMeal(mealId),
+            ) ??
+            Meal(id: mealId);
+      }),
+    );
   }
 
   Future<List<Meal>> _loadHistoricMeals(DateTime date, String clientId) async {
@@ -115,9 +152,11 @@ class _WeekScreenState extends State<WeekScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back_ios),
-                      onPressed: () => _onDateChanged(
-                          _selectedDate.subtract(const Duration(days: 1)),
-                          dietState),
+                      onPressed: _selectedDate.isBefore(_minDate)
+                          ? null
+                          : () => _onDateChanged(
+                              _selectedDate.subtract(const Duration(days: 1)),
+                              dietState),
                     ),
                     Text(
                       formattedDate,
@@ -126,9 +165,11 @@ class _WeekScreenState extends State<WeekScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.arrow_forward_ios),
-                      onPressed: () => _onDateChanged(
-                          _selectedDate.add(const Duration(days: 1)),
-                          dietState),
+                      onPressed: _selectedDate.isAfter(_maxDate)
+                          ? null
+                          : () => _onDateChanged(
+                              _selectedDate.add(const Duration(days: 1)),
+                              dietState),
                     ),
                   ],
                 ),
@@ -168,12 +209,22 @@ class _WeekScreenState extends State<WeekScreen> {
                                   horizontal: 20, vertical: 5),
                               child: ListTile(
                                 title: Text(
-                                  meal.timeOfDay ?? 'Comida',
+                                  meal.name ?? 'Comida',
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                subtitle: Text(meal.description ?? ''),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (meal.timeOfDay != null)
+                                      Text(
+                                        meal.timeOfDay!,
+                                        style: theme.textTheme.bodySmall,
+                                      ),
+                                    Text(meal.description ?? ''),
+                                  ],
+                                ),
                                 trailing: Text(
                                   '${meal.calories?.toString() ?? "0"} kcal',
                                   style: theme.textTheme.bodyMedium?.copyWith(

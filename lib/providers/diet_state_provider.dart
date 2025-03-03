@@ -7,6 +7,7 @@ import 'package:flutter_flexdiet/models/final_models/day.dart';
 import 'package:flutter_flexdiet/models/final_models/meal.dart';
 import 'package:flutter_flexdiet/models/final_models/template.dart';
 import 'package:flutter_flexdiet/models/final_models/user_diet.dart';
+import 'package:flutter_flexdiet/services/cache_service.dart';
 import 'package:intl/intl.dart';
 
 class DietStateProvider with ChangeNotifier {
@@ -20,6 +21,8 @@ class DietStateProvider with ChangeNotifier {
   double _totalProtein = 0;
   double _totalCarbs = 0;
   bool _isInitialized = false;
+
+  final _cacheService = CacheService();
 
   // Getters
   Client? get client => _client;
@@ -73,20 +76,25 @@ class DietStateProvider with ChangeNotifier {
     try {
       final dayName =
           DateFormat('EEEE', 'es_ES').format(DateTime.now()).toLowerCase();
-
-      // Find matching day, if none exists, return empty meals
       final matchingDay = _days.firstWhereOrNull(
         (day) => day.name?.toLowerCase() == dayName,
       );
 
-      if (matchingDay != null && matchingDay.mealIds != null) {
+      if (matchingDay?.mealIds == null) {
         _todayMeals.clear();
-        for (String mealId in matchingDay.mealIds!) {
-          final meal = await Meal.getMeal(mealId);
+        _calculateTotals();
+        return;
+      }
+
+      _todayMeals.clear();
+      for (String mealId in matchingDay!.mealIds!) {
+        final meal = await _cacheService.getCachedMeal(
+          mealId,
+          () => Meal.getMeal(mealId),
+        );
+        if (meal != null) {
           _todayMeals.add(meal);
         }
-      } else {
-        _todayMeals.clear();
       }
 
       _calculateTotals();
