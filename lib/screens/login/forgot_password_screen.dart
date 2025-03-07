@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/theme/theme.dart';
@@ -17,6 +18,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   late Animation<Color?> _backgroundColorAnimation;
   final TextEditingController _emailController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore =
+      FirebaseFirestore.instance; // Firestore instance
   StreamSubscription? _sub;
 
   @override
@@ -31,8 +34,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       begin: backgroundColorWhite,
       end: const Color.fromARGB(48, 98, 15, 231),
     ).animate(_animationController);
-
-    // _handleIncomingLinks();
   }
 
   @override
@@ -43,15 +44,32 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     super.dispose();
   }
 
-  // void _handleIncomingLinks() {
-  //   _sub = uriLinkStream.listen((Uri? uri) {
-  //     if (uri != null && uri.path == '/reset-password') {
-  //       _showResetPasswordDialog();
-  //     }
-  //   }, onError: (Object err) {
-  //     // Handle error
-  //   });
-  // }
+  Future<void> _savePasswordResetRequest(String email) async {
+    try {
+      final timestamp = Timestamp.now();
+
+      await _firestore.collection('password_reset_logs').add({
+        'email': email,
+        'timestamp': timestamp,
+      });
+    } catch (e) {
+      print("Error saving password reset request: $e");
+    }
+  }
+
+  Future<int> _getRequestCount(String email) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('password_reset_logs')
+          .where('email', isEqualTo: email)
+          .get();
+
+      return querySnapshot.docs.length;
+    } catch (e) {
+      print("Error counting requests: $e");
+      return 0;
+    }
+  }
 
   Future<void> _sendPasswordResetEmail() async {
     final email = _emailController.text.trim();
@@ -61,27 +79,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
           toastType: ToastType.error);
       return;
     }
+    final requestCount = await _getRequestCount(email);
+
+    if (requestCount >= 5) {
+      showToast(context,
+          "Has alcanzado el límite de peticiones diarias (5). Inténtelo de nuevo mañana",
+          toastType: ToastType.error);
+      return;
+    }
 
     try {
+      await _savePasswordResetRequest(email);
+
       await _auth.sendPasswordResetEmail(email: email);
+
       if (mounted) {
-        showToast(context, "Correo electrónico enviado",
-            toastType: ToastType.success);
+        showToast(context, "Email enviado", toastType: ToastType.success);
       }
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       if (mounted) {
-        String errorMessage;
-        switch (e.code) {
-          case 'invalid-email':
-            errorMessage = 'El formato del correo electrónico es inválido.';
-            break;
-          case 'user-not-found':
-            errorMessage = 'No hay ninguna cuenta registrada con este correo.';
-            break;
-          default:
-            errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
-        }
-        showToast(context, errorMessage, toastType: ToastType.error);
+        showToast(context, "Email enviado", toastType: ToastType.success);
       }
     } catch (e) {
       if (mounted) {
@@ -152,8 +169,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                         Navigator.pop(context);
                       },
                       child: const Text('Volver al inicio de sesión',
-                          style: TextStyle(
-                              color: textDarkBlue)), // Texto para regresar
+                          style: TextStyle(color: textDarkBlue)),
                     ),
                   ],
                 ),
