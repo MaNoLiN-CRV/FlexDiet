@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/models/ui_constants.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
+import 'package:flutter_flexdiet/screens/log_screen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -151,6 +152,26 @@ class _AdminScreenState extends State<AdminScreen> {
                     .fadeIn(delay: 600.ms, duration: 600.ms)
                     .scale(
                         begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
+                // Añadir un botón para navegar a LogScreen
+                SizedBox(height: UIConstants.defaultSpacing),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LogScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: UIConstants.buttonPadding,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(UIConstants.borderRadius),
+                    ),
+                  ),
+                  child: Text('Ver Historial de Solicitudes'),
+                ),
               ],
             ),
           ),
