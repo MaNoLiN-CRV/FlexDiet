@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/models/ui_constants.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_flexdiet/screens/log_screen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:async';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -18,6 +20,7 @@ class _AdminScreenState extends State<AdminScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Client> _clients = [];
   bool _isLoading = true;
+  Timer? _debounce;
 
   final ValueNotifier<String?> _selectedClientIdNotifier =
       ValueNotifier<String?>(null);
@@ -33,7 +36,6 @@ class _AdminScreenState extends State<AdminScreen> {
 
   Future<void> _loadClients() async {
     setState(() => _isLoading = true);
-    print("_loadClients started");
     try {
       final snapshot = await Client.collection.get();
       List<Client> loadedClients =
@@ -51,7 +53,7 @@ class _AdminScreenState extends State<AdminScreen> {
           _selectedClientIdNotifier.value = currentSelectedClientId;
         }
         _isLoading = false;
-        print("_loadClients setState called");
+        _preloadImages(loadedClients);
       }
     } catch (e) {
       if (mounted) {
@@ -62,11 +64,14 @@ class _AdminScreenState extends State<AdminScreen> {
         }
       }
     }
-    print("_loadClients finished");
   }
 
-  void _selectClient(String clientId) {
-    _selectedClientIdNotifier.value = clientId;
+  // Debounced filter clients function
+  void _filterClientsDebounced(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _filterClients(query);
+    });
   }
 
   void _filterClients(String query) {
@@ -82,8 +87,20 @@ class _AdminScreenState extends State<AdminScreen> {
     }
   }
 
+  // Preload Images
+  Future<void> _preloadImages(List<Client> clients) async {
+    for (final client in clients) {
+      if (client.image != null && client.image!.isNotEmpty) {
+        await precacheImage(NetworkImage(client.image!), context);
+      }
+    }
+  }
+
+  void _selectClient(String clientId) {
+    _selectedClientIdNotifier.value = clientId;
+  }
+
   Future<void> _refreshClients() async {
-    print("_refreshClients called");
     await _loadClients();
   }
 
@@ -217,7 +234,7 @@ class _AdminScreenState extends State<AdminScreen> {
         : theme.colorScheme.onSurfaceVariant.withAlpha(153);
     return TextField(
       controller: _searchController,
-      onChanged: _filterClients,
+      onChanged: _filterClientsDebounced,
       decoration: InputDecoration(
         hintText: 'Buscar cliente...',
         prefixIcon: Icon(
@@ -371,6 +388,7 @@ class _AdminScreenState extends State<AdminScreen> {
     _searchController.dispose();
     _clientsNotifier.dispose();
     _selectedClientIdNotifier.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 }
@@ -452,9 +470,16 @@ Widget buildClientCard(Client client, bool isSelected, BuildContext context,
                     color: Theme.of(context).colorScheme.primaryContainer,
                   ),
                   child: client.image != null && client.image!.isNotEmpty
-                      ? Image(
-                          image: NetworkImage(client.image!),
+                      ? CachedNetworkImage(
+                          imageUrl: client.image!,
                           fit: BoxFit.cover,
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.error,
+                            color: Colors.red,
+                          ),
                         )
                       : Icon(
                           Icons.person,
