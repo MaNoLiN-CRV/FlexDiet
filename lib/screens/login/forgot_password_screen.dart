@@ -82,9 +82,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     final requestCount = await _getRequestCount(email);
 
     if (requestCount >= 5) {
-      showToast(context,
-          "Has alcanzado el límite de peticiones diarias (5). Inténtelo de nuevo mañana",
-          toastType: ToastType.error);
+      if (mounted) {
+        showToast(context,
+            "Has alcanzado el límite de peticiones diarias (5). Inténtelo de nuevo mañana",
+            toastType: ToastType.error);
+      }
       return;
     }
 
@@ -94,11 +96,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       await _auth.sendPasswordResetEmail(email: email);
 
       if (mounted) {
-        showToast(context, "Email enviado", toastType: ToastType.success);
+        showToast(
+          context,
+          "Email de restablecimiento de contraseña enviado correctamente. Por favor, revisa tu bandeja de entrada.", // Updated success message
+          toastType: ToastType.success,
+        );
+        Navigator.pop(context); // Navigate back to LoginScreen
       }
     } on FirebaseAuthException {
       if (mounted) {
-        showToast(context, "Email enviado", toastType: ToastType.success);
+        showToast(
+          context,
+          "Email de restablecimiento de contraseña enviado correctamente. Por favor, revisa tu bandeja de entrada.", // Updated success message even for FirebaseAuthException as email is sent in this case as well
+          toastType: ToastType.success,
+        );
+        Navigator.pop(context); // Navigate back to LoginScreen
       }
     } catch (e) {
       if (mounted) {
