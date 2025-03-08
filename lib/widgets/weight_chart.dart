@@ -14,7 +14,7 @@ class WeightChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // If less than 3 records, don't show the chart
+    // Si hay menos de 3 registros, no mostrar el gráfico
     if (weightHistory.length < 3) {
       return const SizedBox.shrink();
     }
@@ -32,14 +32,22 @@ class WeightChart extends StatelessWidget {
     final backgroundColor =
         isDarkMode ? Colors.grey[900] : theme.colorScheme.surface;
 
-    // Sort weight history by date
+    // Ordenar el historial de peso por fecha
     final sortedHistory = List<HistoricalBodyweight>.from(weightHistory)
       ..sort((a, b) => a.date.compareTo(b.date));
 
-    // Calculate min and max values for Y axis
+    // Calcular los valores mínimo y máximo para el eje Y
     final minWeight = sortedHistory.map((e) => e.weight).reduce(min);
     final maxWeight = sortedHistory.map((e) => e.weight).reduce(max);
     final padding = (maxWeight - minWeight) * 0.1;
+    final weightRange = maxWeight - minWeight; // Calcular el rango de peso
+
+    double intervalY; // Definir intervalY
+    if (weightRange > 10) {
+      intervalY = 10;
+    } else {
+      intervalY = 1;
+    }
 
     return Container(
       height: 300,
@@ -114,7 +122,7 @@ class WeightChart extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      interval: 1,
+                      interval: intervalY, // Intervalo dinámico aquí
                       reservedSize: 40,
                       getTitlesWidget: (value, meta) {
                         return Text(

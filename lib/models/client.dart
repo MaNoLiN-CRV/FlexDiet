@@ -70,7 +70,6 @@ class Client {
 
   static Future<Client> getClient(String clientId) async {
     final docSnap = await collection.doc(clientId).get();
-    print('Joder ${docSnap.data()} / el clientId es $clientId');
     return docSnap.data()!;
   }
 
