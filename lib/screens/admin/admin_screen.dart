@@ -11,14 +11,17 @@ class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
 
   @override
-  State<AdminScreen> createState() => _AdminScreenState();
+  _AdminScreenState createState() => _AdminScreenState();
 }
 
 class _AdminScreenState extends State<AdminScreen> {
-  String? _selectedClientId;
   final TextEditingController _searchController = TextEditingController();
   List<Client> _clients = [];
   bool _isLoading = true;
+
+  final ValueNotifier<String?> _selectedClientIdNotifier =
+      ValueNotifier<String?>(null);
+
   final ValueNotifier<List<Client>> _clientsNotifier =
       ValueNotifier<List<Client>>([]);
 
@@ -35,22 +38,35 @@ class _AdminScreenState extends State<AdminScreen> {
       final snapshot = await Client.collection.get();
       List<Client> loadedClients =
           snapshot.docs.map((doc) => doc.data()).toList();
-      _clientsNotifier.value = loadedClients;
-      _clients = loadedClients;
-      _isLoading = false;
-      print("_loadClients setState called");
-    } catch (e) {
-      setState(() => _isLoading = false);
+
       if (mounted) {
-        showToast(context, 'Error al cargar los clientes',
-            toastType: ToastType.error);
+        final String? currentSelectedClientId = _selectedClientIdNotifier.value;
+
+        _clientsNotifier.value = loadedClients;
+        _clients = loadedClients;
+
+        if (currentSelectedClientId != null &&
+            loadedClients
+                .any((client) => client.id == currentSelectedClientId)) {
+          _selectedClientIdNotifier.value = currentSelectedClientId;
+        }
+        _isLoading = false;
+        print("_loadClients setState called");
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        if (mounted) {
+          showToast(context, 'Error al cargar los clientes',
+              toastType: ToastType.error);
+        }
       }
     }
     print("_loadClients finished");
   }
 
   void _selectClient(String clientId) {
-    setState(() => _selectedClientId = clientId);
+    _selectedClientIdNotifier.value = clientId;
   }
 
   void _filterClients(String query) {
@@ -69,11 +85,6 @@ class _AdminScreenState extends State<AdminScreen> {
   Future<void> _refreshClients() async {
     print("_refreshClients called");
     await _loadClients();
-    final snapshot = await Client.collection.get();
-    List<Client> loadedClients =
-        snapshot.docs.map((doc) => doc.data()).toList();
-    _clientsNotifier.value = loadedClients;
-    print("_refreshClients finished");
   }
 
   @override
@@ -107,6 +118,7 @@ class _AdminScreenState extends State<AdminScreen> {
                     .fadeIn(delay: 200.ms, duration: 600.ms)
                     .slideY(begin: 0.2, end: 0),
                 SizedBox(height: UIConstants.defaultSpacing),
+                // Updated ValueListenableBuilder
                 ValueListenableBuilder<List<Client>>(
                   valueListenable: _clientsNotifier,
                   builder: (context, clients, child) {
@@ -126,27 +138,15 @@ class _AdminScreenState extends State<AdminScreen> {
                         ),
                       );
                     }
-                    return Expanded(
-                      child: SingleChildScrollView(
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.33,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: clients.length,
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            itemBuilder: (context, index) {
-                              final client = clients[index];
-                              final isSelected = client.id == _selectedClientId;
-
-                              return buildClientCard(
-                                  client, isSelected, context, isDarkMode);
-                            },
-                          ),
-                        ),
-                      ),
+                    return ClientListView(
+                      clients: clients,
+                      selectedClientIdNotifier: _selectedClientIdNotifier,
+                      onClientSelected: _selectClient,
+                      isDarkMode: isDarkMode,
                     );
                   },
                 ),
+
                 _buildActionButtons(context, isDarkMode)
                     .animate()
                     .fadeIn(delay: 600.ms, duration: 600.ms)
@@ -241,169 +241,6 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  Widget buildClientCard(
-      Client client, bool isSelected, BuildContext context, bool isDarkMode) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      width: 220,
-      margin: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 4,
-      ),
-      transform:
-          isSelected ? (Matrix4.identity()..scale(1.05)) : Matrix4.identity(),
-      child: Card(
-        elevation: isSelected ? 8 : 4,
-        color: isSelected ? Theme.of(context).colorScheme.primary : null,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: InkWell(
-          onTap: () => _selectClient(client.id),
-          borderRadius: BorderRadius.circular(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: ClipRRect(
-                  // Added ClipRRect
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(12),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                    ),
-                    child: client.image != null && client.image!.isNotEmpty
-                        ? Image(
-                            image: NetworkImage(client.image!),
-                            fit: BoxFit.cover,
-                          )
-                        : Icon(
-                            Icons.person,
-                            size: 48,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                          ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        client.username,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isSelected
-                                      ? Theme.of(context).colorScheme.onPrimary
-                                      : null,
-                                ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (client.description != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          client.description!,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.onPrimary
-                                    : isDarkMode
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .secondaryContainer
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                              ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                      const Spacer(),
-                      Row(
-                        children: [
-                          if (client.bodyweight != null)
-                            _buildClientInfo(
-                              context,
-                              '${client.bodyweight!}kg',
-                              Icons.monitor_weight,
-                              isSelected,
-                              isDarkMode,
-                            ),
-                          if (client.height != null) ...[
-                            const SizedBox(width: 8),
-                            _buildClientInfo(
-                              context,
-                              '${client.height!}cm',
-                              Icons.height,
-                              isSelected,
-                              isDarkMode,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.2, end: 0);
-  }
-
-  Widget _buildClientInfo(
-    BuildContext context,
-    String text,
-    IconData icon,
-    bool isSelected,
-    bool isDarkMode,
-  ) {
-    Color textColor;
-    Color iconColor;
-
-    if (isSelected) {
-      textColor = Theme.of(context).colorScheme.onPrimary;
-      iconColor = Theme.of(context).colorScheme.onPrimary;
-    } else {
-      textColor = isDarkMode
-          ? Theme.of(context).colorScheme.secondaryContainer
-          : Theme.of(context).colorScheme.onSurfaceVariant;
-      iconColor = isDarkMode
-          ? Theme.of(context).colorScheme.secondaryContainer
-          : Theme.of(context).colorScheme.primary;
-    }
-
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 14,
-          color: iconColor,
-        ),
-        const SizedBox(width: 2),
-        Text(
-          text,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: textColor,
-              ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildActionButtons(BuildContext context, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.only(top: UIConstants.defaultSpacing * 2),
@@ -413,13 +250,14 @@ class _AdminScreenState extends State<AdminScreen> {
           _buildActionButton(
             context: context,
             title: 'CREAR PLANTILLA',
-            onPressed: _selectedClientId != null
+            onPressed: _selectedClientIdNotifier.value != null
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => CreateTemplateScreen(
-                                clientID: _selectedClientId!,
-                              )),
+                        builder: (context) => CreateTemplateScreen(
+                          clientID: _selectedClientIdNotifier.value!,
+                        ),
+                      ),
                     )
                 : null,
             isSecondary: true,
@@ -429,12 +267,12 @@ class _AdminScreenState extends State<AdminScreen> {
           _buildActionButton(
             context: context,
             title: 'USAR PLANTILLA EXISTENTE',
-            onPressed: _selectedClientId != null
+            onPressed: _selectedClientIdNotifier.value != null
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => UseTemplateScreen(
-                          clientId: _selectedClientId!,
+                          clientId: _selectedClientIdNotifier.value!,
                         ),
                       ),
                     )
@@ -445,7 +283,7 @@ class _AdminScreenState extends State<AdminScreen> {
           _buildActionButton(
             context: context,
             title: 'EDITAR CLIENTE',
-            onPressed: _selectedClientId != null
+            onPressed: _selectedClientIdNotifier.value != null
                 ? () async {
                     final localContext = context;
                     if (localContext.mounted) {
@@ -453,7 +291,7 @@ class _AdminScreenState extends State<AdminScreen> {
                         localContext,
                         MaterialPageRoute(
                           builder: (context) => EditPerson(
-                            clientId: _selectedClientId!,
+                            clientId: _selectedClientIdNotifier.value!,
                           ),
                         ),
                       );
@@ -532,6 +370,207 @@ class _AdminScreenState extends State<AdminScreen> {
   void dispose() {
     _searchController.dispose();
     _clientsNotifier.dispose();
+    _selectedClientIdNotifier.dispose();
     super.dispose();
   }
+}
+
+class ClientListView extends StatelessWidget {
+  final List<Client> clients;
+  final ValueNotifier<String?> selectedClientIdNotifier;
+  final Function(String) onClientSelected;
+  final bool isDarkMode;
+
+  const ClientListView({
+    super.key,
+    required this.clients,
+    required this.selectedClientIdNotifier,
+    required this.onClientSelected,
+    required this.isDarkMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.30,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: clients.length,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemBuilder: (context, index) {
+              final client = clients[index];
+              return ValueListenableBuilder<String?>(
+                valueListenable: selectedClientIdNotifier,
+                builder: (context, selectedClientId, child) {
+                  final isSelected = client.id == selectedClientId;
+                  return buildClientCard(client, isSelected, context,
+                      isDarkMode, onClientSelected);
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Widget buildClientCard(Client client, bool isSelected, BuildContext context,
+    bool isDarkMode, Function(String) onClientSelected) {
+  return AnimatedContainer(
+    duration: const Duration(milliseconds: 200),
+    width: 220,
+    margin: const EdgeInsets.symmetric(
+      horizontal: 8,
+      vertical: 4,
+    ),
+    transform:
+        isSelected ? (Matrix4.identity()..scale(1.05)) : Matrix4.identity(),
+    child: Card(
+      elevation: isSelected ? 8 : 4,
+      color: isSelected ? Theme.of(context).colorScheme.primary : null,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () => onClientSelected(client.id),
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: ClipRRect(
+                // Added ClipRRect
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  child: client.image != null && client.image!.isNotEmpty
+                      ? Image(
+                          image: NetworkImage(client.image!),
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.person,
+                          size: 48,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      client.username,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : null,
+                          ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (client.description != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        client.description!,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.onPrimary
+                                  : isDarkMode
+                                      ? Theme.of(context)
+                                          .colorScheme
+                                          .secondaryContainer
+                                      : Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                            ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                    const Spacer(),
+                    Row(
+                      children: [
+                        if (client.bodyweight != null)
+                          _buildClientInfo(
+                            context,
+                            '${client.bodyweight!}kg',
+                            Icons.monitor_weight,
+                            isSelected,
+                            isDarkMode,
+                          ),
+                        if (client.height != null) ...[
+                          const SizedBox(width: 8),
+                          _buildClientInfo(
+                            context,
+                            '${client.height!}cm',
+                            Icons.height,
+                            isSelected,
+                            isDarkMode,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.2, end: 0);
+}
+
+Widget _buildClientInfo(
+  BuildContext context,
+  String text,
+  IconData icon,
+  bool isSelected,
+  bool isDarkMode,
+) {
+  Color textColor;
+  Color iconColor;
+
+  if (isSelected) {
+    textColor = Theme.of(context).colorScheme.onPrimary;
+    iconColor = Theme.of(context).colorScheme.onPrimary;
+  } else {
+    textColor = isDarkMode
+        ? Theme.of(context).colorScheme.secondaryContainer
+        : Theme.of(context).colorScheme.onSurfaceVariant;
+    iconColor = isDarkMode
+        ? Theme.of(context).colorScheme.secondaryContainer
+        : Theme.of(context).colorScheme.primary;
+  }
+
+  return Row(
+    children: [
+      Icon(
+        icon,
+        size: 14,
+        color: iconColor,
+      ),
+      const SizedBox(width: 2),
+      Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: textColor,
+            ),
+      ),
+    ],
+  );
 }
