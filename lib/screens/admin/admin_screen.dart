@@ -10,7 +10,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:async';
 
 class AdminScreen extends StatefulWidget {
-  const AdminScreen({super.key});
+  const AdminScreen({Key? key}) : super(key: key);
 
   @override
   _AdminScreenState createState() => _AdminScreenState();
@@ -34,7 +34,17 @@ class _AdminScreenState extends State<AdminScreen> {
     _loadClients();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _clientsNotifier.dispose();
+    _selectedClientIdNotifier.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
   Future<void> _loadClients() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final snapshot = await Client.collection.get();
@@ -53,7 +63,9 @@ class _AdminScreenState extends State<AdminScreen> {
           _selectedClientIdNotifier.value = currentSelectedClientId;
         }
         _isLoading = false;
-        _preloadImages(loadedClients);
+        if (mounted) {
+          await _preloadImages(loadedClients);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -76,31 +88,44 @@ class _AdminScreenState extends State<AdminScreen> {
 
   void _filterClients(String query) {
     if (query.isEmpty) {
-      _clientsNotifier.value = List.from(_clients);
+      if (mounted) {
+        _clientsNotifier.value = List.from(_clients);
+      }
     } else {
       final lowercaseQuery = query.toLowerCase();
-      _clientsNotifier.value = _clients.where((client) {
-        return client.username.toLowerCase().contains(lowercaseQuery) ||
-            (client.description?.toLowerCase().contains(lowercaseQuery) ??
-                false);
-      }).toList();
+      if (mounted) {
+        _clientsNotifier.value = _clients.where((client) {
+          return client.username.toLowerCase().contains(lowercaseQuery) ||
+              (client.description?.toLowerCase().contains(lowercaseQuery) ??
+                  false);
+        }).toList();
+      }
     }
   }
 
   // Preload Images
   Future<void> _preloadImages(List<Client> clients) async {
+    if (!mounted) return;
     for (final client in clients) {
       if (client.image != null && client.image!.isNotEmpty) {
-        await precacheImage(NetworkImage(client.image!), context);
+        try {
+          await precacheImage(NetworkImage(client.image!), context);
+        } catch (e) {
+          print('Error preloading image for client ${client.id}: $e');
+        }
       }
     }
   }
 
-  void _selectClient(String clientId) {
-    _selectedClientIdNotifier.value = clientId;
+  // Update select client to be async
+  void _selectClient(String clientId) async {
+    if (mounted) {
+      _selectedClientIdNotifier.value = clientId;
+    }
   }
 
   Future<void> _refreshClients() async {
+    if (!mounted) return;
     await _loadClients();
   }
 
@@ -135,7 +160,6 @@ class _AdminScreenState extends State<AdminScreen> {
                     .fadeIn(delay: 200.ms, duration: 600.ms)
                     .slideY(begin: 0.2, end: 0),
                 SizedBox(height: UIConstants.defaultSpacing),
-                // Updated ValueListenableBuilder
                 ValueListenableBuilder<List<Client>>(
                   valueListenable: _clientsNotifier,
                   builder: (context, clients, child) {
@@ -163,13 +187,13 @@ class _AdminScreenState extends State<AdminScreen> {
                     );
                   },
                 ),
-
-                _buildActionButtons(context, isDarkMode)
-                    .animate()
-                    .fadeIn(delay: 600.ms, duration: 600.ms)
-                    .scale(
-                        begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
-                // Añadir un botón para navegar a LogScreen
+                ValueListenableBuilder<String?>(
+                  valueListenable: _selectedClientIdNotifier,
+                  builder: (context, selectedClientId, child) {
+                    return _buildActionButtons(
+                        context, isDarkMode, selectedClientId);
+                  },
+                ),
                 SizedBox(height: UIConstants.defaultSpacing),
                 ElevatedButton(
                   onPressed: () {
@@ -258,7 +282,9 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, bool isDarkMode) {
+  // Use a new _buildActionButtons that receives selectedClientId as argument
+  Widget _buildActionButtons(
+      BuildContext context, bool isDarkMode, String? selectedClientId) {
     return Padding(
       padding: const EdgeInsets.only(top: UIConstants.defaultSpacing * 2),
       child: Column(
@@ -267,12 +293,12 @@ class _AdminScreenState extends State<AdminScreen> {
           _buildActionButton(
             context: context,
             title: 'CREAR PLANTILLA',
-            onPressed: _selectedClientIdNotifier.value != null
+            onPressed: selectedClientId != null
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => CreateTemplateScreen(
-                          clientID: _selectedClientIdNotifier.value!,
+                          clientID: selectedClientId,
                         ),
                       ),
                     )
@@ -284,12 +310,12 @@ class _AdminScreenState extends State<AdminScreen> {
           _buildActionButton(
             context: context,
             title: 'USAR PLANTILLA EXISTENTE',
-            onPressed: _selectedClientIdNotifier.value != null
+            onPressed: selectedClientId != null
                 ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => UseTemplateScreen(
-                          clientId: _selectedClientIdNotifier.value!,
+                          clientId: selectedClientId,
                         ),
                       ),
                     )
@@ -300,7 +326,7 @@ class _AdminScreenState extends State<AdminScreen> {
           _buildActionButton(
             context: context,
             title: 'EDITAR CLIENTE',
-            onPressed: _selectedClientIdNotifier.value != null
+            onPressed: selectedClientId != null
                 ? () async {
                     final localContext = context;
                     if (localContext.mounted) {
@@ -308,7 +334,7 @@ class _AdminScreenState extends State<AdminScreen> {
                         localContext,
                         MaterialPageRoute(
                           builder: (context) => EditPerson(
-                            clientId: _selectedClientIdNotifier.value!,
+                            clientId: selectedClientId,
                           ),
                         ),
                       );
@@ -382,15 +408,6 @@ class _AdminScreenState extends State<AdminScreen> {
       ),
     );
   }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _clientsNotifier.dispose();
-    _selectedClientIdNotifier.dispose();
-    _debounce?.cancel();
-    super.dispose();
-  }
 }
 
 class ClientListView extends StatelessWidget {
@@ -400,12 +417,12 @@ class ClientListView extends StatelessWidget {
   final bool isDarkMode;
 
   const ClientListView({
-    super.key,
+    Key? key,
     required this.clients,
     required this.selectedClientIdNotifier,
     required this.onClientSelected,
     required this.isDarkMode,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -461,7 +478,6 @@ Widget buildClientCard(Client client, bool isSelected, BuildContext context,
             AspectRatio(
               aspectRatio: 16 / 9,
               child: ClipRRect(
-                // Added ClipRRect
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(12),
                 ),

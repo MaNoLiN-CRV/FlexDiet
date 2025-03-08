@@ -69,38 +69,29 @@ class _LoginScreenState extends State<LoginScreen>
     await adminService.initialize();
     final isAdmin = await adminService.isUserAdmin();
 
+    Widget nextScreen;
+
     if (isAdmin) {
-      if (context.mounted) {
-        Navigator.pushReplacement(
-          context,
+      nextScreen = const AdminScreen();
+    } else {
+      bool userInfoCompleted = await isUserInfoCompleted();
+      nextScreen = userInfoCompleted
+          ? const HomeScreen()
+          : UserInfoScreen(
+              client: client,
+            );
+    }
+
+    //Replace all routes to prevent going back.
+    if (context.mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => LoadingScreen(
-              targetScreen: const AdminScreen(),
+              targetScreen: nextScreen,
               loadingSeconds: 2,
             ),
           ),
-        );
-      }
-      return;
-    }
-
-    // If not admin, proceed with regular user flow
-    bool userInfoCompleted = await isUserInfoCompleted();
-
-    if (context.mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LoadingScreen(
-            targetScreen: userInfoCompleted
-                ? const HomeScreen()
-                : UserInfoScreen(
-                    client: client,
-                  ),
-            loadingSeconds: 2,
-          ),
-        ),
-      );
+          (Route<dynamic> route) => false);
     }
   }
 

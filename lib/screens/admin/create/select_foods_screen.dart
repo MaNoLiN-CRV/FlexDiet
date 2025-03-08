@@ -791,7 +791,7 @@ class _SelectFoodsScreenState extends State<SelectFoodsScreen> {
           if (isClientUpdated && mounted) {
             showToast(
               context,
-              'Plan de comidas guardado correctamente y asignado al cliente',
+              'Plan de comidas guardado correctamente y asignado al cliente. Reinicia la aplicación para que se apliquen los cambios',
               toastType: ToastType.success,
             );
             Navigator.pop(context);

@@ -19,7 +19,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 late SharedPreferences prefs;
 
-const String _appFirstLaunchKey = 'appFirstLaunch'; // Key to track first launch
+const String _appFirstLaunchKey = 'appFirstLaunch';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

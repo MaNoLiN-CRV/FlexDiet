@@ -31,15 +31,20 @@ class _HomeScreenContent extends StatefulWidget {
 }
 
 class _HomeScreenContentState extends State<_HomeScreenContent> {
-  double _completedCalories = 0;
-  double _completedProtein = 0;
-  double _completedCarbs = 0;
   final TextEditingController _weightController = TextEditingController();
   final _notificationService = NotificationService();
+
+  // Mover estos valores a un ValueNotifier para actualizaciones localizadas
+  final ValueNotifier<double> _completedCalories = ValueNotifier(0.0);
+  final ValueNotifier<double> _completedProtein = ValueNotifier(0);
+  final ValueNotifier<double> _completedCarbs = ValueNotifier(0);
 
   @override
   void dispose() {
     _weightController.dispose();
+    _completedCalories.dispose();
+    _completedProtein.dispose();
+    _completedCarbs.dispose();
     super.dispose();
   }
 
@@ -49,6 +54,9 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final dietState = context.read<DietStateProvider>();
       await dietState.initializeData();
+
+      // Actualizar valores de nutrientes después de inicializar
+      _updateCompletedNutrients(dietState);
 
       // Verificar si debe mostrar el diálogo de actualización de peso
       _checkAndShowWeightUpdateDialog();
@@ -60,7 +68,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     final bool shouldShow =
         await _notificationService.shouldShowBodyweightUpdateDialog();
 
-    if (shouldShow) {
+    if (shouldShow && mounted) {
       // Esperar un momento para que la pantalla termine de cargarse
       await Future.delayed(const Duration(milliseconds: 500));
       await _showWeightUpdateDialog();
@@ -69,160 +77,163 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
 
   // Función para mostrar el diálogo de actualización de peso
   Future<void> _showWeightUpdateDialog() async {
-    final DietStateProvider dietState;
-    if (mounted) {
-      dietState = context.read<DietStateProvider>();
+    if (!mounted) return;
 
-      // Obtener el peso más reciente como valor por defecto
-      final currentWeight = dietState.client?.bodyweight ?? 0.0;
-      final latestBodyweight = await _notificationService.getLatestBodyweight();
+    final dietState = context.read<DietStateProvider>();
 
-      // Usar el peso guardado si existe, de lo contrario usar el peso actual
-      _weightController.text = (latestBodyweight ?? currentWeight).toString();
+    // Obtener el peso más reciente como valor por defecto
+    final currentWeight = dietState.client?.bodyweight ?? 0.0;
+    final latestBodyweight = await _notificationService.getLatestBodyweight();
 
-      if (!mounted) return;
+    // Usar el peso guardado si existe, de lo contrario usar el peso actual
+    _weightController.text = (latestBodyweight ?? currentWeight).toString();
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          final theme = Theme.of(context);
-          final isDarkMode = theme.brightness == Brightness.dark;
-          final dialogBackgroundColor =
-              isDarkMode ? Colors.grey[850] : Colors.white;
-          final textColor = isDarkMode ? Colors.white : Colors.black;
-          final buttonColor = isDarkMode
-              ? theme.colorScheme.secondary
-              : theme.colorScheme.primary;
-          final buttonTextColor = isDarkMode ? Colors.black : Colors.white;
+    if (!mounted) return;
 
-          return AlertDialog(
-            backgroundColor: dialogBackgroundColor,
-            titleTextStyle: TextStyle(color: textColor, fontSize: 20),
-            contentTextStyle: TextStyle(color: textColor),
-            title:
-                Text('Actualiza tu peso', style: TextStyle(color: textColor)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Es importante registrar tu peso para realizar un seguimiento adecuado de tu progreso.',
-                  style: TextStyle(color: textColor),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _weightController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: 'Peso (kg)',
-                    labelStyle: TextStyle(color: textColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(color: textColor),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: textColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: textColor),
-                    ),
-                  ),
-                  style: TextStyle(color: textColor),
-                ),
-              ],
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return _buildWeightDialog(dialogContext, dietState);
+      },
+    );
+  }
+
+  // Extraer la construcción del diálogo a un método separado
+  Widget _buildWeightDialog(
+      BuildContext dialogContext, DietStateProvider dietState) {
+    final theme = Theme.of(dialogContext);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final dialogBackgroundColor = isDarkMode ? Colors.grey[850] : Colors.white;
+    final textColor = isDarkMode ? Colors.white : Colors.black;
+    final buttonColor =
+        isDarkMode ? theme.colorScheme.secondary : theme.colorScheme.primary;
+    final buttonTextColor = isDarkMode ? Colors.black : Colors.white;
+
+    return AlertDialog(
+      backgroundColor: dialogBackgroundColor,
+      titleTextStyle: TextStyle(color: textColor, fontSize: 20),
+      contentTextStyle: TextStyle(color: textColor),
+      title: Text('Actualiza tu peso', style: TextStyle(color: textColor)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Es importante registrar tu peso para realizar un seguimiento adecuado de tu progreso.',
+            style: TextStyle(color: textColor),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _weightController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: InputDecoration(
+              labelText: 'Peso (kg)',
+              labelStyle: TextStyle(color: textColor),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(color: textColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: textColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: textColor),
+              ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  // Guardar el peso ingresado para usarlo mañana si el usuario elige "Más tarde"
-                  final enteredWeight = double.tryParse(_weightController.text);
-                  if (enteredWeight != null) {
-                    await _notificationService
-                        .setLatestBodyweight(enteredWeight);
-                  }
+            style: TextStyle(color: textColor),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () async {
+            // Guardar el peso ingresado para usarlo mañana si el usuario elige "Más tarde"
+            final enteredWeight = double.tryParse(_weightController.text);
+            if (enteredWeight != null) {
+              await _notificationService.setLatestBodyweight(enteredWeight);
+            }
 
-                  // Mark the dialog as not shown for tomorrow
-                  await _notificationService.snoozeBodyweightUpdateDialog();
+            // Mark the dialog as not shown for tomorrow
+            await _notificationService.snoozeBodyweightUpdateDialog();
 
-                  Navigator.of(context).pop();
-                },
-                child: Text('Más tarde', style: TextStyle(color: textColor)),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
-                  foregroundColor: buttonTextColor,
-                ),
-                onPressed: () async {
-                  // Obtener y validar el peso ingresado
-                  final enteredWeight = double.tryParse(_weightController.text);
-                  if (enteredWeight == null || enteredWeight <= 0) {
-                    final SnackBar snackBar = const SnackBar(
-                      content: Text('Por favor, introduce un peso válido'),
-                      backgroundColor: Colors.red,
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    return;
-                  }
+            Navigator.of(dialogContext).pop();
+          },
+          child: Text('Más tarde', style: TextStyle(color: textColor)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: buttonColor,
+            foregroundColor: buttonTextColor,
+          ),
+          onPressed: () async {
+            // Obtener y validar el peso ingresado
+            final enteredWeight = double.tryParse(_weightController.text);
+            if (enteredWeight == null || enteredWeight <= 0) {
+              final SnackBar snackBar = const SnackBar(
+                content: Text('Por favor, introduce un peso válido'),
+                backgroundColor: Colors.red,
+              );
+              ScaffoldMessenger.of(dialogContext).showSnackBar(snackBar);
+              return;
+            }
 
-                  // Actualizar el peso en el modelo Cliente
-                  if (dietState.client != null) {
-                    final success =
-                        await dietState.client!.updateBodyweight(enteredWeight);
+            // Actualizar el peso en el modelo Cliente
+            if (dietState.client != null) {
+              final success =
+                  await dietState.client!.updateBodyweight(enteredWeight);
 
-                    if (success) {
-                      // Marcar el diálogo como mostrado hoy
-                      await _notificationService
-                          .setBodyweightUpdateDialogShownToday(true);
-                      // Set the weight update date for weekly suppression
-                      await _notificationService.setLastWeightUpdateDate();
-                      // Limpiar el peso guardado
-                      await _notificationService.setLatestBodyweight(null);
+              if (success) {
+                // Marcar el diálogo como mostrado hoy
+                await _notificationService
+                    .setBodyweightUpdateDialogShownToday(true);
+                // Set the weight update date for weekly suppression
+                await _notificationService.setLastWeightUpdateDate();
+                // Limpiar el peso guardado
+                await _notificationService.setLatestBodyweight(null);
 
-                      // Actualizar el estado para refrescar el gráfico
-                      setState(() {});
-
-                      if (mounted) {
-                        final SnackBar snackBar = const SnackBar(
-                          content: Text('Peso actualizado correctamente'),
-                          backgroundColor: Colors.green,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        Navigator.of(context).pop();
-                      }
-                    } else {
-                      if (mounted) {
-                        final SnackBar snackBar = const SnackBar(
-                          content: Text('Error al actualizar el peso'),
-                          backgroundColor: Colors.red,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                    }
-                  }
-                },
-                child: const Text('Actualizar'),
-              ),
-            ],
-          );
-        },
-      );
-    }
+                if (mounted) {
+                  final SnackBar snackBar = const SnackBar(
+                    content: Text('Peso actualizado correctamente'),
+                    backgroundColor: Colors.green,
+                  );
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(snackBar);
+                  Navigator.of(dialogContext).pop();
+                }
+              } else {
+                if (mounted) {
+                  final SnackBar snackBar = const SnackBar(
+                    content: Text('Error al actualizar el peso'),
+                    backgroundColor: Colors.red,
+                  );
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(snackBar);
+                }
+              }
+            }
+          },
+          child: const Text('Actualizar'),
+        ),
+      ],
+    );
   }
 
   void _updateCompletedNutrients(DietStateProvider dietState) {
-    _completedCalories = 0;
-    _completedProtein = 0;
-    _completedCarbs = 0;
+    if (!mounted) return;
+    double calories = 0;
+    double protein = 0;
+    double carbs = 0;
 
     for (final meal in dietState.todayMeals) {
       if (dietState.userDiet?.completedMealIds.contains(meal.id) ?? false) {
-        _completedCalories += meal.calories ?? 0;
-        _completedProtein += meal.protein ?? 0;
-        _completedCarbs += meal.carbs ?? 0;
+        calories += meal.calories ?? 0;
+        protein += meal.protein ?? 0;
+        carbs += meal.carbs ?? 0;
       }
     }
+
+    // Actualizar los ValueNotifiers en lugar de variables de estado
+    _completedCalories.value = calories;
+    _completedProtein.value = protein;
+    _completedCarbs.value = carbs;
   }
 
   @override
@@ -237,12 +248,17 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
           );
         }
 
+        // El scaffold y estructuras principales que no cambian frecuentemente
         return Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
           appBar: _buildAppBar(Theme.of(context)),
           body: Stack(
             children: [
-              _buildWaveBackgrounds(Theme.of(context)),
+              // Fondo estático que no necesita reconstruirse con cada cambio
+              RepaintBoundary(
+                child: _buildWaveBackgrounds(Theme.of(context)),
+              ),
+              // Contenido principal
               _buildMainContent(Theme.of(context), context, dietState),
             ],
           ),
@@ -273,6 +289,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
   }
 
   Widget _buildWaveBackgrounds(ThemeData theme) {
+    // Este widget está dentro de un RepaintBoundary para evitar repintarlo
     return Stack(
       children: [
         Positioned.fill(
@@ -307,18 +324,57 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildNutritionCard(theme, dietState)
+            // Usar NutritionCard como widget separado
+            NutritionCard(
+              theme: theme,
+              completedCalories: _completedCalories,
+              completedProtein: _completedProtein,
+              completedCarbs: _completedCarbs,
+              totalCalories: dietState.totalCalories,
+            )
                 .animate()
                 .fadeIn(duration: 300.ms, delay: 0.ms)
                 .slideX(begin: 0.2, end: 0),
             const SizedBox(height: 15),
-            _buildMealsSection(theme, context, dietState)
+            // Usar MealsSection como widget separado
+            MealsSection(
+              theme: theme,
+              context: context,
+              dietState: dietState,
+              onMealStatusChanged: (String mealId, bool completed) async {
+                final meal =
+                    dietState.todayMeals.firstWhere((m) => m.id == mealId);
+
+                if (completed) {
+                  dietState.userDiet?.completedMealIds.add(meal.id);
+                } else {
+                  dietState.userDiet?.completedMealIds.remove(meal.id);
+                }
+
+                // Actualizar nutrientes sin reconstruir toda la pantalla
+                _updateCompletedNutrients(dietState);
+
+                // Update UserDiet in Firestore
+                if (dietState.userDiet != null) {
+                  await UserDiet.updateUserDiet(dietState.userDiet!);
+                }
+
+                // Save to historic meals for today
+                await dietState.saveHistoricMeals(
+                  DateTime.now(),
+                  dietState.userDiet?.completedMealIds ?? [],
+                );
+              },
+            )
                 .animate()
                 .fadeIn(duration: 300.ms, delay: 100.ms)
                 .slideX(begin: 0.2, end: 0),
             const SizedBox(height: 15),
-            WeightChart(
-              weightHistory: dietState.client?.bodyweightHistory ?? [],
+            // WeightChart como widget separado
+            RepaintBoundary(
+              child: WeightChart(
+                weightHistory: dietState.client?.bodyweightHistory ?? [],
+              ),
             )
                 .animate()
                 .fadeIn(duration: 300.ms, delay: 200.ms)
@@ -328,10 +384,27 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
       ),
     );
   }
+}
 
-  Widget _buildNutritionCard(ThemeData theme, DietStateProvider dietState) {
-    _updateCompletedNutrients(dietState);
+// Nuevo widget para la tarjeta de nutrición
+class NutritionCard extends StatelessWidget {
+  final ThemeData theme;
+  final ValueNotifier<double> completedCalories;
+  final ValueNotifier<double> completedProtein;
+  final ValueNotifier<double> completedCarbs;
+  final double totalCalories;
 
+  const NutritionCard({
+    Key? key,
+    required this.theme,
+    required this.completedCalories,
+    required this.completedProtein,
+    required this.completedCarbs,
+    required this.totalCalories,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return GridCard(
       cardTheme: CardTheme(
         color: theme.colorScheme.secondary,
@@ -345,27 +418,61 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
       rowSpace: HomeScreen._smallSpacing,
       padding: const EdgeInsets.all(HomeScreen._mediumSpacing),
       children: [
-        _CaloryInfo(
-          title: 'Proteínas',
-          value: '${_completedProtein.toStringAsFixed(1)} g',
-          theme: theme,
+        // Usar ValueListenableBuilder para reconstruir solo cuando cambia el valor
+        ValueListenableBuilder<double>(
+          valueListenable: completedProtein,
+          builder: (context, value, child) {
+            return _CaloryInfo(
+              title: 'Proteínas',
+              value: '${value.toStringAsFixed(1)} g',
+              theme: theme,
+            );
+          },
         ),
-        CalorieWheel(
-          consumedCalories: _completedCalories.toInt(),
-          dailyGoal: dietState.totalCalories.toInt(),
-          theme: theme,
+        // Usar ValueListenableBuilder para reconstruir solo cuando cambia el valor
+        ValueListenableBuilder<double>(
+          valueListenable: completedCalories,
+          builder: (context, value, child) {
+            return CalorieWheel(
+              consumedCalories: value.toInt(),
+              dailyGoal: totalCalories.toInt(),
+              theme: theme,
+            );
+          },
         ),
-        _CaloryInfo(
-          title: 'Carbohidratos',
-          value: '${_completedCarbs.toStringAsFixed(1)} g',
-          theme: theme,
+        // Usar ValueListenableBuilder para reconstruir solo cuando cambia el valor
+        ValueListenableBuilder<double>(
+          valueListenable: completedCarbs,
+          builder: (context, value, child) {
+            return _CaloryInfo(
+              title: 'Carbohidratos',
+              value: '${value.toStringAsFixed(1)} g',
+              theme: theme,
+            );
+          },
         ),
       ],
     );
   }
+}
 
-  Widget _buildMealsSection(
-      ThemeData theme, BuildContext context, DietStateProvider dietState) {
+// Nuevo widget para la sección de comidas
+class MealsSection extends StatelessWidget {
+  final ThemeData theme;
+  final BuildContext context;
+  final DietStateProvider dietState;
+  final Function(String, bool) onMealStatusChanged;
+
+  const MealsSection({
+    Key? key,
+    required this.theme,
+    required this.context,
+    required this.dietState,
+    required this.onMealStatusChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     if (dietState.todayMeals.isEmpty) {
       return Center(
         child: Text(
@@ -383,7 +490,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
         SizedBox(
           height: HomeScreen._cardHeight,
           width: double.infinity,
-          child: CardScroll(
+          child: OptimizedCardScroll(
             onCardTap: (index) {
               final meal = dietState.todayMeals[index];
               Navigator.push(
@@ -410,37 +517,208 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                       isSelected: dietState.userDiet?.completedMealIds
                               .contains(meal.id) ??
                           false,
+                      mealId: meal.id, // Añadir ID de comida para identificarla
                     ))
                 .toList(),
-            meals: dietState.todayMeals,
-            onMealStatusChanged: (mealId, completed) async {
-              final mealInList =
-                  dietState.todayMeals.firstWhere((meal) => meal.id == mealId);
-
-              if (completed) {
-                dietState.userDiet?.completedMealIds.add(mealInList.id);
-              } else {
-                dietState.userDiet?.completedMealIds.remove(mealInList.id);
-              }
-
-              setState(() {
-                _updateCompletedNutrients(dietState);
-              });
-
-              // Update UserDiet in Firestore
-              if (dietState.userDiet != null) {
-                await UserDiet.updateUserDiet(dietState.userDiet!);
-              }
-
-              // Save to historic meals for today
-              await dietState.saveHistoricMeals(
-                DateTime.now(),
-                dietState.userDiet?.completedMealIds ?? [],
-              );
-            },
+            onMealStatusChanged: onMealStatusChanged,
           ),
         ),
       ],
+    );
+  }
+}
+
+// Modificar MealCardData para incluir el ID de la comida
+class MealCardData extends CardData {
+  bool isSelected;
+  final IconData defaultIcon;
+  final String mealId; // Agregar el ID de la comida
+
+  MealCardData({
+    required super.title,
+    required super.description,
+    super.imageUrl,
+    this.isSelected = false,
+    this.defaultIcon = Icons.restaurant,
+    required this.mealId, // Requerir el ID de la comida
+  });
+}
+
+// CardScroll optimizado que utiliza ListView.builder con widgets individuales
+class OptimizedCardScroll extends StatelessWidget {
+  final List<MealCardData> cards;
+  final Function(int) onCardTap;
+  final Function(String, bool) onMealStatusChanged;
+
+  const OptimizedCardScroll({
+    Key? key,
+    required this.cards,
+    required this.onCardTap,
+    required this.onMealStatusChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: cards.length,
+      itemBuilder: (context, index) {
+        return MealCard(
+          card: cards[index],
+          index: index,
+          onTap: () => onCardTap(index),
+          onStatusChanged: onMealStatusChanged,
+        );
+      },
+    );
+  }
+}
+
+// Widget separado para cada tarjeta individual
+class MealCard extends StatefulWidget {
+  final MealCardData card;
+  final int index;
+  final VoidCallback onTap;
+  final Function(String, bool) onStatusChanged;
+
+  const MealCard({
+    Key? key,
+    required this.card,
+    required this.index,
+    required this.onTap,
+    required this.onStatusChanged,
+  }) : super(key: key);
+
+  @override
+  State<MealCard> createState() => _MealCardState();
+}
+
+class _MealCardState extends State<MealCard> {
+  late bool _isSelected;
+
+  @override
+  void initState() {
+    super.initState();
+    _isSelected = widget.card.isSelected;
+  }
+
+  @override
+  void didUpdateWidget(MealCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.card.isSelected != widget.card.isSelected) {
+      _isSelected = widget.card.isSelected;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor =
+        _isSelected ? Colors.white : theme.textTheme.bodyMedium?.color;
+
+    return RepaintBoundary(
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          width: 200,
+          margin: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: _isSelected ? Colors.green : theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
+                child: widget.card.imageUrl != null &&
+                        widget.card.imageUrl!.isNotEmpty
+                    ? Image.network(
+                        widget.card.imageUrl!,
+                        height: 120,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildIconContainer(
+                              widget.card.defaultIcon, theme);
+                        },
+                      )
+                    : _buildIconContainer(widget.card.defaultIcon, theme),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.card.title,
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(color: textColor),
+                    ),
+                    Text(
+                      widget.card.description ?? '',
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(color: textColor),
+                      maxLines: 1, // Limit to one line
+                      overflow: TextOverflow
+                          .ellipsis, // Add ellipsis (...) if the text overflows
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: MSHCheckbox(
+                      size: 30,
+                      value: _isSelected,
+                      colorConfig: MSHColorConfig.fromCheckedUncheckedDisabled(
+                        checkedColor: Colors.white,
+                        uncheckedColor: theme.colorScheme.onSurface,
+                      ),
+                      style: MSHCheckboxStyle.stroke,
+                      onChanged: (selected) {
+                        setState(() {
+                          _isSelected = selected;
+                        });
+                        // Actualizar el estado externo con el ID de la comida
+                        widget.onStatusChanged(widget.card.mealId, selected);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconContainer(IconData icon, ThemeData theme) {
+    return Container(
+      height: 120,
+      width: double.infinity,
+      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+      child: Icon(
+        icon,
+        size: 48,
+        color: theme.colorScheme.primary,
+      ),
     );
   }
 }
@@ -477,166 +755,6 @@ class _CaloryInfo extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       ],
-    );
-  }
-}
-
-// Clases existentes sin cambios
-class MealCardData extends CardData {
-  bool isSelected;
-  final IconData defaultIcon;
-
-  MealCardData({
-    required super.title,
-    required super.description,
-    super.imageUrl,
-    this.isSelected = false,
-    this.defaultIcon = Icons.restaurant,
-  });
-}
-
-class CardScroll extends StatefulWidget {
-  final List<MealCardData> cards;
-  final List<Meal> meals;
-  final Function(int) onCardTap;
-  final Function(String mealId, bool completed) onMealStatusChanged;
-
-  const CardScroll({
-    super.key,
-    required this.cards,
-    required this.meals,
-    required this.onCardTap,
-    required this.onMealStatusChanged,
-  });
-
-  @override
-  State<CardScroll> createState() => _CardScrollState();
-}
-
-class _CardScrollState extends State<CardScroll> {
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemCount: widget.cards.length,
-      itemBuilder: (context, index) {
-        final card = widget.cards[index];
-        final textColor =
-            card.isSelected ? Colors.white : theme.textTheme.bodyMedium?.color;
-
-        return GestureDetector(
-          onTap: () {
-            widget.onCardTap(index);
-          },
-          child: Container(
-            width: 200,
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              color: card.isSelected ? Colors.green : theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(12)),
-                  child: card.imageUrl != null && card.imageUrl!.isNotEmpty
-                      ? Image.network(
-                          card.imageUrl!,
-                          height: 120,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildIconContainer(card.defaultIcon, theme);
-                          },
-                        )
-                      : _buildIconContainer(card.defaultIcon, theme),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        card.title,
-                        style: theme.textTheme.titleMedium
-                            ?.copyWith(color: textColor),
-                      ),
-                      Text(
-                        card.description ?? '',
-                        style: theme.textTheme.bodyMedium
-                            ?.copyWith(color: textColor),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: MSHCheckbox(
-                        size: 30,
-                        value: card.isSelected,
-                        colorConfig:
-                            MSHColorConfig.fromCheckedUncheckedDisabled(
-                          checkedColor: Colors.white,
-                          uncheckedColor: theme.colorScheme.onSurface,
-                        ),
-                        style: MSHCheckboxStyle.stroke,
-                        onChanged: (selected) async {
-                          setState(() {
-                            card.isSelected = selected;
-                          });
-
-                          // Get the corresponding meal
-                          final mealInList = widget.meals[index];
-
-                          if (selected) {
-                            // Add to completed meals
-                            widget.onMealStatusChanged(mealInList.id, true);
-                          } else {
-                            // Remove from completed meals
-                            widget.onMealStatusChanged(mealInList.id, false);
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // Add this helper method in _CardScrollState
-  Widget _buildIconContainer(IconData icon, ThemeData theme) {
-    return Container(
-      height: 120,
-      width: double.infinity,
-      color: theme.colorScheme.primary.withValues(alpha: 0.1),
-      child: Icon(
-        icon,
-        size: 48,
-        color: theme.colorScheme.primary,
-      ),
     );
   }
 }
