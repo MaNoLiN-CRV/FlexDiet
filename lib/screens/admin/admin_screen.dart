@@ -201,6 +201,25 @@ class _AdminScreenState extends State<AdminScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
+                        builder: (context) => EditTemplatesScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: UIConstants.buttonPadding,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(UIConstants.borderRadius),
+                    ),
+                  ),
+                  child: Text('Editar Plantillas'),
+                ),
+                SizedBox(height: UIConstants.defaultSpacing),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
                         builder: (context) => LogScreen(),
                       ),
                     );
@@ -348,21 +367,6 @@ class _AdminScreenState extends State<AdminScreen> {
                     }
                   }
                 : null,
-            isDarkMode: isDarkMode,
-          ),
-          const SizedBox(height: UIConstants.defaultSpacing),
-          _buildActionButton(
-            context: context,
-            title: 'EDITAR PLANTILLAS',
-            onPressed: selectedClientId != null
-                ? () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditTemplatesScreen(),
-                      ),
-                    )
-                : null,
-            isSecondary: true,
             isDarkMode: isDarkMode,
           ),
         ],
