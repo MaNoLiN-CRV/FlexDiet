@@ -302,74 +302,75 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  // Use a new _buildActionButtons that receives selectedClientId as argument
   Widget _buildActionButtons(
       BuildContext context, bool isDarkMode, String? selectedClientId) {
     return Padding(
       padding: const EdgeInsets.only(top: UIConstants.defaultSpacing * 2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildActionButton(
-            context: context,
-            title: 'CREAR PLANTILLA',
-            onPressed: selectedClientId != null
-                ? () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CreateTemplateScreen(
-                          clientID: selectedClientId,
-                        ),
-                      ),
-                    )
-                : null,
-            isSecondary: true,
-            isDarkMode: isDarkMode,
-          ),
-          const SizedBox(height: UIConstants.defaultSpacing),
-          _buildActionButton(
-            context: context,
-            title: 'USAR PLANTILLA EXISTENTE',
-            onPressed: selectedClientId != null
-                ? () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UseTemplateScreen(
-                          clientId: selectedClientId,
-                        ),
-                      ),
-                    )
-                : null,
-            isDarkMode: isDarkMode,
-          ),
-          const SizedBox(height: UIConstants.defaultSpacing),
-          _buildActionButton(
-            context: context,
-            title: 'EDITAR CLIENTE',
-            onPressed: selectedClientId != null
-                ? () async {
-                    final localContext = context;
-                    if (localContext.mounted) {
-                      final result = await Navigator.push(
-                        localContext,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal, // <-- Set horizontal scroll
+        child: Row(
+          children: [
+            _buildActionButton(
+              context: context,
+              title: 'CREAR PLANTILLA',
+              onPressed: selectedClientId != null
+                  ? () => Navigator.push(
+                        context,
                         MaterialPageRoute(
-                          builder: (context) => EditPerson(
+                          builder: (context) => CreateTemplateScreen(
+                            clientID: selectedClientId,
+                          ),
+                        ),
+                      )
+                  : null,
+              isSecondary: true,
+              isDarkMode: isDarkMode,
+            ),
+            SizedBox(width: UIConstants.defaultSpacing),
+            _buildActionButton(
+              context: context,
+              title: 'USAR PLANTILLA EXISTENTE',
+              onPressed: selectedClientId != null
+                  ? () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UseTemplateScreen(
                             clientId: selectedClientId,
                           ),
                         ),
-                      );
+                      )
+                  : null,
+              isDarkMode: isDarkMode,
+            ),
+            SizedBox(width: UIConstants.defaultSpacing),
+            _buildActionButton(
+              context: context,
+              title: 'EDITAR CLIENTE',
+              onPressed: selectedClientId != null
+                  ? () async {
+                      final localContext = context;
+                      if (localContext.mounted) {
+                        final result = await Navigator.push(
+                          localContext,
+                          MaterialPageRoute(
+                            builder: (context) => EditPerson(
+                              clientId: selectedClientId,
+                            ),
+                          ),
+                        );
 
-                      if (localContext.mounted &&
-                          result != null &&
-                          result == true) {
-                        await _refreshClients();
+                        if (localContext.mounted &&
+                            result != null &&
+                            result == true) {
+                          await _refreshClients();
+                        }
                       }
                     }
-                  }
-                : null,
-            isDarkMode: isDarkMode,
-          ),
-        ],
+                  : null,
+              isDarkMode: isDarkMode,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -389,32 +390,35 @@ class _AdminScreenState extends State<AdminScreen> {
         ? (isDarkMode ? Colors.white : theme.colorScheme.onSecondary)
         : theme.colorScheme.onPrimary;
 
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: buttonColor,
-        foregroundColor: textColor,
-        padding: UIConstants.buttonPadding,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(UIConstants.borderRadius),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 4),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: buttonColor,
+          foregroundColor: textColor,
+          padding: UIConstants.buttonPadding,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(UIConstants.borderRadius),
+          ),
+          elevation: 2,
         ),
-        elevation: 2,
-      ),
-      child: Text(
-        title,
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: textColor,
+        child: Text(
+          title,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: textColor,
+          ),
         ),
-      ),
-    )
-        .animate(
-          onPlay: (controller) => controller.repeat(reverse: true),
-        )
-        .shimmer(
-          duration: 2000.ms,
-          color: theme.colorScheme.onPrimary.withValues(alpha: 0.1),
-        );
+      )
+          .animate(
+            onPlay: (controller) => controller.repeat(reverse: true),
+          )
+          .shimmer(
+            duration: 2000.ms,
+            color: theme.colorScheme.onPrimary.withValues(alpha: 0.1),
+          ),
+    );
   }
 
   Widget _buildWaveBackgrounds(ThemeData theme) {
@@ -447,26 +451,21 @@ class ClientListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.30,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: clients.length,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemBuilder: (context, index) {
-              final client = clients[index];
-              return ValueListenableBuilder<String?>(
-                valueListenable: selectedClientIdNotifier,
-                builder: (context, selectedClientId, child) {
-                  final isSelected = client.id == selectedClientId;
-                  return buildClientCard(client, isSelected, context,
-                      isDarkMode, onClientSelected);
-                },
-              );
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: clients.length,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        itemBuilder: (context, index) {
+          final client = clients[index];
+          return ValueListenableBuilder<String?>(
+            valueListenable: selectedClientIdNotifier,
+            builder: (context, selectedClientId, child) {
+              final isSelected = client.id == selectedClientId;
+              return buildClientCard(
+                  client, isSelected, context, isDarkMode, onClientSelected);
             },
-          ),
-        ),
+          );
+        },
       ),
     );
   }
