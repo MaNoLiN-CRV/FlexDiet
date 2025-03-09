@@ -306,70 +306,78 @@ class _AdminScreenState extends State<AdminScreen> {
       BuildContext context, bool isDarkMode, String? selectedClientId) {
     return Padding(
       padding: const EdgeInsets.only(top: UIConstants.defaultSpacing * 2),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal, // <-- Set horizontal scroll
-        child: Row(
-          children: [
-            _buildActionButton(
-              context: context,
-              title: 'CREAR PLANTILLA',
-              onPressed: selectedClientId != null
-                  ? () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CreateTemplateScreen(
-                            clientID: selectedClientId,
-                          ),
-                        ),
-                      )
-                  : null,
-              isSecondary: true,
-              isDarkMode: isDarkMode,
-            ),
-            SizedBox(width: UIConstants.defaultSpacing),
-            _buildActionButton(
-              context: context,
-              title: 'USAR PLANTILLA EXISTENTE',
-              onPressed: selectedClientId != null
-                  ? () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UseTemplateScreen(
-                            clientId: selectedClientId,
-                          ),
-                        ),
-                      )
-                  : null,
-              isDarkMode: isDarkMode,
-            ),
-            SizedBox(width: UIConstants.defaultSpacing),
-            _buildActionButton(
-              context: context,
-              title: 'EDITAR CLIENTE',
-              onPressed: selectedClientId != null
-                  ? () async {
-                      final localContext = context;
-                      if (localContext.mounted) {
-                        final result = await Navigator.push(
-                          localContext,
+      child: ScrollbarTheme(
+        data: ScrollbarThemeData( 
+          thickness: WidgetStateProperty.all(4.0),
+          thumbColor: WidgetStateProperty.all(
+              Theme.of(context).colorScheme.onSurface.withValues( alpha: 0.4)),
+          radius: const Radius.circular(8.0),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildActionButton(
+                context: context,
+                title: 'CREAR PLANTILLA',
+                onPressed: selectedClientId != null
+                    ? () => Navigator.push(
+                          context,
                           MaterialPageRoute(
-                            builder: (context) => EditPerson(
+                            builder: (context) => CreateTemplateScreen(
+                              clientID: selectedClientId,
+                            ),
+                          ),
+                        )
+                    : null,
+                isSecondary: true,
+                isDarkMode: isDarkMode,
+              ),
+              SizedBox(width: UIConstants.defaultSpacing),
+              _buildActionButton(
+                context: context,
+                title: 'USAR PLANTILLA EXISTENTE',
+                onPressed: selectedClientId != null
+                    ? () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UseTemplateScreen(
                               clientId: selectedClientId,
                             ),
                           ),
-                        );
+                        )
+                    : null,
+                isDarkMode: isDarkMode,
+              ),
+              SizedBox(width: UIConstants.defaultSpacing),
+              _buildActionButton(
+                context: context,
+                title: 'EDITAR CLIENTE',
+                onPressed: selectedClientId != null
+                    ? () async {
+                        final localContext = context;
+                        if (localContext.mounted) {
+                          final result = await Navigator.push(
+                            localContext,
+                            MaterialPageRoute(
+                              builder: (context) => EditPerson(
+                                clientId: selectedClientId,
+                              ),
+                            ),
+                          );
 
-                        if (localContext.mounted &&
-                            result != null &&
-                            result == true) {
-                          await _refreshClients();
+                          if (localContext.mounted &&
+                              result != null &&
+                              result == true) {
+                            await _refreshClients();
+                          }
                         }
                       }
-                    }
-                  : null,
-              isDarkMode: isDarkMode,
-            ),
-          ],
+                    : null,
+                isDarkMode: isDarkMode,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -403,11 +411,14 @@ class _AdminScreenState extends State<AdminScreen> {
           ),
           elevation: 2,
         ),
-        child: Text(
-          title,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: textColor,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            title,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
           ),
         ),
       )
