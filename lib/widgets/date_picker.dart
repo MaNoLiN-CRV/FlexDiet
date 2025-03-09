@@ -7,7 +7,8 @@ class DatePicker extends StatefulWidget {
       required this.initialDate,
       required this.firstDate,
       required this.lastDate,
-      required this.theme, required this.onDateChanged});
+      required this.theme,
+      required this.onDateChanged});
 
   final DateTime initialDate;
   final DateTime firstDate;
@@ -56,13 +57,10 @@ class _DatePickerState extends State<DatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      spacing: 20,
-      children: <Widget>[
-        OutlinedButton(
-            onPressed: _selectDate, child: const Text('Select Date')),
-      ],
-    );
+    return IconButton(
+        onPressed: _selectDate,
+        icon: const Icon(
+          Icons.calendar_today,
+          color: Colors.white));
   }
 }
