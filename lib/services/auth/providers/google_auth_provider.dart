@@ -3,7 +3,6 @@ import 'package:flutter_flexdiet/services/auth/providers/providers.dart'
     as provider;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class GoogleAuth implements provider.AuthProvider {
   final FirebaseAuth _auth;
@@ -57,7 +56,7 @@ class GoogleAuth implements provider.AuthProvider {
       await googleSignIn.signOut();
     } catch (e) {
       print('Error al cerrar sesión: $e');
-      throw e;
+      rethrow;
     }
   }
 }

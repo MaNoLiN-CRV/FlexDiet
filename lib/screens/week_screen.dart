@@ -23,6 +23,7 @@ class _WeekScreenState extends State<WeekScreen> {
   final _cacheService = CacheService();
 
   // Add date range limits
+  late final DateTime _actualDate;
   late final DateTime _minDate;
   late final DateTime _maxDate;
 
@@ -30,8 +31,9 @@ class _WeekScreenState extends State<WeekScreen> {
   void initState() {
     super.initState();
     // Set date range to today + 2 weeks
-    _minDate = DateTime.now();
-    _maxDate = _minDate.add(const Duration(days: 14));
+    _actualDate = DateTime.now();
+    _minDate = _actualDate.subtract(const Duration(days: 14));
+    _maxDate = _actualDate.add(const Duration(days: 14));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DietStateProvider>().initializeData().then((_) {
