@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flexdiet/models/client.dart';
 import 'package:flutter_flexdiet/models/ui_constants.dart';
 import 'package:flutter_flexdiet/navigation/navigation.dart';
+import 'package:flutter_flexdiet/screens/admin/edit_templates.dart';
 import 'package:flutter_flexdiet/screens/log_screen.dart';
 import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:flutter_flexdiet/widgets/widgets.dart';
@@ -347,6 +348,21 @@ class _AdminScreenState extends State<AdminScreen> {
                     }
                   }
                 : null,
+            isDarkMode: isDarkMode,
+          ),
+          const SizedBox(height: UIConstants.defaultSpacing),
+          _buildActionButton(
+            context: context,
+            title: 'EDITAR PLANTILLAS',
+            onPressed: selectedClientId != null
+                ? () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditTemplatesScreen(),
+                      ),
+                    )
+                : null,
+            isSecondary: true,
             isDarkMode: isDarkMode,
           ),
         ],

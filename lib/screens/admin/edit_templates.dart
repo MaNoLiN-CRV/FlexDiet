@@ -3,8 +3,7 @@ import 'package:flutter_flexdiet/models/template.dart';
 import 'package:flutter_flexdiet/widgets/custom_toast.dart';
 
 class EditTemplatesScreen extends StatefulWidget {
-  final List<Template> templates;
-  const EditTemplatesScreen({super.key, required this.templates});
+  const EditTemplatesScreen({super.key});
   @override
   _EditTemplatesScreenState createState() => _EditTemplatesScreenState();
 }
@@ -15,7 +14,23 @@ class _EditTemplatesScreenState extends State<EditTemplatesScreen> {
   @override
   void initState() {
     super.initState();
-    _templates = widget.templates;
+    _loadTemplates();
+  }
+
+  Future<void> _loadTemplates() async {
+    try {
+      final snapshot = await Template.collection.get();
+      if (mounted) {
+        setState(() {
+          _templates = snapshot.docs.map((doc) => doc.data()).toList();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showToast(context, 'Error al cargar las plantillas',
+            toastType: ToastType.error);
+      }
+    }
   }
 
   @override
