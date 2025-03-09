@@ -10,6 +10,8 @@ import 'package:flutter_flexdiet/screens/screens.dart';
 import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/widgets.dart';
+
 class WeekScreen extends StatefulWidget {
   const WeekScreen({super.key});
 
@@ -30,10 +32,10 @@ class _WeekScreenState extends State<WeekScreen> {
   @override
   void initState() {
     super.initState();
-    // Set date range to today + 2 weeks
+    // Set date range this year
     _actualDate = DateTime.now();
-    _minDate = _actualDate.subtract(const Duration(days: 14));
-    _maxDate = _actualDate.add(const Duration(days: 14));
+    _minDate = DateTime(_actualDate.year, 1, 1);;
+    _maxDate = DateTime(_actualDate.year, 12, 31);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DietStateProvider>().initializeData().then((_) {
@@ -139,6 +141,19 @@ class _WeekScreenState extends State<WeekScreen> {
           appBar: AppBar(
             title: const Text('Calendario de Comidas'),
             backgroundColor: theme.colorScheme.primary,
+            actions: [
+              DatePicker(
+                initialDate: _selectedDate,
+                firstDate: _minDate,
+                lastDate: _maxDate,
+                theme: theme,
+                onDateChanged: (DateTime newDate) {
+                  setState(() {
+                    _selectedDate = newDate;  
+                  });
+                }
+              )
+            ],
           ),
           bottomNavigationBar: BottomNav(
             selectedIndex: 0,

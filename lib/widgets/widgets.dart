@@ -18,3 +18,4 @@ export 'package:flutter_flexdiet/widgets/weight_chart.dart';
 export 'package:flutter_flexdiet/widgets/auth/login_form.dart';
 export 'package:flutter_flexdiet/widgets/auth/social_buttons.dart';
 export 'package:flutter_flexdiet/widgets/auth/action_buttons.dart';
+export 'package:flutter_flexdiet/widgets/date_picker.dart';
