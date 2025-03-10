@@ -395,13 +395,13 @@ class NutritionCard extends StatelessWidget {
   final double totalCalories;
 
   const NutritionCard({
-    Key? key,
+    super.key,
     required this.theme,
     required this.completedCalories,
     required this.completedProtein,
     required this.completedCarbs,
     required this.totalCalories,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -464,12 +464,12 @@ class MealsSection extends StatelessWidget {
   final Function(String, bool) onMealStatusChanged;
 
   const MealsSection({
-    Key? key,
+    super.key,
     required this.theme,
     required this.context,
     required this.dietState,
     required this.onMealStatusChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -551,11 +551,11 @@ class OptimizedCardScroll extends StatelessWidget {
   final Function(String, bool) onMealStatusChanged;
 
   const OptimizedCardScroll({
-    Key? key,
+    super.key,
     required this.cards,
     required this.onCardTap,
     required this.onMealStatusChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -582,12 +582,12 @@ class MealCard extends StatefulWidget {
   final Function(String, bool) onStatusChanged;
 
   const MealCard({
-    Key? key,
+    super.key,
     required this.card,
     required this.index,
     required this.onTap,
     required this.onStatusChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<MealCard> createState() => _MealCardState();

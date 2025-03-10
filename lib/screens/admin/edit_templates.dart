@@ -133,7 +133,7 @@ class _EditTemplatesScreenState extends State<EditTemplatesScreen> {
 class _EditTemplateScreen extends StatefulWidget {
   final Template template;
 
-  _EditTemplateScreen(this.template);
+  const _EditTemplateScreen(this.template);
 
   @override
   _EditTemplateScreenState createState() => _EditTemplateScreenState();

@@ -34,7 +34,7 @@ class _WeekScreenState extends State<WeekScreen> {
     super.initState();
     // Set date range this year
     _actualDate = DateTime.now();
-    _minDate = DateTime(_actualDate.year, 1, 1);;
+    _minDate = DateTime(_actualDate.year, 1, 1);
     _maxDate = DateTime(_actualDate.year, 12, 31);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -11,7 +11,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:async';
 
 class AdminScreen extends StatefulWidget {
-  const AdminScreen({Key? key}) : super(key: key);
+  const AdminScreen({super.key});
 
   @override
   _AdminScreenState createState() => _AdminScreenState();
@@ -452,12 +452,12 @@ class ClientListView extends StatelessWidget {
   final bool isDarkMode;
 
   const ClientListView({
-    Key? key,
+    super.key,
     required this.clients,
     required this.selectedClientIdNotifier,
     required this.onClientSelected,
     required this.isDarkMode,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
